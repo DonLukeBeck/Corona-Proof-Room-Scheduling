@@ -4,6 +4,7 @@ stages:
   - build
   - staticAnalysis
   - test
+  - visualize
 
 build:
   stage: build
@@ -23,4 +24,36 @@ PMD:
 test:
   stage: test
   script:
-    gradle test
+    - gradle test
+    - gradle jacocoTestReport
+    # instruction coverage (may replace later with branch coverage)
+    # this is easier than trying to get the coverage from the html/xml
+    - awk -F "," 'NF>1
+        {
+          totalLines += $4 + $5; coveredLines += $5
+        }
+        END {
+          print "(" 100*coveredLines/totalLines "%) covered"
+        }' build/reports/jacoco/test/jacocoTestReport.csv
+  coverage: /\(\d+.\d+\%\) covered/
+  artifacts:
+    paths:
+      - build/reports/jacoco/test/jacocoTestReport.xml
+    expire_in: 1 week
+
+# with kind help from the docs: https://docs.gitlab.com/ee/user/project/merge_requests/test_coverage_visualization.html
+coverage:
+  stage: visualize
+  image: haynes/jacoco2cobertura:1.0.3
+  script:
+    # convert report from jacoco to cobertura
+    - 'python /opt/cover2cover.py build/reports/jacoco/test/jacocoTestReport.xml src/main/java > build/cobertura.xml'
+    # read the <source></source> tag and prepend the path to every filename attribute
+    - 'python /opt/source2filename.py build/cobertura.xml'
+  needs: ["test"]
+  dependencies:
+    - test
+  artifacts:
+    reports:
+      cobertura: build/cobertura.xml
+
