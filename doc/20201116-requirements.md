@@ -6,10 +6,10 @@
 - The user shall be able to log in using NetID and password (encrypted)
 - The user shall be able to log in as either a student or a teacher
 - A teacher shall be associated with the courses they teach
-- Each lecture shall be scheduled in a particular lecture room and for a particular time slot with a teacher to teach it
+- A teacher shall be able to request a lecture for course x of duration y in hours to be scheduled on day z
+- Each of the requested lectures shall be scheduled in a particular lecture room and for a particular time slot with a teacher to teach it
 - Once a time slot has been taken, overlapping lectures shall be scheduled in another lecture room
 - For each lecture, a subset of the students should be selected to attend it live on campus, such that each student is selected for at least one lecture every 2 weeks
-- Course information -> num lectures, frequency etc?!
 - A teacher shall be able to see their own schedule for the upcoming days, that is, for each upcoming lecture, the timeslot and allocated room should be displayed
 - A student shall be able to see their own schedule for the upcoming days, that is, 
   for each upcoming lecture, the timeslot and allocated room should be displayed, next to an indication of whether the student is selected to attend the lecture in person or not
@@ -24,12 +24,12 @@
 
 #### Could have
 - A teacher shall be able to indicate to the system that the physical class is cancelled due to symptoms of the coronavirus, so that the system can notify the selected students and reschedule if needed
+- A teacher shall be able to change the interval in which lectures can be scheduled every day
 
 #### Won’t have
 - A teacher shall be able to re-allocate the slots of students that indicated that they won’t be attending the online session they’re selected for
 - A student shall be able to indicate a preferred lecture to attend physically
 - A student shall be able to indicate that they are in quarantine as to not be scheduled for in person classes
-
 
 ### Non-Functional 
 - The system shall be runnable on Windows, Linux, and MAC
