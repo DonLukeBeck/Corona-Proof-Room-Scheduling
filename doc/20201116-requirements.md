@@ -55,12 +55,12 @@
 - As a student, I should get the opportunity to attend physical lectures once every 2 weeks to maintain a connection with campus life
 - As a student, if I am assigned to a physical lecture, I should be able to specify if I will attend the lecture, in order to minimize the spread of the coronavirus
 
-| Permissions                                  | Teacher  | student  |
+| Permissions                                  | Teacher  | Student  |
 | -------------------------------------------- |:--------:| --------:|
 | Log-in                                       | ✔        | ✔        |
 | Create courses                               | ✔        |          |
 | Create lecture requests                      | ✔        |          |
 | Assign students to courses                   | ✔        |          |
 | See schedule                                 | ✔        | ✔        |
-| Refrain from attending the lecture in person | (✔)      |    ✔     |
+| Refrain from attending the lecture in person | (✔)      | ✔     |
 
