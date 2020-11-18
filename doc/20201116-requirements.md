@@ -62,5 +62,5 @@
 | Create lecture requests                      | ✔        |          |
 | Assign students to courses                   | ✔        |          |
 | See schedule                                 | ✔        | ✔        |
-| Refrain from attending the lecture in person | (✔)      | ✔     |
+| Refrain from attending the lecture in person | (✔)      | ✔        |
 
