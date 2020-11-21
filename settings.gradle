@@ -1,1 +1,8 @@
 rootProject.name = 'template'
+
+include 'identity', 'course-management'
+
+for (project in rootProject.children) {
+    project.projectDir = file("subprojects/${project.name}")
+}
+
