@@ -5,7 +5,7 @@
 #### Must have
 - A user, which has a name and is either a student or a teacher, shall be able to log in using NetID and password
 - A teacher shall be able to request a lecture for course x of duration y in minutes to be scheduled on day z
-- A lecture schedule shall be created once every two weeks on saturday. All lecture scheduling requests must be received before then
+- A lecture schedule shall be created once every quarter on the friday before the quarter starts. All lecture scheduling requests must be received before then
 - Each of the requested lectures shall be scheduled in a particular lecture room and for a particular time slot with a teacher to teach it
 - When the schedule is being made, rooms with the highest capacity shall be assigned to the courses with the most attending students, and smaller rooms to smaller lectures
 - A teacher shall be able to retrieve their own schedule once the lectures have been scheduled, that is, for each upcoming lecture, the timeslot and allocated room should be given
