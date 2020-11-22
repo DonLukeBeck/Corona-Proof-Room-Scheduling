@@ -8,7 +8,7 @@ public class Example {
     }
 
     public String getName() {
-        return this.name;
+        return "nice";
     }
 
     public void setName(String name) {

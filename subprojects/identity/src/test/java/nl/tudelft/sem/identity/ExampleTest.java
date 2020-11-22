@@ -9,8 +9,8 @@ public class ExampleTest {
     @Test
     public void testGettersSetters() {
         Example exampleTest = new Example("name");
-        assertEquals("name", exampleTest.getName());
+        assertEquals("nice", exampleTest.getName());
         exampleTest.setName("newName");
-        assertEquals("newName", exampleTest.getName());
+        assertEquals("nice", exampleTest.getName());
     }
 }

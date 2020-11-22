@@ -15,6 +15,7 @@ plugins {
 	id 'java'
 	// Test coverage
 	id 'jacoco'
+	id 'org.barfuin.gradle.jacocolog'
 
 	// Code style
 	id 'checkstyle'
@@ -26,7 +27,7 @@ plugins {
 	id 'info.solidsoft.pitest'
 }
 
-group = 'nl.tudelft.cse.sem.template'
+group = 'nl.tudelft.cse.sem.calendar'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = 14
 targetCompatibility = 14
@@ -49,7 +50,7 @@ test {
 	useJUnitPlatform()
 	jacoco {
 		enabled = true
-		includes = ['nl.tudelft.sem.template.*']
+		includes = ['nl.tudelft.sem.calendar.*']
 		excludes = []
 	}
 }
@@ -64,7 +65,7 @@ jacocoTestCoverageVerification() {
 		rule {
 			enabled = true
 			element = 'CLASS'
-			includes = ['nl.tudelft.sem.template.*']
+			includes = ['nl.tudelft.sem.calendar.*']
 
 			limit {
 				counter = 'BRANCH'
@@ -98,7 +99,7 @@ pitest {
 	//adds dependency to org.pitest:pitest-junit5-plugin and sets "testPlugin" to "junit5"
 	junit5PluginVersion = '0.12'
 
-	targetClasses = ['nl.tudelft.sem.template.*']  //by default "${project.group}.*"
+	targetClasses = ['nl.tudelft.sem.calendar.*']  //by default "${project.group}.*"
 	pitestVersion = '1.5.1' //not needed when a default PIT version should be used
 	threads = 4
 	outputFormats = ['XML', 'HTML']

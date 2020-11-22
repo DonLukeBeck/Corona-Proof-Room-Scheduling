@@ -35,6 +35,10 @@ test:
     - gradle jacocoTestReport
     # instruction coverage (may replace later with branch coverage)
     # this is easier than trying to get the coverage from the html/xml
+    - for f in subprojects/*; do 
+          tail -n+2 "$f"/build/reports/jacoco/test/jacocoTestReport.csv
+              >> build/reports/jacoco/test/jacocoTestReport.csv;
+        done
     - awk -F "," 'NF>1
         {
           totalLines += $4 + $5; coveredLines += $5
