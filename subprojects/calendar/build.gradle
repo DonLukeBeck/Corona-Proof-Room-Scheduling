@@ -10,12 +10,12 @@ buildscript {
 }
 
 plugins {
-	id 'org.springframework.boot' version '2.3.5.RELEASE'
-	id 'io.spring.dependency-management' version '1.0.10.RELEASE'
+	id 'org.springframework.boot'
+	id 'io.spring.dependency-management'
 	id 'java'
 	// Test coverage
 	id 'jacoco'
-	id 'org.barfuin.gradle.jacocolog' version '1.2.3'
+	id 'org.barfuin.gradle.jacocolog'
 
 	// Code style
 	id 'checkstyle'
@@ -24,10 +24,10 @@ plugins {
 	id 'pmd'
 
 	// PITest
-	id 'info.solidsoft.pitest' version '1.5.2'
+	id 'info.solidsoft.pitest'
 }
 
-group = 'nl.tudelft.cse.sem.template'
+group = 'nl.tudelft.cse.sem.calendar'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = 14
 targetCompatibility = 14
@@ -50,7 +50,7 @@ test {
 	useJUnitPlatform()
 	jacoco {
 		enabled = true
-		includes = ['nl.tudelft.sem.template.*']
+		includes = ['nl.tudelft.sem.calendar.*']
 		excludes = []
 	}
 }
@@ -65,7 +65,7 @@ jacocoTestCoverageVerification() {
 		rule {
 			enabled = true
 			element = 'CLASS'
-			includes = ['nl.tudelft.sem.template.*']
+			includes = ['nl.tudelft.sem.calendar.*']
 
 			limit {
 				counter = 'BRANCH'
@@ -99,7 +99,7 @@ pitest {
 	//adds dependency to org.pitest:pitest-junit5-plugin and sets "testPlugin" to "junit5"
 	junit5PluginVersion = '0.12'
 
-	targetClasses = ['nl.tudelft.sem.template.*']  //by default "${project.group}.*"
+	targetClasses = ['nl.tudelft.sem.calendar.*']  //by default "${project.group}.*"
 	pitestVersion = '1.5.1' //not needed when a default PIT version should be used
 	threads = 4
 	outputFormats = ['XML', 'HTML']

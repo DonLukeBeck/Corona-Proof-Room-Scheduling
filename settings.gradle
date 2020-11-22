@@ -1,1 +1,8 @@
 rootProject.name = 'template'
+
+include 'calendar', 'course-management', 'identity', 'lecture-scheduling', 'restrictions-management', 'room-management'
+
+for (project in rootProject.children) {
+    project.projectDir = file("subprojects/${project.name}")
+}
+
