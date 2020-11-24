@@ -6,9 +6,13 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+
 public class UserTest {
     private User user;
 
+    /**
+     * Method to setup all the paramaters before each test.
+     */
     @BeforeEach
     public void setup() {
         user = new User();
