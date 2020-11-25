@@ -1,38 +1,41 @@
 package nl.tudelft.sem.lecture_scheduling.controllers;
 import nl.tudelft.sem.lecture_scheduling.communication.RestrictionManagementCommunicator;
-import nl.tudelft.sem.lecture_scheduling.entities.Lecture;
+import nl.tudelft.sem.lecture_scheduling.communication.CalendarCommunicator;
+import nl.tudelft.sem.lecture_scheduling.entities.OnCampusCandidate;
+import nl.tudelft.sem.lecture_scheduling.entities.RequestedLecture;
 import nl.tudelft.sem.lecture_scheduling.entities.Room;
+import nl.tudelft.sem.lecture_scheduling.entities.ScheduledLecture;
+
+import java.time.LocalTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 //import nl.tudelft.sem.lecture_scheduling.repositories;
 //@EnableJpaRepositories("nl.tudelft.sem.lecture_scheduling.repositories")
-import org.springframework.stereotype.Controller;
 import java.util.*;
+
+import static java.util.stream.Collectors.groupingBy;
 
 
 //@RestController
-public class SchedulingController{
+public class SchedulingController {
 
     //@PostMapping("schedule-lectures")
-    public String  schedulePlannedLectures(List<Lecture> lecturesToSchedule){
+    public String  schedulePlannedLectures(List<RequestedLecture> lecturesToSchedule) {
 
-        Map<String,Integer> allParticipants = new HashMap<>(); // Global hash map to keep track of participation in any lecture within 2 weeks
-
+        LocalTime startTime = RestrictionManagementCommunicator.getStartTime(); // Make API call to retrieve the start time
+        LocalTime endTime = RestrictionManagementCommunicator.getEndTime(); // Make API call to retrieve the end time
         int timeGapLength = RestrictionManagementCommunicator.getTimeGapLength(); // Make API call to retrieve time gap length
         List<Room> rooms = RestrictionManagementCommunicator.getAllRoomsWithAdjustedCapacity(); // Make API call to retrieve rooms with restricted capacity
 
-        lecturesToSchedule.sort(Comparator.comparing(Lecture::getDate)
-                .thenComparing((Lecture l) -> l.getCourse().getParticipants().size()));
+        LectureScheduler scheduler = new LectureScheduler(rooms, lecturesToSchedule, startTime, endTime, timeGapLength, 0.75);
+        List<ScheduledLecture> scheduledLectures = scheduler.scheduledAllLectures();
 
-        if(rooms == null) throw new NullPointerException("No rooms available");
-        else rooms.sort(Comparator.comparing(Room::getCapacity));
-
-        for(Lecture lecture: lecturesToSchedule) {
-            List<String> courseParticipants = lecture.getCourse().getParticipants();
-            for(String student: courseParticipants) {
-                allParticipants.put(student, 0); // If already in there it shouldn't replace it.
-            }
+        if(CalendarCommunicator.sendSchedulerLecturesToCalendar(scheduledLectures)){
+            //success;
+        }
+        else{
+            //something went wrong with passing the lectures to the calendar.
         }
         return null;
     }

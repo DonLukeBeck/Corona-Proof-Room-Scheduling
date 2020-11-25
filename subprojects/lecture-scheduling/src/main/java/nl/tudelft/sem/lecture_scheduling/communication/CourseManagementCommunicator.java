@@ -1,10 +1,10 @@
 package nl.tudelft.sem.lecture_scheduling.communication;
-import nl.tudelft.sem.lecture_scheduling.entities.Lecture;
+import nl.tudelft.sem.lecture_scheduling.entities.RequestedLecture;
 
 import java.util.List;
 
 public class CourseManagementCommunicator {
-    public static List<Lecture> getToBeScheduledLectures(){
+    public static List<RequestedLecture> getToBeScheduledLectures(){
         return null;
     }
 }
