@@ -1,5 +1,5 @@
-package nl.tudelft.sem.lecture_scheduling.communication;
-import nl.tudelft.sem.lecture_scheduling.entities.RequestedLecture;
+package nl.tudelft.sem.calendar.communication;
+import nl.tudelft.sem.calendar.entities.RequestedLecture;
 
 import java.util.List;
 

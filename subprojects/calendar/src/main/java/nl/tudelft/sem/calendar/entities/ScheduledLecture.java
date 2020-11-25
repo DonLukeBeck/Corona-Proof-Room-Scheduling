@@ -1,4 +1,4 @@
-package nl.tudelft.sem.lecture_scheduling.entities;
+package nl.tudelft.sem.calendar.entities;
 
 import java.time.LocalTime;
 import java.util.Date;

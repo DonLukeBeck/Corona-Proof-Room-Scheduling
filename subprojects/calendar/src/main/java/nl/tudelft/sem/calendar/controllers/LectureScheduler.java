@@ -1,11 +1,10 @@
-package nl.tudelft.sem.lecture_scheduling.controllers;
+package nl.tudelft.sem.calendar.controllers;
 
-import nl.tudelft.sem.lecture_scheduling.entities.OnCampusCandidate;
-import nl.tudelft.sem.lecture_scheduling.entities.RequestedLecture;
-import nl.tudelft.sem.lecture_scheduling.entities.Room;
-import nl.tudelft.sem.lecture_scheduling.entities.ScheduledLecture;
+import nl.tudelft.sem.calendar.entities.OnCampusCandidate;
+import nl.tudelft.sem.calendar.entities.RequestedLecture;
+import nl.tudelft.sem.calendar.entities.Room;
+import nl.tudelft.sem.calendar.entities.ScheduledLecture;
 
-import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.*;
 

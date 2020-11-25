@@ -1,9 +1,8 @@
-package nl.tudelft.sem.lecture_scheduling.communication;
-import nl.tudelft.sem.lecture_scheduling.entities.Room;
+package nl.tudelft.sem.calendar.communication;
+import nl.tudelft.sem.calendar.entities.Room;
 
 import java.time.LocalTime;
 import java.util.List;
-import java.util.Optional;
 
 public class RestrictionManagementCommunicator {
     public static List<Room> getAllRoomsWithAdjustedCapacity(){ return null; }

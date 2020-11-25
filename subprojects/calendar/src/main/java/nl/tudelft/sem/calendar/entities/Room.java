@@ -1,4 +1,4 @@
-package nl.tudelft.sem.lecture_scheduling.entities;
+package nl.tudelft.sem.calendar.entities;
 public class Room {
     private int roomId;
     private int capacity;
