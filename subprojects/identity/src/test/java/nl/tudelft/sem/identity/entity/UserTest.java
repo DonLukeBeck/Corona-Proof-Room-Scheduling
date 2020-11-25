@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 
 
 public class UserTest {
-    private User user;
+    private static User user;
 
     /**
      * Method to setup all the paramaters before each test.
