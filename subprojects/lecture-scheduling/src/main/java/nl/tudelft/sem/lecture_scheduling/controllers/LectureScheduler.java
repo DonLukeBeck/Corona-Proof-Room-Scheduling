@@ -5,6 +5,7 @@ import nl.tudelft.sem.lecture_scheduling.entities.RequestedLecture;
 import nl.tudelft.sem.lecture_scheduling.entities.Room;
 import nl.tudelft.sem.lecture_scheduling.entities.ScheduledLecture;
 
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.*;
 
@@ -13,6 +14,7 @@ import static java.util.stream.Collectors.groupingBy;
 public class LectureScheduler {
 
     private List<Room> roomList;
+    LocalTime[] roomAvailability = new LocalTime[roomList.size()];
     private List<RequestedLecture> lecturesToSchedule;
     private LocalTime startTime;
     private LocalTime endTime;
@@ -31,24 +33,52 @@ public class LectureScheduler {
         this.percentageOfCourseParticipantsToAimFor = percentageOfCourseParticipantsToAimFor;
     }
 
+    public boolean scheduleInRoom(int roomSearchIndex, Date lectureDate, int numberOfStudents, int durationInMinutes) {
+        boolean scheduled = false;
+        while(roomSearchIndex < roomList.size() && !scheduled) {
+            if(roomList.get(roomSearchIndex).getCapacity() >= numberOfStudents * percentageOfCourseParticipantsToAimFor){
+                if(roomAvailability[roomSearchIndex].plusMinutes(durationInMinutes).isBefore(endTime) || roomAvailability[roomSearchIndex].plusMinutes(durationInMinutes).equals(endTime)) {
+                    roomAvailability[roomSearchIndex] = roomAvailability[roomSearchIndex].plusMinutes(durationInMinutes + timeGapLengthInMinutes);
+                    scheduled = true;
+                } else roomSearchIndex++;
+            }
+            else roomSearchIndex++;
+        }
+        if(scheduled)
+            return true;
+        if(percentageOfCourseParticipantsToAimFor == 0.5)
+            return false;
+        else
+           return scheduleInRoom(roomSearchIndex, lectureDate, numberOfStudents, durationInMinutes);
+    }
+
     public List<ScheduledLecture> scheduledAllLectures() {
         List<ScheduledLecture> scheduledLectures = new ArrayList<>();
-        // Algorithm variables
-        Map<String, Integer> allParticipants = new HashMap<>(); // Global hash map to keep track of participation in any lecture within 2 weeks
-        double assumedCapacity = 0.75; // the percentage of the number of course participants should fit in a room to consider
 
-        Map<Date, List<RequestedLecture>> lecturesByDay = lecturesToSchedule.stream().collect(groupingBy(RequestedLecture::getDate));
-        if (roomList == null) throw new NullPointerException("No roomList available");
-        else roomList.sort(Comparator.comparing(Room::getCapacity));
+        // Map with to be scheduled lectures grouped by date
+        Map<Date, List<RequestedLecture>> lecturesByDay =
+                lecturesToSchedule.stream().collect(groupingBy(RequestedLecture::getDate));
+
+        // Hash map to keep track of participation in any lecture within 2 week
+        Map<String, Integer> allParticipants = new HashMap<>();
+
+        // Key set from the map
+        List<Date> dates = (List) lecturesByDay.keySet();
+        Collections.sort(dates);
+        Date startDate = dates.get(0);
 
         int roomIndex = 0;
-        for (Map.Entry<Date, List<RequestedLecture>> schedulingDay : lecturesByDay.entrySet()) {
-            schedulingDay.getValue().sort(Comparator.comparing(lecture -> lecture.getCourse().getParticipants().size()));
+        for (Date date: dates) {
 
-            LocalTime[] roomAvailability = new LocalTime[roomList.size()];
+            // The list of lectures to schedule for this date, sorted by course size.
+            List<RequestedLecture> toScheduleThisDay = lecturesByDay.get(date);
+            toScheduleThisDay.sort(Comparator.comparing(lecture -> lecture.getCourse()
+                    .getParticipants().size()));
+
+            // Reset room availability
             Arrays.fill(roomAvailability, startTime);
 
-            for (RequestedLecture toBeScheduled : schedulingDay.getValue()) {
+            for (RequestedLecture toBeScheduled : toScheduleThisDay) {
                 List<String> courseParticipants = toBeScheduled.getCourse().getParticipants();
                 PriorityQueue<OnCampusCandidate> candidates = new PriorityQueue<>(courseParticipants.size(),
                         Comparator.comparing(OnCampusCandidate::getNumParticipations));
@@ -61,16 +91,8 @@ public class LectureScheduler {
                         candidates.add(new OnCampusCandidate(student, 0));
                     }
                 }
-                while (roomIndex < roomList.size()) {
-                    Room candidateRoom = roomList.get(roomIndex);
-                    if (roomAvailability[roomIndex].plusMinutes(toBeScheduled.getDurationInMinutes()).isBefore(endTime)) {
-                        // schedule lecture in this room
-                        roomAvailability[roomIndex] = roomAvailability[roomIndex].plusMinutes(toBeScheduled.getDurationInMinutes() + timeGapLengthInMinutes);
-                        break;
-                    } else {
-                        roomIndex++;
-                    }
-                }
+                percentageOfCourseParticipantsToAimFor = 1;
+                scheduleInRoom(roomIndex, toBeScheduled.getDate(), courseParticipants.size(), toBeScheduled.getDurationInMinutes());
             }
         }
         return null;

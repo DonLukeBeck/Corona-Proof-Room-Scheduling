@@ -28,7 +28,7 @@ public class SchedulingController {
         int timeGapLength = RestrictionManagementCommunicator.getTimeGapLength(); // Make API call to retrieve time gap length
         List<Room> rooms = RestrictionManagementCommunicator.getAllRoomsWithAdjustedCapacity(); // Make API call to retrieve rooms with restricted capacity
 
-        LectureScheduler scheduler = new LectureScheduler(rooms, lecturesToSchedule, startTime, endTime, timeGapLength, 0.75);
+        LectureScheduler scheduler = new LectureScheduler(rooms, lecturesToSchedule, startTime, endTime, timeGapLength, 0.50);
         List<ScheduledLecture> scheduledLectures = scheduler.scheduledAllLectures();
 
         if(CalendarCommunicator.sendSchedulerLecturesToCalendar(scheduledLectures)){
