@@ -1,19 +1,19 @@
 package nl.tudelft.sem.restriction;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController // This means that this class is a RestController
-@RequestMapping(path = "/restrictions") // This means URL's start with /restrictions (after Application path)
+@RequestMapping(path = "/restrictions") // URL's start with /restrictions (after Application path)
 public class RestrictionController {
 
     @Autowired
-    private RestrictionRepository restrictionRepository;
+    private transient RestrictionRepository restrictionRepository;
 
     /**
      * Instantiates repository needed.
@@ -30,18 +30,17 @@ public class RestrictionController {
             if (r.getName().equals(name)) {
                 if (r.getValue() == value) {
                     return "Already Exists";
-                }
-                else {
+                } else {
                     r.setValue(value);
                     restrictionRepository.save(r);
                     return "Updated";
                 }
             }
         }
-        Restriction rNew = new Restriction();
-        rNew.setName(name);
-        rNew.setValue(value);
-        restrictionRepository.save(rNew);
+        Restriction rn = new Restriction();
+        rn.setName(name);
+        rn.setValue(value);
+        restrictionRepository.save(rn);
         return "Saved";
     }
 
@@ -58,17 +57,18 @@ public class RestrictionController {
     }
 
     /**
-     * This function sets the capacity restriction for big and small rooms
+     * This function sets the capacity restriction for big and small rooms.
+     *
      * @param bigOrSmallRoom boolean representing if the parameter is for big (1) or small (0) rooms
      * @param maxPercentageAllowed max percentage allowed to be used in a room
-     * @return
+     * @return a string containing the success or error message
      */
     @PostMapping(path = "/setCapacityRestriction") // Map ONLY POST Requests
-    public String setCapacityRestriction(@RequestParam boolean bigOrSmallRoom, @RequestParam float maxPercentageAllowed) {
+    public String setCapacityRestriction(@RequestParam boolean bigOrSmallRoom,
+                                         @RequestParam float maxPercentageAllowed) {
         if (bigOrSmallRoom) {
             return addNewRestriction("bigRoomMaxPercentage", maxPercentageAllowed);
-        }
-        else {
+        } else {
             return addNewRestriction("smallRoomMaxPercentage", maxPercentageAllowed);
         }
     }
@@ -87,14 +87,14 @@ public class RestrictionController {
         return -10000;
     }
 
-//    List<Room> getAllRoomsWithAdjustedCapacity()
-//    setMinSeatsBig(int numberOfSeats)
-//    setTimeGapLength(int gapTimeInMinutes)
-//    int getTimeGapLength()
-//    setStartTime(LocalTime startTime)
-//    setEndTime(LocalTime endTime)
-//    int getStartTime()
-//    int getEndTime()
+    //    List<Room> getAllRoomsWithAdjustedCapacity()
+    //    setMinSeatsBig(int numberOfSeats)
+    //    setTimeGapLength(int gapTimeInMinutes)
+    //    int getTimeGapLength()
+    //    setStartTime(LocalTime startTime)
+    //    setEndTime(LocalTime endTime)
+    //    int getStartTime()
+    //    int getEndTime()
 
 
 }

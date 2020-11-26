@@ -22,7 +22,8 @@ public class Restriction {
     private float value;
 
     /**
-     * Returns the name variable
+     * Returns the name variable.
+     *
      * @return name of the restriction
      */
     public String getName() {
@@ -30,7 +31,8 @@ public class Restriction {
     }
 
     /**
-     * Sets the name variable
+     * Sets the name variable.
+     *
      * @param name of the restriction entity
      */
     public void setName(String name) {
@@ -38,7 +40,8 @@ public class Restriction {
     }
 
     /**
-     * Returns the value variable
+     * Returns the value variable.
+     *
      * @return value of the restriction
      */
     public float getValue() {
@@ -46,7 +49,8 @@ public class Restriction {
     }
 
     /**
-     * Sets the value variable
+     * Sets the value variable.
+     *
      * @param value of the restriction entity
      */
     public void setValue(float value) {
