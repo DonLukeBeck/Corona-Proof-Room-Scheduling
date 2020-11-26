@@ -36,12 +36,9 @@ public class LectureScheduler {
         List<ScheduledLecture> scheduledLectures = new ArrayList<>();
         Map<String, Integer> allParticipants = new HashMap<>();
         Map<Date, List<RequestedLecture>> lecturesByDay = groupLecturesByDay();
-
-        // Key set from the map
         List<Date> dates = (List) lecturesByDay.keySet();
-        Collections.sort(dates);
 
-        // Sort the rooms by capacity
+        Collections.sort(dates);
         sortRoomsByCapacity();
 
         Date startDate = dates.get(0);
@@ -67,7 +64,7 @@ public class LectureScheduler {
         return scheduledLectures;
     }
 
-    public List<String> assignStudents(ScheduledLecture scheduledLecture, Map<String, Integer> allParticipants) {
+    public void assignStudents(ScheduledLecture scheduledLecture, Map<String, Integer> allParticipants) {
 
         List<String> assignedStudents = new ArrayList<>();
         PriorityQueue<OnCampusCandidate> candidateSelector = createCandidateSelector(scheduledLecture.getCourse().getParticipants(),allParticipants);
@@ -76,7 +73,7 @@ public class LectureScheduler {
         while(!candidateSelector.isEmpty() && scheduledLecture.getRoom().getCapacity() < studentCounter) {
             assignedStudents.add(candidateSelector.remove().getNetId());
         }
-        return assignedStudents;
+        scheduledLecture.addStudentsOnCampus(assignedStudents);
     }
 
     public void sortRoomsByCapacity(){

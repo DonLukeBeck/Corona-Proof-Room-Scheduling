@@ -85,4 +85,9 @@ class ScheduledLectureTest {
     void testAddStudentsOnCampus() {
 
     }
+
+    @Test
+    void testAddStudentOnCampus() {
+
+    }
 }

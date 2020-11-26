@@ -41,7 +41,9 @@ public class ScheduledLecture {
         this.endTime = endTime;
     }
 
-    public void addStudentsOnCampus(String netId) {
+    public void addStudentOnCampus(String netId) {
         this.studentsOnCampus.add(netId);
     }
+    
+    public void addStudentsOnCampus(List<String> netIds) { this.studentsOnCampus.addAll(netIds); }
 }
