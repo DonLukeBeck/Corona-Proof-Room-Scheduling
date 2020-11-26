@@ -1,9 +1,9 @@
 server:
-  port: 8083
+  port: 8085
 
 spring:
   application:
-    name: identity-service
+    name: rooms-service
 
 eureka:
   client:

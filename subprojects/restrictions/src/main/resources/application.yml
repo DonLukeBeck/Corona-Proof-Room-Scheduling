@@ -1,9 +1,9 @@
 server:
-  port: 8083
+  port: 8084
 
 spring:
   application:
-    name: identity-service
+    name: restrictions-service
 
 eureka:
   client:
