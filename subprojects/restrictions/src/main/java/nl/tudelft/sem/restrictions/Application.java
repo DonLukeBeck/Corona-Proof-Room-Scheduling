@@ -1,4 +1,4 @@
-package nl.tudelft.sem.restriction;
+package nl.tudelft.sem.restrictions;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

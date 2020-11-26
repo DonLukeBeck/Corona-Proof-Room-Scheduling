@@ -1,4 +1,4 @@
-package nl.tudelft.sem.restriction;
+package nl.tudelft.sem.restrictions;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -24,7 +24,7 @@ public class Restriction {
     /**
      * Returns the name variable.
      *
-     * @return name of the restriction
+     * @return name of the restrictions
      */
     public String getName() {
         return name;
@@ -33,7 +33,7 @@ public class Restriction {
     /**
      * Sets the name variable.
      *
-     * @param name of the restriction entity
+     * @param name of the restrictions entity
      */
     public void setName(String name) {
         this.name = name;
@@ -42,7 +42,7 @@ public class Restriction {
     /**
      * Returns the value variable.
      *
-     * @return value of the restriction
+     * @return value of the restrictions
      */
     public float getValue() {
         return value;
@@ -51,7 +51,7 @@ public class Restriction {
     /**
      * Sets the value variable.
      *
-     * @param value of the restriction entity
+     * @param value of the restrictions entity
      */
     public void setValue(float value) {
         this.value = value;

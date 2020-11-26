@@ -1,7 +1,6 @@
-package nl.tudelft.sem.restriction;
+package nl.tudelft.sem.restrictions;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -23,7 +22,7 @@ public class RestrictionController {
     }
 
     /**
-     * Adds a new restriction with provided parameters.
+     * Adds a new restrictions with provided parameters.
      */
     public String addNewRestriction(String name, float value) {
         for (Restriction r : restrictionRepository.findAll()) {
@@ -45,7 +44,7 @@ public class RestrictionController {
     }
 
     /**
-     * Fetches restriction value with given name form the database.
+     * Fetches restrictions value with given name form the database.
      */
     public float getRestrictionVal(String name) {
         for (Restriction r : restrictionRepository.findAll()) {
@@ -57,7 +56,7 @@ public class RestrictionController {
     }
 
     /**
-     * This function sets the capacity restriction for big and small rooms.
+     * This function sets the capacity restrictions for big and small rooms.
      *
      * @param bigOrSmallRoom boolean representing if the parameter is for big (1) or small (0) rooms
      * @param maxPercentageAllowed max percentage allowed to be used in a room
@@ -74,7 +73,7 @@ public class RestrictionController {
     }
 
     /**
-     * Fetches restriction value with given name form the database.
+     * Fetches restrictions value with given name form the database.
      */
     @PostMapping(path = "/restrictionByName")
     public @ResponseBody

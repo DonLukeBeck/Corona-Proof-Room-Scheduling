@@ -1,4 +1,4 @@
-package nl.tudelft.sem.restriction;
+package nl.tudelft.sem.restrictions;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

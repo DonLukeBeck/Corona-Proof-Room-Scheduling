@@ -1,4 +1,4 @@
-package nl.tudelft.sem.restriction;
+package nl.tudelft.sem.restrictions;
 
 //import static org.junit.jupiter.api.Assertions.*;
 
