@@ -28,7 +28,7 @@ public class SchedulingController {
         // Make API call to retrieve rooms with restricted capacity
 
         LectureScheduler scheduler = new LectureScheduler(rooms, lecturesToSchedule, startTime,
-                endTime, timeGapLength, 0.50);
+                endTime, timeGapLength);
         List<ScheduledLecture> scheduledLectures = scheduler.scheduledAllLectures();
         return null;
     }

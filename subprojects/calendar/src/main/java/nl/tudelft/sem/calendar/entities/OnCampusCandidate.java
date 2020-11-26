@@ -2,17 +2,17 @@ package nl.tudelft.sem.calendar.entities;
 
 public class OnCampusCandidate {
 
-    private String netID;
+    private String netId;
     private int numParticipations;
 
-    public OnCampusCandidate(String netID, int numParticipations){
+    public OnCampusCandidate(String netId, int numParticipations){
 
-        this.netID = netID;
+        this.netId = netId;
         this.numParticipations = numParticipations;
     }
 
-    public String getNetID() {
-        return this.netID;
+    public String getNetId() {
+        return this.netId;
     }
 
     public int getNumParticipations(){
