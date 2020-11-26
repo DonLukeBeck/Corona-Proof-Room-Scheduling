@@ -1,9 +1,9 @@
 server:
-  port: 8083
+  port: 8080
 
 spring:
   application:
-    name: restrictions-service
+    name: calendar-service
 
 eureka:
   client:
