@@ -49,8 +49,9 @@ public class LectureScheduler {
         for (Date date: dates) {
             long dayDiff = TimeUnit.DAYS.convert(Math.abs(date.getTime() - startDate.getTime()), TimeUnit.MILLISECONDS);
 
-            if( dayDiff >= 14 )  {
+            if(dayDiff >= 14) {
                 allParticipants = new HashMap<>();
+                startDate = date;
             }
             // Reset room availability
             Arrays.fill(roomAvailability, startTime);

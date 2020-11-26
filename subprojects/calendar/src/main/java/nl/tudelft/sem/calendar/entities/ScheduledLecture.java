@@ -22,9 +22,7 @@ public class ScheduledLecture {
         this.studentsOnCampus = new ArrayList<String>();
     }
 
-    public Course getCourse(){
-        return this.course;
-    }
+    public Course getCourse(){ return this.course; }
     public Date getDate() { return this.date; }
     public LocalTime getStartTime() { return startTime; }
     public LocalTime getEndTime() { return endTime; }

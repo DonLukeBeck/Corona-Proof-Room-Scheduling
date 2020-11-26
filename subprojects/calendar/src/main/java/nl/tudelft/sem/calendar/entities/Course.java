@@ -3,7 +3,10 @@ import java.util.List;
 
 public class Course {
     private List<String> participants;
-    public List<String> getParticipants(){
-        return this.participants;
+
+    public Course(List<String> participants) {
+        this.participants = participants;
     }
+
+    public List<String> getParticipants(){ return this.participants; }
 }

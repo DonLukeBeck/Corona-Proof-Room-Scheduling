@@ -4,13 +4,13 @@ public class Room {
     private int capacity;
     private String name;
 
-    public int getRoomId() {
-        return roomId;
+    public Room(int roomId, int capacity, String name) {
+        this.roomId = roomId;
+        this.capacity = capacity;
+        this.name = name;
     }
-    public String getName() {
-        return name;
-    }
-    public int getCapacity() {
-        return capacity;
-    }
+
+    public int getRoomId() { return roomId; }
+    public int getCapacity() { return capacity; }
+    public String getName() { return name; }
 }

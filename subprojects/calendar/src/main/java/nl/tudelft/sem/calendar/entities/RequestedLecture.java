@@ -7,9 +7,13 @@ public class RequestedLecture {
     private Date date;
     private int durationInMinutes;
 
-    public Course getCourse(){
-        return this.course;
+    public RequestedLecture(Course course, Date date, int durationInMinutes){
+        this.course = course;
+        this.date = date;
+        this.durationInMinutes = durationInMinutes;
     }
+
+    public Course getCourse(){ return this.course; }
     public Date getDate() { return this.date; }
     public int getDurationInMinutes() { return this.durationInMinutes; }
 }
