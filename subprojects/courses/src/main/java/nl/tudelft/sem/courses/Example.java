@@ -1,4 +1,4 @@
-package nl.tudelft.sem.identity;
+package nl.tudelft.sem.courses;
 
 public class Example {
     private String name;
@@ -8,7 +8,7 @@ public class Example {
     }
 
     public String getName() {
-        return "nice";
+        return this.name;
     }
 
     public void setName(String name) {

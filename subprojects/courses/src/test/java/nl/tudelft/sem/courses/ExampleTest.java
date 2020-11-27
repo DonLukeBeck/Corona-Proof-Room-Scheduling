@@ -1,4 +1,4 @@
-package nl.tudelft.sem.identity;
+package nl.tudelft.sem.courses;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -9,8 +9,8 @@ public class ExampleTest {
     @Test
     public void testGettersSetters() {
         Example exampleTest = new Example("name");
-        assertEquals("nice", exampleTest.getName());
+        assertEquals("name", exampleTest.getName());
         exampleTest.setName("newName");
-        assertEquals("nice", exampleTest.getName());
+        assertEquals("newName", exampleTest.getName());
     }
 }
