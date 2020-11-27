@@ -36,8 +36,11 @@ public class RestrictionController {
                 if (r.getValue() == value) {
                     return "Already Exists";
                 } else {
-                    r.setValue(value);
-                    restrictionRepository.save(r);
+                    restrictionRepository.delete(r);
+                    Restriction rn = new Restriction();
+                    rn.setName(name);
+                    rn.setValue(value);
+                    restrictionRepository.save(rn);
                     return "Updated";
                 }
             }
@@ -189,5 +192,13 @@ public class RestrictionController {
     //        return null;
     //    }
 
+    //    /**
+    //     *
+    //     * @return
+    //     */
+    //    @PostMapping(path = "/getRoomWithAdjustedCapacity") // Map ONLY POST Requests
+    //    Room getRoomWithAdjustedCapacity(int roomId) {
+    //        return null;
+    //    }
 }
 
