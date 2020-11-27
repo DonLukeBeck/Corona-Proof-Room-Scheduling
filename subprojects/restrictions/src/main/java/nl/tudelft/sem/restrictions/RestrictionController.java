@@ -183,22 +183,33 @@ public class RestrictionController {
         return LocalTime.ofSecondOfDay((int) getRestrictionVal("endTime"));
     }
 
-    //    /**
-    //     *
-    //     * @return
-    //     */
-    //    @PostMapping(path = "/getAllRoomsWithAdjustedCapacity") // Map ONLY POST Requests
-    //    public List<Room> getAllRoomsWithAdjustedCapacity() {
-    //        return null;
-    //    }
+    /*
+    @PostMapping(path = "/getAllRoomsWithAdjustedCapacity") // Map ONLY POST Requests
+    public Iterable<Room> getAllRoomsWithAdjustedCapacity() {
+        Iterable<Room> it = RoomController.getAllRooms();
+        for (Room r : it) {
+            int cap = r.getCapacity();
+            if (cap >= getMinSeatsBig()) {
+                r.setCapacity(cap*(getCapacityRestriction(true)/100));
+            } else {
+                r.setCapacity(cap*(getCapacityRestriction(false)/100));
+            }
+        }
+        return it;
+    }
 
-    //    /**
-    //     *
-    //     * @return
-    //     */
-    //    @PostMapping(path = "/getRoomWithAdjustedCapacity") // Map ONLY POST Requests
-    //    Room getRoomWithAdjustedCapacity(int roomId) {
-    //        return null;
-    //    }
+    @PostMapping(path = "/getRoomWithAdjustedCapacity") // Map ONLY POST Requests
+    Room getRoomWithAdjustedCapacity(int roomId) {
+        Room r = RoomController.getRoom(roomId);
+        int cap = r.getCapacity();
+        if (cap >= getMinSeatsBig()) {
+            r.setCapacity(cap*(getCapacityRestriction(true)/100));
+        } else {
+            r.setCapacity(cap*(getCapacityRestriction(false)/100));
+        }
+        return r;
+    }
+    */
+
 }
 
