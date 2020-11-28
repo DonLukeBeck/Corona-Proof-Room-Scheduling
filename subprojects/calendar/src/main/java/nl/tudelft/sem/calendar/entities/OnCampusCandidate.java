@@ -1,15 +1,14 @@
 package nl.tudelft.sem.calendar.entities;
-
-import java.util.Objects;
+import java.time.LocalDate;
 
 public class OnCampusCandidate {
 
     private String netId;
-    private int numParticipations;
+    private LocalDate deadline;
 
-    public OnCampusCandidate(String netId, int numParticipations){
+    public OnCampusCandidate(String netId, LocalDate deadline){
         this.netId = netId;
-        this.numParticipations = numParticipations;
+        this.deadline = deadline;
     }
 
     @Override
@@ -20,7 +19,7 @@ public class OnCampusCandidate {
             return false;
         }
         OnCampusCandidate that = (OnCampusCandidate) o;
-        return getNumParticipations() == that.getNumParticipations() &&
+        return getDeadline() == that.getDeadline() &&
                 getNetId().equals(that.getNetId());
     }
 
@@ -32,11 +31,11 @@ public class OnCampusCandidate {
         this.netId = netId;
     }
 
-    public int getNumParticipations() {
-        return numParticipations;
+    public LocalDate getDeadline() {
+        return this.deadline;
     }
 
-    public void setNumParticipations(int numParticipations) {
-        this.numParticipations = numParticipations;
+    public void setDeadline(LocalDate deadline) {
+        this.deadline = deadline;
     }
 }

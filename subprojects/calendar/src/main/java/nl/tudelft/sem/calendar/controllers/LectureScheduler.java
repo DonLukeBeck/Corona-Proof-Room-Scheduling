@@ -38,14 +38,13 @@ public class LectureScheduler {
         List<ScheduledLecture> scheduledLectures = new ArrayList<>();
         if(lecturesToSchedule == null || lecturesToSchedule.size() == 0) return scheduledLectures;
 
-        Map<String, Integer> allParticipants = new HashMap<>();
+        Map<String, LocalDate> allParticipants = new HashMap<>();
         Map<LocalDate, List<RequestedLecture>> lecturesByDay = groupLecturesByDay();
         List<LocalDate> dates = new ArrayList<>(lecturesByDay.keySet());
 
         Collections.sort(dates);
         sortRoomsByCapacity();
 
-        LocalDate startDate = dates.get(0);
         int roomIndex = 0;
         for (LocalDate date: dates) {
             // Reset room availability
@@ -62,12 +61,15 @@ public class LectureScheduler {
         return scheduledLectures;
     }
 
-    public void assignStudents(ScheduledLecture scheduledLecture, Map<String, Integer> allParticipants) {
-        PriorityQueue<OnCampusCandidate> candidateSelector = createCandidateSelector(scheduledLecture.getCourse().getParticipants(),allParticipants);
+    public void assignStudents(ScheduledLecture scheduledLecture, Map<String, LocalDate> allParticipants) {
+        PriorityQueue<OnCampusCandidate> candidateSelector = createCandidateSelector(scheduledLecture.getDate(), scheduledLecture.getCourse().getParticipants(),allParticipants);
 
+        //Updated students in the map should be tested for!
         int studentCounter = 0;
         while(!candidateSelector.isEmpty() && studentCounter < scheduledLecture.getRoom().getCapacity()) {
-            scheduledLecture.addStudentOnCampus(candidateSelector.remove().getNetId());
+            String selected = candidateSelector.remove().getNetId();
+            scheduledLecture.addStudentOnCampus(selected);
+            allParticipants.put(selected, scheduledLecture.getDate().plusDays(14));
             studentCounter++;
         }
     }
@@ -85,19 +87,19 @@ public class LectureScheduler {
         return lecturesByDay.get(date);
     }
 
-    public PriorityQueue<OnCampusCandidate> createCandidateSelector(List<String> courseParticipants, Map<String, Integer> allParticipants){
+    public PriorityQueue<OnCampusCandidate> createCandidateSelector(LocalDate lectureDate, List<String> courseParticipants, Map<String, LocalDate> allParticipants){
         if(courseParticipants == null)
             return new PriorityQueue<>();
 
         PriorityQueue<OnCampusCandidate> candidates = new PriorityQueue<>(courseParticipants.size(),
-                Comparator.comparing(OnCampusCandidate::getNumParticipations));
+                Comparator.comparing(OnCampusCandidate::getDeadline));
 
         for (String student : courseParticipants) {
             if (allParticipants.containsKey(student)) {
                 candidates.add(new OnCampusCandidate(student, allParticipants.get(student)));
             } else {
-                allParticipants.put(student, 0);
-                candidates.add(new OnCampusCandidate(student, 0));
+                allParticipants.put(student, lectureDate.plusDays(14));
+                candidates.add(new OnCampusCandidate(student, lectureDate.plusDays(14)));
             }
         }
         return candidates;

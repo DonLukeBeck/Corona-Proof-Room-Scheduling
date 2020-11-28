@@ -86,7 +86,7 @@ class LectureSchedulerTest {
         }};
     }
 
-    private static HashMap<String, Integer> createParticipants(){
+    private static HashMap<String, LocalDate> createParticipants(){
         return new HashMap<>() {{
             put("abobe", 3);
             put("cparlar", 2);
@@ -144,15 +144,16 @@ class LectureSchedulerTest {
     @Test
     void testCreateCandidateSelector() {
         List<String> courseParticipants = Arrays.asList("abobe", "mbjdegoede", "cparlar");
-        HashMap<String, Integer> allParticipants = createParticipants();
+        HashMap<String, LocalDate> allParticipants = createParticipants();
+        LocalDate lectureDate = LocalDate.of(2020, 12, 18);
 
         OnCampusCandidate[] verficiation = {
-                new OnCampusCandidate("mbjdegoede", 0),
-                new OnCampusCandidate("cparlar", 2),
-                new OnCampusCandidate("abobe", 3) };
+                new OnCampusCandidate("mbjdegoede", LocalDate.of(2020, 12, 20)),
+                new OnCampusCandidate("cparlar", LocalDate.of(2020, 12, 24)),
+                new OnCampusCandidate("abobe", LocalDate.of(2020, 12, 26)) };
 
         PriorityQueue<OnCampusCandidate> result =
-                scheduler.createCandidateSelector(courseParticipants, allParticipants);
+                scheduler.createCandidateSelector(lectureDate, courseParticipants, allParticipants);
 
         for(int i = 0; i < verficiation.length; i++){
             assertThat(result.remove()).isEqualTo(verficiation[i]);
