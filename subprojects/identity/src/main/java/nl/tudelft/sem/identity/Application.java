@@ -26,7 +26,8 @@ public class Application {
 
 		//list of user objects to be 'registered' in the database
 		List<User> users = Stream.of(
-				new User("luca", encoder.encode("1234"), "student", false)
+				new User("luca", encoder.encode("1234"), "student", false),
+				new User("luka", encoder.encode("12345"), "teacher", true)
 		).collect(Collectors.toList());
 		repository.saveAll(users);
 	}

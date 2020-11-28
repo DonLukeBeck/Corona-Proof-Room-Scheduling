@@ -17,7 +17,7 @@ public class JwtUtil {
     private String secret = "semcoronaproofroomreservation";
 
     //return netid
-    public String extractUsername(String token) {
+    public String extractNetid(String token) {
         return extractClaim(token, Claims::getSubject);
     }
 
@@ -55,8 +55,8 @@ public class JwtUtil {
 
     //verify if token received is valid
     public Boolean validateToken(String token, UserDetails userDetails) {
-        final String username = extractUsername(token);
-        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+        final String netid = extractNetid(token);
+        return (netid.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
 
 }
