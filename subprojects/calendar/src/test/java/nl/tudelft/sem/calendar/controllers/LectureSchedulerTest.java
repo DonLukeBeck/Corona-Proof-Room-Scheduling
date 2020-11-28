@@ -88,9 +88,9 @@ class LectureSchedulerTest {
 
     private static HashMap<String, LocalDate> createParticipants(){
         return new HashMap<>() {{
-            put("abobe", 3);
-            put("cparlar", 2);
-            put("random", 4);
+            put("abobe", LocalDate.of(2020, 12, 26));
+            put("cparlar", LocalDate.of(2020, 12, 24));
+            put("random", LocalDate.of(2020, 12, 29));
         }};
     }
 
@@ -101,7 +101,7 @@ class LectureSchedulerTest {
 
     @Test
     void testAssignStudentsEnoughCapacity() {
-        Map<String, Integer> allParticipants = createParticipants();
+        Map<String, LocalDate> allParticipants = createParticipants();
         testSchedLectures[1].setRoom(testRooms[1]);
         assertThat(testSchedLectures[1].getStudentsOnCampus()).isEmpty();
         scheduler.assignStudents(testSchedLectures[1], allParticipants);
@@ -110,13 +110,17 @@ class LectureSchedulerTest {
 
     @Test
     void testAssignStudentsButNotEnoughCapacity() {
-        Map<String, Integer> allParticipants = createParticipants();
+        Map<String, LocalDate> allParticipants = createParticipants();
         testSchedLectures[1].setRoom(testRooms[0]);
         assertThat(testSchedLectures[1].getStudentsOnCampus()).isEmpty();
         scheduler.assignStudents(testSchedLectures[1], allParticipants);
 
         assertThat(testSchedLectures[1].getStudentsOnCampus())
                 .containsExactly("mbjdegoede","cparlar");
+
+        assertThat(allParticipants.get("mbjdegoede")).isEqualTo(testSchedLectures[1].getDate().plusDays(14));
+        assertThat(allParticipants.get("cparlar")).isEqualTo(testSchedLectures[1].getDate().plusDays(14));
+        assertThat(allParticipants.get("abobe")).isEqualTo(LocalDate.of(2020, 12, 26));
     }
 
     @Test
@@ -147,19 +151,21 @@ class LectureSchedulerTest {
         HashMap<String, LocalDate> allParticipants = createParticipants();
         LocalDate lectureDate = LocalDate.of(2020, 12, 18);
 
-        OnCampusCandidate[] verficiation = {
-                new OnCampusCandidate("mbjdegoede", LocalDate.of(2020, 12, 20)),
+        OnCampusCandidate[] verification = {
+                new OnCampusCandidate("mbjdegoede", LocalDate.of(2020, 12, 18)),
                 new OnCampusCandidate("cparlar", LocalDate.of(2020, 12, 24)),
                 new OnCampusCandidate("abobe", LocalDate.of(2020, 12, 26)) };
 
         PriorityQueue<OnCampusCandidate> result =
                 scheduler.createCandidateSelector(lectureDate, courseParticipants, allParticipants);
 
-        for(int i = 0; i < verficiation.length; i++){
-            assertThat(result.remove()).isEqualTo(verficiation[i]);
+        for (OnCampusCandidate onCampusCandidate : verification) {
+            OnCampusCandidate candidate = result.remove();
+
+            assertThat(candidate.getDeadline()).isEqualTo(onCampusCandidate.getDeadline());
         }
-        assertThat(allParticipants.get("abobe")).isEqualTo(3);
-        assertThat(allParticipants.get("mbjdegoede")).isEqualTo(0);
+        assertThat(allParticipants.get("abobe")).isEqualTo(LocalDate.of(2020, 12, 26));
+        assertThat(allParticipants.get("mbjdegoede")).isEqualTo(LocalDate.of(2020, 12, 18));
     }
 
     @Test

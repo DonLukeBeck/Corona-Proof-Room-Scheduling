@@ -15,13 +15,14 @@ public class OnCampusCandidate {
     public boolean equals(Object o) {
         if (this == o)
             return true;
-        if (!(o instanceof OnCampusCandidate)) {
+        if (!(o instanceof OnCampusCandidate))
             return false;
-        }
         OnCampusCandidate that = (OnCampusCandidate) o;
-        return getDeadline() == that.getDeadline() &&
+        return this.getDeadline() == that.getDeadline() &&
                 getNetId().equals(that.getNetId());
     }
+    
+    
 
     public String getNetId() {
         return netId;

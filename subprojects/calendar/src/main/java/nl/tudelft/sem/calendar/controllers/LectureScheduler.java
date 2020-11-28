@@ -98,8 +98,8 @@ public class LectureScheduler {
             if (allParticipants.containsKey(student)) {
                 candidates.add(new OnCampusCandidate(student, allParticipants.get(student)));
             } else {
-                allParticipants.put(student, lectureDate.plusDays(14));
-                candidates.add(new OnCampusCandidate(student, lectureDate.plusDays(14)));
+                allParticipants.put(student, lectureDate);
+                candidates.add(new OnCampusCandidate(student, lectureDate));
             }
         }
         return candidates;
