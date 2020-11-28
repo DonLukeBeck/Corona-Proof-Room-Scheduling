@@ -6,6 +6,7 @@ import nl.tudelft.sem.calendar.entities.Room;
 import nl.tudelft.sem.calendar.entities.ScheduledLecture;
 
 
+import java.time.Duration;
 import java.time.LocalTime;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -36,9 +37,11 @@ public class LectureScheduler {
 
     public List<ScheduledLecture> scheduleAllLectures() {
         List<ScheduledLecture> scheduledLectures = new ArrayList<>();
+        if(lecturesToSchedule == null || lecturesToSchedule.size() == 0) return scheduledLectures;
+
         Map<String, Integer> allParticipants = new HashMap<>();
         Map<Date, List<RequestedLecture>> lecturesByDay = groupLecturesByDay();
-        List<Date> dates = (List) lecturesByDay.keySet();
+        List<Date> dates = new ArrayList<>(lecturesByDay.keySet());
 
         Collections.sort(dates);
         sortRoomsByCapacity();
@@ -59,9 +62,9 @@ public class LectureScheduler {
             List<RequestedLecture> toScheduleThisDay = getSortedLecturesForDay(date, lecturesByDay);
             for (RequestedLecture toBeScheduled : toScheduleThisDay) {
                 ScheduledLecture scheduledLecture = new ScheduledLecture(toBeScheduled.getCourse(), toBeScheduled.getDate());
-                assignRoom(roomIndex, scheduledLecture, toBeScheduled.getDurationInMinutes());
-                roomIndex++;
+                roomIndex = assignRoom(roomIndex, scheduledLecture, toBeScheduled.getDurationInMinutes());
                 assignStudents(scheduledLecture, allParticipants);
+                scheduledLectures.add(scheduledLecture);
             }
         }
         return scheduledLectures;
@@ -108,9 +111,9 @@ public class LectureScheduler {
         return candidates;
     }
 
-    public void assignRoom(int roomSearchIndex, ScheduledLecture scheduledLecture, int durationInMinutes) {
+    public int assignRoom(int roomSearchIndex, ScheduledLecture scheduledLecture, int durationInMinutes) {
         while(roomSearchIndex < roomList.size()) {
-            if(roomAvailability[roomSearchIndex].plusMinutes(durationInMinutes).isBefore(endTime) || roomAvailability[roomSearchIndex].plusMinutes(durationInMinutes).equals(endTime)) {
+            if(durationInMinutes <= (int) Duration.between(roomAvailability[roomSearchIndex], endTime).toMinutes()) {
                 scheduledLecture.setRoom(roomList.get(roomSearchIndex));
                 scheduledLecture.setStartTime(roomAvailability[roomSearchIndex]);
                 scheduledLecture.setEndTime(roomAvailability[roomSearchIndex].plusMinutes(durationInMinutes));
@@ -118,6 +121,7 @@ public class LectureScheduler {
                 break;
             } else roomSearchIndex++;
         }
+        return roomSearchIndex;
     }
 
     public List<Room> getRoomList() {

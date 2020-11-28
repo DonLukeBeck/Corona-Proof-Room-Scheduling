@@ -64,7 +64,7 @@ class LectureSchedulerTest {
     private static void createLectures(){
         testReqLectures = new RequestedLecture[5];
         testReqLectures[0] = new RequestedLecture(testCourses[0], testDates[0], 90);
-        testReqLectures[1] = new RequestedLecture(testCourses[1], testDates[0], 200);
+        testReqLectures[1] = new RequestedLecture(testCourses[1], testDates[0], 540);
         testReqLectures[2] = new RequestedLecture(testCourses[2], testDates[0], 100);
         testReqLectures[3] = new RequestedLecture(testCourses[0], testDates[1], 90);
         testReqLectures[4] = new RequestedLecture(testCourses[0], testDates[2], 200);
@@ -94,8 +94,9 @@ class LectureSchedulerTest {
     }
 
     @Test
-    void testScheduledAllLectures() {
-
+    void testScheduleAllLecturesMoreThanTwoWeeks() {
+        List<ScheduledLecture> result = scheduler.scheduleAllLectures();
+        System.out.println("Geweldig!");
     }
 
     @Test
@@ -200,7 +201,7 @@ class LectureSchedulerTest {
         scheduler.sortRoomsByCapacity();
         scheduler.assignRoom(0,testSchedLectures[0],185);
         scheduler.assignRoom(0,testSchedLectures[1],
-                testReqLectures[1].getDurationInMinutes());
+                200);
         assertThat(testSchedLectures[1].getRoom()).isEqualTo(testRooms[2]);
     }
 
@@ -210,7 +211,19 @@ class LectureSchedulerTest {
         scheduler.assignRoom(roomList.size()-1,
                 testSchedLectures[0],540);
         scheduler.assignRoom(roomList.size()-1,
+                testSchedLectures[1],200);
+        assertThat(testSchedLectures[1].getRoom()).isNull();
+    }
+
+    @Test
+    void testAssignSecondLectureNoRoomLeftNextDayWrap() {
+        scheduler.sortRoomsByCapacity();
+        int roomIndex = scheduler.assignRoom(roomList.size()-1,
+                testSchedLectures[0],540);
+        assertThat(roomIndex).isEqualTo(roomList.size()-1);
+        int roomIndex2 = scheduler.assignRoom(roomIndex,
                 testSchedLectures[1],testReqLectures[1].getDurationInMinutes());
         assertThat(testSchedLectures[1].getRoom()).isNull();
+        assertThat(roomIndex2).isEqualTo(roomList.size());
     }
 }
