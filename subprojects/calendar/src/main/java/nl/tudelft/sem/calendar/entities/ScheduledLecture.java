@@ -1,19 +1,19 @@
 package nl.tudelft.sem.calendar.entities;
 
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 public class ScheduledLecture {
     private Course course;
-    private Date date;
+    private LocalDate date;
     private LocalTime startTime;
     private LocalTime endTime;
     private Room room;
     private List<String> studentsOnCampus;
 
-    public ScheduledLecture(Course course, Date date) {
+    public ScheduledLecture(Course course, LocalDate date) {
         this.course = course;
         this.date = date;
         this.startTime = null;
@@ -30,11 +30,11 @@ public class ScheduledLecture {
         this.course = course;
     }
 
-    public Date getDate() {
+    public LocalDate getDate() {
         return date;
     }
 
-    public void setDate(Date date) {
+    public void setDate(LocalDate date) {
         this.date = date;
     }
 

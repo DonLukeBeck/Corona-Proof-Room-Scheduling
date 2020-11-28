@@ -4,6 +4,7 @@ import nl.tudelft.sem.calendar.entities.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.*;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -21,7 +22,7 @@ class LectureSchedulerTest {
  private static RequestedLecture[] testReqLectures;
  private static ScheduledLecture[] testSchedLectures;
  private static Course[] testCourses;
- private static Date[]  testDates;
+ private static LocalDate[]  testDates;
 
     @BeforeEach
     void setup(){
@@ -55,10 +56,10 @@ class LectureSchedulerTest {
     }
 
     private static void createDates(){
-        testDates = new Date[3];
-        testDates[0] = new GregorianCalendar(2020, Calendar.FEBRUARY, 1).getTime();
-        testDates[1] = new GregorianCalendar(2020, Calendar.FEBRUARY, 13).getTime();
-        testDates[2] = new GregorianCalendar(2020, Calendar.FEBRUARY, 15).getTime();
+        testDates = new LocalDate[3];
+        testDates[0] = LocalDate.of(2020, 2, 1);
+        testDates[1] = LocalDate.of(2020, 2, 13);
+        testDates[2] = LocalDate.of(2020, 2, 15);
     }
 
     private static void createLectures(){
@@ -76,7 +77,7 @@ class LectureSchedulerTest {
         testSchedLectures[1] = new ScheduledLecture(testCourses[1], testDates[0]);
     }
 
-    private static HashMap<Date, List<RequestedLecture>> createMap(){
+    private static HashMap<LocalDate, List<RequestedLecture>> createMap(){
         return new HashMap<>() {{
             put(testDates[0], Arrays.asList(testReqLectures[0],
                     testReqLectures[1], testReqLectures[2]));
@@ -96,7 +97,6 @@ class LectureSchedulerTest {
     @Test
     void testScheduleAllLecturesMoreThanTwoWeeks() {
         List<ScheduledLecture> result = scheduler.scheduleAllLectures();
-        System.out.println("Geweldig!");
     }
 
     @Test
@@ -129,7 +129,7 @@ class LectureSchedulerTest {
     @Test
     void testGroupLecturesByDay() {
         scheduler.groupLecturesByDay();
-        Map<Date, List<RequestedLecture>> groupedByDay = createMap();
+        Map<LocalDate, List<RequestedLecture>> groupedByDay = createMap();
         assertThat(scheduler.groupLecturesByDay()).isEqualTo(groupedByDay);
     }
 

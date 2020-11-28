@@ -7,10 +7,9 @@ import nl.tudelft.sem.calendar.entities.ScheduledLecture;
 
 
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
-
 import static java.util.Comparator.reverseOrder;
 import static java.util.stream.Collectors.groupingBy;
 
@@ -40,24 +39,17 @@ public class LectureScheduler {
         if(lecturesToSchedule == null || lecturesToSchedule.size() == 0) return scheduledLectures;
 
         Map<String, Integer> allParticipants = new HashMap<>();
-        Map<Date, List<RequestedLecture>> lecturesByDay = groupLecturesByDay();
-        List<Date> dates = new ArrayList<>(lecturesByDay.keySet());
+        Map<LocalDate, List<RequestedLecture>> lecturesByDay = groupLecturesByDay();
+        List<LocalDate> dates = new ArrayList<>(lecturesByDay.keySet());
 
         Collections.sort(dates);
         sortRoomsByCapacity();
 
-        Date startDate = dates.get(0);
+        LocalDate startDate = dates.get(0);
         int roomIndex = 0;
-        for (Date date: dates) {
+        for (LocalDate date: dates) {
             // Reset room availability
             Arrays.fill(roomAvailability, startTime);
-
-            // Check if two weeks have passed since the first request
-            long dayDiff = TimeUnit.DAYS.convert(Math.abs(date.getTime() - startDate.getTime()), TimeUnit.MILLISECONDS);
-            if(dayDiff >= 14) {
-                allParticipants = new HashMap<>();
-                startDate = date;
-            }
 
             List<RequestedLecture> toScheduleThisDay = getSortedLecturesForDay(date, lecturesByDay);
             for (RequestedLecture toBeScheduled : toScheduleThisDay) {
@@ -84,11 +76,11 @@ public class LectureScheduler {
         roomList.sort(Comparator.comparing(Room::getCapacity, reverseOrder()));
     }
 
-    public Map<Date, List<RequestedLecture>> groupLecturesByDay() {
+    public Map<LocalDate, List<RequestedLecture>> groupLecturesByDay() {
         return lecturesToSchedule.stream().collect(groupingBy(RequestedLecture::getDate));
     }
 
-    public List<RequestedLecture> getSortedLecturesForDay(Date date, Map<Date, List<RequestedLecture>> lecturesByDay) {
+    public List<RequestedLecture> getSortedLecturesForDay(LocalDate date, Map<LocalDate, List<RequestedLecture>> lecturesByDay) {
         lecturesByDay.get(date).sort(Comparator.comparing(l -> l.getCourse().getParticipants().size(), reverseOrder()));
         return lecturesByDay.get(date);
     }

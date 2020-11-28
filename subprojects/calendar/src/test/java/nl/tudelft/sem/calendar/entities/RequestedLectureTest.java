@@ -1,22 +1,23 @@
 package nl.tudelft.sem.calendar.entities;
+import org.apache.tomcat.jni.Local;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.time.LocalDate;
 import java.util.Arrays;
-import java.util.Date;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class RequestedLectureTest {
     private Course course;
     private RequestedLecture lecture;
-    private Date date;
+    private LocalDate date;
     private int durationInMinutes;
 
     @BeforeEach
     void setUp() {
-       date = new Date(System.currentTimeMillis());
+       date = LocalDate.now();
        course = new Course(Arrays.asList("mbjdegoede", "abobe"));
        durationInMinutes = 90;
        lecture = new RequestedLecture(course, date, durationInMinutes);
@@ -45,8 +46,8 @@ class RequestedLectureTest {
     }
 
     @Test
-    void testSetDate() {
-        Date date2 = new Date(System.currentTimeMillis()+1);
+    void testSet() {
+        LocalDate date2 = LocalDate.now();
         lecture.setDate(date2);
         assertEquals(date2, lecture.getDate());
     }

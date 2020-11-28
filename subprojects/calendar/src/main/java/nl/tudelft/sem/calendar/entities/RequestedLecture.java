@@ -1,13 +1,12 @@
 package nl.tudelft.sem.calendar.entities;
-
-import java.util.Date;
+import java.time.LocalDate;
 
 public class RequestedLecture {
     private Course course;
-    private Date date;
+    private LocalDate date;
     private int durationInMinutes;
 
-    public RequestedLecture(Course course, Date date, int durationInMinutes){
+    public RequestedLecture(Course course, LocalDate date, int durationInMinutes){
         this.course = course;
         this.date = date;
         this.durationInMinutes = durationInMinutes;
@@ -21,11 +20,11 @@ public class RequestedLecture {
         this.course = course;
     }
 
-    public Date getDate() {
+    public LocalDate getDate() {
         return date;
     }
 
-    public void setDate(Date date) {
+    public void setDate(LocalDate date) {
         this.date = date;
     }
 

@@ -3,17 +3,16 @@ package nl.tudelft.sem.calendar.entities;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class ScheduledLectureTest {
     private Course course;
-    private Date date;
+    private LocalDate date;
     private LocalTime startTime;
     private LocalTime endTime;
     private Room room;
@@ -24,7 +23,7 @@ class ScheduledLectureTest {
         endTime = LocalTime.NOON;
         startTime = LocalTime.MIDNIGHT;
         course = new Course(Arrays.asList("mbjdegoede", "abobe"));
-        date = new Date(System.currentTimeMillis());
+        date = LocalDate.now();
         room = new Room(10, 200, "Drebbelweg IZ-2");
 
         scheduledLecture = new ScheduledLecture(course,date);
@@ -39,7 +38,7 @@ class ScheduledLectureTest {
     }
 
     @Test
-    void testGetDate() {
+    void testGetLocalDate() {
         assertEquals(date, scheduledLecture.getDate());
     }
 
@@ -106,7 +105,7 @@ class ScheduledLectureTest {
 
     @Test
     void testSetDate(){
-        Date date2 = new Date(System.currentTimeMillis()+1);
+        LocalDate date2 = LocalDate.now();
         scheduledLecture.setDate(date2);
         assertEquals(date2, scheduledLecture.getDate());
     }
