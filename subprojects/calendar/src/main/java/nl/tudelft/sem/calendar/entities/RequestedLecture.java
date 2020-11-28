@@ -13,7 +13,27 @@ public class RequestedLecture {
         this.durationInMinutes = durationInMinutes;
     }
 
-    public Course getCourse(){ return this.course; }
-    public Date getDate() { return this.date; }
-    public int getDurationInMinutes() { return this.durationInMinutes; }
+    public Course getCourse() {
+        return course;
+    }
+
+    public void setCourse(Course course) {
+        this.course = course;
+    }
+
+    public Date getDate() {
+        return date;
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
+    }
+
+    public int getDurationInMinutes() {
+        return durationInMinutes;
+    }
+
+    public void setDurationInMinutes(int durationInMinutes) {
+        this.durationInMinutes = durationInMinutes;
+    }
 }

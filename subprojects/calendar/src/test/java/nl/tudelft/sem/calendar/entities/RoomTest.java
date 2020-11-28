@@ -34,4 +34,25 @@ class RoomTest {
     void testGetCapacity() {
         assertEquals(capacity, room.getCapacity());
     }
+
+    @Test
+    void testSetRoomId() {
+        int roomId2 = 120;
+        room.setRoomId(roomId2);
+        assertEquals(roomId2, room.getRoomId());
+    }
+
+    @Test
+    void testSetName() {
+        String name = "IZ_3";
+        room.setName(name);
+        assertEquals(name, room.getName());
+    }
+
+    @Test
+    void testSetCapacity() {
+        int capacity2 = 560;
+        room.setCapacity(capacity2);
+        assertEquals(capacity2, room.getCapacity());
+    }
 }

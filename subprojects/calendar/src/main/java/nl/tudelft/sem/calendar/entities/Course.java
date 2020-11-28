@@ -8,5 +8,11 @@ public class Course {
         this.participants = participants;
     }
 
-    public List<String> getParticipants(){ return this.participants; }
+    public List<String> getParticipants() {
+        return participants;
+    }
+
+    public void setParticipants(List<String> participants) {
+        this.participants = participants;
+    }
 }

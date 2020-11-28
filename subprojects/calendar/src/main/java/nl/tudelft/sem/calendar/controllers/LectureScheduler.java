@@ -16,7 +16,7 @@ import static java.util.stream.Collectors.groupingBy;
 public class LectureScheduler {
 
     private List<Room> roomList;
-    LocalTime[] roomAvailability = new LocalTime[roomList.size()];
+    private LocalTime[] roomAvailability = new LocalTime[roomList.size()];
     private List<RequestedLecture> lecturesToSchedule;
     private LocalTime startTime;
     private LocalTime endTime;
@@ -118,5 +118,53 @@ public class LectureScheduler {
                 roomAvailability[roomSearchIndex] = roomAvailability[roomSearchIndex].plusMinutes(durationInMinutes + timeGapLengthInMinutes);
             } else roomSearchIndex++;
         }
+    }
+
+    public List<Room> getRoomList() {
+        return roomList;
+    }
+
+    public void setRoomList(List<Room> roomList) {
+        this.roomList = roomList;
+    }
+
+    public LocalTime[] getRoomAvailability() {
+        return roomAvailability;
+    }
+
+    public void setRoomAvailability(LocalTime[] roomAvailability) {
+        this.roomAvailability = roomAvailability;
+    }
+
+    public List<RequestedLecture> getLecturesToSchedule() {
+        return lecturesToSchedule;
+    }
+
+    public void setLecturesToSchedule(List<RequestedLecture> lecturesToSchedule) {
+        this.lecturesToSchedule = lecturesToSchedule;
+    }
+
+    public LocalTime getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(LocalTime startTime) {
+        this.startTime = startTime;
+    }
+
+    public LocalTime getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(LocalTime endTime) {
+        this.endTime = endTime;
+    }
+
+    public int getTimeGapLengthInMinutes() {
+        return timeGapLengthInMinutes;
+    }
+
+    public void setTimeGapLengthInMinutes(int timeGapLengthInMinutes) {
+        this.timeGapLengthInMinutes = timeGapLengthInMinutes;
     }
 }

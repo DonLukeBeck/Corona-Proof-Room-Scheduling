@@ -17,7 +17,7 @@ class RequestedLectureTest {
     @BeforeEach
     void setUp() {
        date = new Date(System.currentTimeMillis());
-       course = new Course(Arrays.asList("Matthijs", "Alex"));
+       course = new Course(Arrays.asList("mbjdegoede", "abobe"));
        durationInMinutes = 90;
        lecture = new RequestedLecture(course, date, durationInMinutes);
     }
@@ -35,5 +35,26 @@ class RequestedLectureTest {
     @Test
     void testGetDurationInMinutes() {
         assertEquals(durationInMinutes, lecture.getDurationInMinutes());
+    }
+
+    @Test
+    void testSetCourse() {
+        Course course2 = new Course(Arrays.asList("mbjdegoede", "abobe"));
+        lecture.setCourse(course2);
+        assertEquals(course2, lecture.getCourse());
+    }
+
+    @Test
+    void testSetDate() {
+        Date date2 = new Date(System.currentTimeMillis()+1);
+        lecture.setDate(date2);
+        assertEquals(date2, lecture.getDate());
+    }
+
+    @Test
+    void testSetDurationInMinutes() {
+        int duration2 = 100;
+        lecture.setDurationInMinutes(duration2);
+        assertEquals(duration2, lecture.getDurationInMinutes());
     }
 }

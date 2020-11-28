@@ -16,12 +16,19 @@ class CourseTest {
 
     @BeforeEach
     void setUp() {
-        List<String> participants = Arrays.asList("Matthijs", "Alex");
+        participants = Arrays.asList("abobe", "mbjdegoede");
         course = new Course(participants);
     }
 
     @Test
     void testGetParticipants() {
         assertEquals(participants, course.getParticipants());
+    }
+
+    @Test
+    void testSetParticipants() {
+        List<String> participants2 = Arrays.asList("someNetId", "someNetId2");
+        course.setParticipants(participants2);
+        assertEquals(participants2, course.getParticipants());
     }
 }

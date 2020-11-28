@@ -22,7 +22,13 @@ class OnCampusCandidateTest {
     }
 
     @Test
-    void testGetNumParticipations() {
+    void testConstructorParticipations() {
         assertEquals(numParticipants, candidate.getNumParticipations());
+    }
+    
+    @Test 
+    void testGetSetParticipations() {
+        candidate.setNumParticipations(10);
+        assertEquals(10, candidate.getNumParticipations());
     }
 }

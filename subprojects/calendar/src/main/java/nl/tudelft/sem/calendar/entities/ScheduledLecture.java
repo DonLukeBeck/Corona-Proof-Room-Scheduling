@@ -22,28 +22,58 @@ public class ScheduledLecture {
         this.studentsOnCampus = new ArrayList<String>();
     }
 
-    public Course getCourse(){ return this.course; }
-    public Date getDate() { return this.date; }
-    public LocalTime getStartTime() { return startTime; }
-    public LocalTime getEndTime() { return endTime; }
-    public Room getRoom() { return room; }
-    public List<String> getStudentsOnCampus() { return studentsOnCampus; }
+    public Course getCourse() {
+        return course;
+    }
 
-    public void setRoom(Room room) {
-        this.room = room;
+    public void setCourse(Course course) {
+        this.course = course;
+    }
+
+    public Date getDate() {
+        return date;
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
+    }
+
+    public LocalTime getStartTime() {
+        return startTime;
     }
 
     public void setStartTime(LocalTime startTime) {
         this.startTime = startTime;
     }
 
+    public LocalTime getEndTime() {
+        return endTime;
+    }
+
     public void setEndTime(LocalTime endTime) {
         this.endTime = endTime;
+    }
+
+    public Room getRoom() {
+        return room;
+    }
+
+    public void setRoom(Room room) {
+        this.room = room;
+    }
+
+    public List<String> getStudentsOnCampus() {
+        return studentsOnCampus;
+    }
+
+    public void setStudentsOnCampus(List<String> studentsOnCampus) {
+        this.studentsOnCampus = studentsOnCampus;
     }
 
     public void addStudentOnCampus(String netId) {
         this.studentsOnCampus.add(netId);
     }
-    
-    public void addStudentsOnCampus(List<String> netIds) { this.studentsOnCampus.addAll(netIds); }
+    public void addStudentsOnCampus(List<String> netIds) {
+        this.studentsOnCampus.addAll(netIds);
+    }
 }

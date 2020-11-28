@@ -4,6 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -16,14 +17,13 @@ class ScheduledLectureTest {
     private LocalTime startTime;
     private LocalTime endTime;
     private Room room;
-    private List<String> studentsOnCampus;
     private ScheduledLecture scheduledLecture;
 
     @BeforeEach
     void setUp() {
         endTime = LocalTime.NOON;
         startTime = LocalTime.MIDNIGHT;
-        course = new Course(Arrays.asList("Matthijs", "Alex"));
+        course = new Course(Arrays.asList("mbjdegoede", "abobe"));
         date = new Date(System.currentTimeMillis());
         room = new Room(10, 200, "Drebbelweg IZ-2");
 
@@ -60,7 +60,7 @@ class ScheduledLectureTest {
 
     @Test
     void testGetStudentsOnCampus() {
-
+        assertTrue(scheduledLecture.getStudentsOnCampus().isEmpty());
     }
 
     @Test
@@ -83,11 +83,39 @@ class ScheduledLectureTest {
 
     @Test
     void testAddStudentsOnCampus() {
-
+        assertTrue(scheduledLecture.getStudentsOnCampus().isEmpty());
+        List<String> students2 = Arrays.asList("mbjdegoede", "abobe");
+        scheduledLecture.addStudentsOnCampus(students2);
+        assertEquals(students2 ,scheduledLecture.getStudentsOnCampus());
     }
 
     @Test
     void testAddStudentOnCampus() {
+        assertTrue(scheduledLecture.getStudentsOnCampus().isEmpty());
+        String student2 = "abobe";
+        scheduledLecture.addStudentOnCampus(student2);
+        assertTrue(scheduledLecture.getStudentsOnCampus().contains(student2));
+    }
 
+    @Test
+    void testSetCourse(){
+        Course course2 = new Course(Arrays.asList("abobe"));
+        scheduledLecture.setCourse(course2);
+        assertEquals(course2, scheduledLecture.getCourse());
+    }
+
+    @Test
+    void testSetDate(){
+        Date date2 = new Date(System.currentTimeMillis()+1);
+        scheduledLecture.setDate(date2);
+        assertEquals(date2, scheduledLecture.getDate());
+    }
+
+    @Test
+    void testSetStudentsOnCampus() {
+        assertTrue(scheduledLecture.getStudentsOnCampus().isEmpty());
+        List<String> studentsOnCampus = Arrays.asList("someNetId, someNetId2");
+        scheduledLecture.setStudentsOnCampus(studentsOnCampus);
+        assertEquals(studentsOnCampus, scheduledLecture.getStudentsOnCampus());
     }
 }
