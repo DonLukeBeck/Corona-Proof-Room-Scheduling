@@ -15,9 +15,13 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 @EnableDiscoveryClient
 @SpringBootApplication
 public class Application {
+
 	@Autowired
 	private UserRepository repository;
 
+	/**
+	 * Initialise a list of users to be added to the database.
+	 */
 	@PostConstruct
 	public void initUsers() {
 

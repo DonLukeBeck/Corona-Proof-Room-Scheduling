@@ -23,12 +23,30 @@ public class UserController {
         return "Welcome";
     }
 
-    @PostMapping("/authenticate")
+    @GetMapping("/create-courses")
+    public String createCourses() {
+        return "Create courses page";
+    }
+
+    @GetMapping("/see-schedule")
+    public String seeSchedule() {
+        return "See schedule page";
+    }
+
+    /**
+     * Generate jwt token from incoming authentication details.
+     *
+     * @param authRequest Object containing username and password
+     * @return a jwt token if username and password are valid
+     * @throws Exception if authentication fails
+     */
+    @PostMapping("/login")
     public String generateToken(@RequestBody AuthenticationRequest authRequest) throws Exception {
         try {
             //validate username and password
             authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(authRequest.getNetid(), authRequest.getPassword())
+                    new UsernamePasswordAuthenticationToken(authRequest
+                            .getNetid(), authRequest.getPassword())
             );
         } catch (Exception ex) {
             //authentication failure
