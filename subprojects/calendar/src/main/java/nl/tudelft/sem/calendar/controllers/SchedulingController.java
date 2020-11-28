@@ -30,7 +30,7 @@ public class SchedulingController {
         LectureScheduler scheduler = new LectureScheduler(rooms, lecturesToSchedule, startTime,
                 endTime, timeGapLength); // Create the scheduler that does the scheduling
 
-        List<ScheduledLecture> scheduledLectures = scheduler.scheduledAllLectures();
+        List<ScheduledLecture> scheduledLectures = scheduler.scheduleAllLectures();
         // Save lectures in right format into database
         return null;
     }

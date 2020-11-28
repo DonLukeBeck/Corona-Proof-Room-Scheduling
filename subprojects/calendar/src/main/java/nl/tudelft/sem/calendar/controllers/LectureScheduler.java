@@ -16,7 +16,7 @@ import static java.util.stream.Collectors.groupingBy;
 public class LectureScheduler {
 
     private List<Room> roomList;
-    private LocalTime[] roomAvailability = new LocalTime[roomList.size()];
+    private LocalTime[] roomAvailability;
     private List<RequestedLecture> lecturesToSchedule;
     private LocalTime startTime;
     private LocalTime endTime;
@@ -30,9 +30,11 @@ public class LectureScheduler {
         this.startTime = startTime;
         this.endTime = endTime;
         this.timeGapLengthInMinutes = timeGapLengthInMinutes;
+        this.roomAvailability = new LocalTime[roomList.size()];
+        Arrays.fill(roomAvailability, startTime);
     }
 
-    public List<ScheduledLecture> scheduledAllLectures() {
+    public List<ScheduledLecture> scheduleAllLectures() {
         List<ScheduledLecture> scheduledLectures = new ArrayList<>();
         Map<String, Integer> allParticipants = new HashMap<>();
         Map<Date, List<RequestedLecture>> lecturesByDay = groupLecturesByDay();
@@ -44,14 +46,15 @@ public class LectureScheduler {
         Date startDate = dates.get(0);
         int roomIndex = 0;
         for (Date date: dates) {
-            long dayDiff = TimeUnit.DAYS.convert(Math.abs(date.getTime() - startDate.getTime()), TimeUnit.MILLISECONDS);
+            // Reset room availability
+            Arrays.fill(roomAvailability, startTime);
 
+            // Check if two weeks have passed since the first request
+            long dayDiff = TimeUnit.DAYS.convert(Math.abs(date.getTime() - startDate.getTime()), TimeUnit.MILLISECONDS);
             if(dayDiff >= 14) {
                 allParticipants = new HashMap<>();
                 startDate = date;
             }
-            // Reset room availability
-            Arrays.fill(roomAvailability, startTime);
 
             List<RequestedLecture> toScheduleThisDay = getSortedLecturesForDay(date, lecturesByDay);
             for (RequestedLecture toBeScheduled : toScheduleThisDay) {
@@ -116,6 +119,7 @@ public class LectureScheduler {
                 scheduledLecture.setStartTime(roomAvailability[roomSearchIndex]);
                 scheduledLecture.setEndTime(roomAvailability[roomSearchIndex].plusMinutes(durationInMinutes));
                 roomAvailability[roomSearchIndex] = roomAvailability[roomSearchIndex].plusMinutes(durationInMinutes + timeGapLengthInMinutes);
+                break;
             } else roomSearchIndex++;
         }
     }
