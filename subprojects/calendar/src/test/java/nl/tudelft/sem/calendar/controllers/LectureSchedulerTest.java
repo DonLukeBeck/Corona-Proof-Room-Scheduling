@@ -8,6 +8,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.*;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class LectureSchedulerTest {
  private static LectureScheduler scheduler;
@@ -96,7 +97,62 @@ class LectureSchedulerTest {
 
     @Test
     void testScheduleAllLecturesMoreThanTwoWeeks() {
-        List<ScheduledLecture> result = scheduler.scheduleAllLectures();
+        List<Room> realRoomList = new ArrayList<Room>();
+        for(int i = 1; i <= 20; i++) {
+            realRoomList.add(new Room(i, i * 100, "R-" + i));
+        }
+        Collections.shuffle(realRoomList);
+
+        List<String> realParticipants = new ArrayList<String>();
+        for(int i = 1; i <= 300; i++) {
+            Random r = new Random();
+            char c = (char)(r.nextInt(26) + 'a');
+            realParticipants.add(i + "" + c + c + c + c);
+        }
+
+        List<String> courseParticipants = new ArrayList<String>();
+        List<Course> realCourseList = new ArrayList<Course>();
+        for(int i = 1; i <= 40; i++) {
+            Collections.shuffle(realParticipants);
+            Random random = new Random();
+            int size = random.nextInt(300 - 30) + 30;
+            courseParticipants = realParticipants.subList(0,size);
+            realCourseList.add(new Course(courseParticipants));
+        }
+
+        List<LocalDate> realDates = new ArrayList<LocalDate>();
+        LocalDate firstDate = LocalDate.of(2020,9,1);
+        for(int i = 1; i <= 60; i++) {
+            realDates.add(firstDate.plusDays(i));
+        }
+
+
+        List<RequestedLecture> realRequestedLectures = new ArrayList<RequestedLecture>();
+        for(int i = 1; i <= 50; i++) {
+            Random random = new Random();
+            int index = random.nextInt(240);
+            realRequestedLectures.add(new RequestedLecture(realCourseList.get(index % 40), realDates.get(index % 60), index));
+        }
+
+
+
+        LectureScheduler realLectureScheduler = new LectureScheduler(realRoomList, realRequestedLectures,
+                startTime, endTime, timeGapLengthInMinutes);
+        List<ScheduledLecture> result = realLectureScheduler.scheduleAllLectures();
+        for(int i = 0; i < result.size() - 1; i++) {
+            for(int j = i + 1; j < result.size(); j++) {
+
+                if(result.get(i).getDate().equals(result.get(j).getDate())) {
+                    //assert that the rooms are sorted descending
+                    assertTrue(result.get(i).getRoom().getCapacity() >= result.get(j).getRoom().getCapacity());
+
+                    //assert that size of courses are sorted
+                    assertTrue(result.get(i).getStudentsOnCampus().size() >= result.get(j).getStudentsOnCampus().size());
+                }
+            }
+        }
+
+
     }
 
     @Test
