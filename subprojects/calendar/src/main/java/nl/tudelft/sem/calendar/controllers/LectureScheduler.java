@@ -66,7 +66,9 @@ public class LectureScheduler {
 
         //Updated students in the map should be tested for!
         int studentCounter = 0;
-        while(!candidateSelector.isEmpty() && studentCounter < scheduledLecture.getRoom().getCapacity()) {
+        while(!candidateSelector.isEmpty()
+                && scheduledLecture.getRoom() != null
+                && studentCounter < scheduledLecture.getRoom().getCapacity()) {
             String selected = candidateSelector.remove().getNetId();
             scheduledLecture.addStudentOnCampus(selected);
             allParticipants.put(selected, scheduledLecture.getDate().plusDays(14));
