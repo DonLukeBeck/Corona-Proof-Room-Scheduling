@@ -68,15 +68,13 @@ public class LectureScheduler {
     }
 
     public void assignStudents(ScheduledLecture scheduledLecture, Map<String, Integer> allParticipants) {
-
-        List<String> assignedStudents = new ArrayList<>();
         PriorityQueue<OnCampusCandidate> candidateSelector = createCandidateSelector(scheduledLecture.getCourse().getParticipants(),allParticipants);
 
         int studentCounter = 0;
-        while(!candidateSelector.isEmpty() && scheduledLecture.getRoom().getCapacity() < studentCounter) {
-            assignedStudents.add(candidateSelector.remove().getNetId());
+        while(!candidateSelector.isEmpty() && studentCounter < scheduledLecture.getRoom().getCapacity()) {
+            scheduledLecture.addStudentOnCampus(candidateSelector.remove().getNetId());
+            studentCounter++;
         }
-        scheduledLecture.addStudentsOnCampus(assignedStudents);
     }
 
     public void sortRoomsByCapacity(){

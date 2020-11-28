@@ -1,5 +1,4 @@
 package nl.tudelft.sem.calendar.entities;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -36,13 +35,9 @@ class OnCampusCandidateTest {
     }
 
     @Test
-    void testGetNetId() {
-        assertEquals(netId,candidate.getNetId());
-    }
-
-    @Test
-    void testConstructorParticipations() {
-        assertEquals(numParticipants, candidate.getNumParticipations());
+    void testGetSetNetId() {
+        candidate.setNetId("mbjdegoede");
+        assertEquals("mbjdegoede", candidate.getNetId());
     }
 
     @Test

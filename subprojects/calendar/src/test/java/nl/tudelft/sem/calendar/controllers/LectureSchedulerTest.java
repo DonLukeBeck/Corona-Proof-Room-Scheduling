@@ -38,7 +38,7 @@ class LectureSchedulerTest {
 
     private static void createRooms(){
         testRooms = new Room[5];
-        testRooms[0] = new Room(1, 10, "Class");
+        testRooms[0] = new Room(1, 2, "Class");
         testRooms[1] = new Room(2, 20, "IZ-2");
         testRooms[2] = new Room(3, 30, "W-2");
         testRooms[3] = new Room(4, 15, "IZ-4");
@@ -49,8 +49,8 @@ class LectureSchedulerTest {
 
     private static void createCourses(){
         testCourses = new Course[3];
-        testCourses[0] = new Course(Arrays.asList("abobe","mbjdegoede"));
-        testCourses[1] = new Course(Arrays.asList("someNetId","someNetId2","slokn"));
+        testCourses[0] = new Course(Arrays.asList("someNetId","someNetId2"));
+        testCourses[1] = new Course(Arrays.asList("abobe","mbjdegoede","cparlar"));
         testCourses[2] = new Course(Arrays.asList("mdavid"));
     }
 
@@ -76,7 +76,7 @@ class LectureSchedulerTest {
         testSchedLectures[1] = new ScheduledLecture(testCourses[1], testDates[0]);
     }
 
-    private static Map<Date, List<RequestedLecture>> createMap(){
+    private static HashMap<Date, List<RequestedLecture>> createMap(){
         return new HashMap<>() {{
             put(testDates[0], Arrays.asList(testReqLectures[0],
                     testReqLectures[1], testReqLectures[2]));
@@ -85,14 +85,38 @@ class LectureSchedulerTest {
         }};
     }
 
+    private static HashMap<String, Integer> createParticipants(){
+        return new HashMap<>() {{
+            put("abobe", 3);
+            put("cparlar", 2);
+            put("random", 4);
+        }};
+    }
+
     @Test
     void testScheduledAllLectures() {
+
     }
 
     @Test
-    void testAssignStudents() {
+    void testAssignStudentsEnoughCapacity() {
+        Map<String, Integer> allParticipants = createParticipants();
+        testSchedLectures[1].setRoom(testRooms[1]);
+        assertThat(testSchedLectures[1].getStudentsOnCampus()).isEmpty();
+        scheduler.assignStudents(testSchedLectures[1], allParticipants);
+        assertThat(testSchedLectures[1].getStudentsOnCampus().size()).isEqualTo(3);
     }
 
+    @Test
+    void testAssignStudentsButNotEnoughCapacity() {
+        Map<String, Integer> allParticipants = createParticipants();
+        testSchedLectures[1].setRoom(testRooms[0]);
+        assertThat(testSchedLectures[1].getStudentsOnCampus()).isEmpty();
+        scheduler.assignStudents(testSchedLectures[1], allParticipants);
+
+        assertThat(testSchedLectures[1].getStudentsOnCampus())
+                .containsExactly("mbjdegoede","cparlar");
+    }
 
     @Test
     void testSortRoomsByCapacity() {
@@ -119,10 +143,7 @@ class LectureSchedulerTest {
     @Test
     void testCreateCandidateSelector() {
         List<String> courseParticipants = Arrays.asList("abobe", "mbjdegoede", "cparlar");
-        Map<String, Integer> allParticipants = new HashMap<>();
-        allParticipants.put("abobe", 3);
-        allParticipants.put("cparlar", 2);
-        allParticipants.put("random", 4);
+        HashMap<String, Integer> allParticipants = createParticipants();
 
         OnCampusCandidate[] verficiation = {
                 new OnCampusCandidate("mbjdegoede", 0),
@@ -135,6 +156,8 @@ class LectureSchedulerTest {
         for(int i = 0; i < verficiation.length; i++){
             assertThat(result.remove()).isEqualTo(verficiation[i]);
         }
+        assertThat(allParticipants.get("abobe")).isEqualTo(3);
+        assertThat(allParticipants.get("mbjdegoede")).isEqualTo(0);
     }
 
     @Test
