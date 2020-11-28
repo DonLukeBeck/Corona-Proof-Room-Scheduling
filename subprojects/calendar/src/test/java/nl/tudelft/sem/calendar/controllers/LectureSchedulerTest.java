@@ -1,9 +1,6 @@
 package nl.tudelft.sem.calendar.controllers;
 
-import nl.tudelft.sem.calendar.entities.Course;
-import nl.tudelft.sem.calendar.entities.RequestedLecture;
-import nl.tudelft.sem.calendar.entities.Room;
-import nl.tudelft.sem.calendar.entities.ScheduledLecture;
+import nl.tudelft.sem.calendar.entities.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -121,6 +118,23 @@ class LectureSchedulerTest {
 
     @Test
     void testCreateCandidateSelector() {
+        List<String> courseParticipants = Arrays.asList("abobe", "mbjdegoede", "cparlar");
+        Map<String, Integer> allParticipants = new HashMap<>();
+        allParticipants.put("abobe", 3);
+        allParticipants.put("cparlar", 2);
+        allParticipants.put("random", 4);
+
+        OnCampusCandidate[] verficiation = {
+                new OnCampusCandidate("mbjdegoede", 0),
+                new OnCampusCandidate("cparlar", 2),
+                new OnCampusCandidate("abobe", 3) };
+
+        PriorityQueue<OnCampusCandidate> result =
+                scheduler.createCandidateSelector(courseParticipants, allParticipants);
+
+        for(int i = 0; i < verficiation.length; i++){
+            assertThat(result.remove()).isEqualTo(verficiation[i]);
+        }
     }
 
     @Test

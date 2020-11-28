@@ -84,19 +84,17 @@ public class LectureScheduler {
     }
 
     public Map<Date, List<RequestedLecture>> groupLecturesByDay() {
-        // Map with to be scheduled lectures grouped by date
         return lecturesToSchedule.stream().collect(groupingBy(RequestedLecture::getDate));
     }
 
     public List<RequestedLecture> getSortedLecturesForDay(Date date, Map<Date, List<RequestedLecture>> lecturesByDay) {
-        // The list of lectures to schedule for this date, sorted by course size
         lecturesByDay.get(date).sort(Comparator.comparing(l -> l.getCourse().getParticipants().size(), reverseOrder()));
         return lecturesByDay.get(date);
     }
 
     public PriorityQueue<OnCampusCandidate> createCandidateSelector(List<String> courseParticipants, Map<String, Integer> allParticipants){
         if(courseParticipants == null)
-            return new PriorityQueue<OnCampusCandidate>();
+            return new PriorityQueue<>();
 
         PriorityQueue<OnCampusCandidate> candidates = new PriorityQueue<>(courseParticipants.size(),
                 Comparator.comparing(OnCampusCandidate::getNumParticipations));

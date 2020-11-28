@@ -1,5 +1,7 @@
 package nl.tudelft.sem.calendar.entities;
 
+import java.util.Objects;
+
 public class OnCampusCandidate {
 
     private String netId;
@@ -8,6 +10,18 @@ public class OnCampusCandidate {
     public OnCampusCandidate(String netId, int numParticipations){
         this.netId = netId;
         this.numParticipations = numParticipations;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (!(o instanceof OnCampusCandidate)) {
+            return false;
+        }
+        OnCampusCandidate that = (OnCampusCandidate) o;
+        return getNumParticipations() == that.getNumParticipations() &&
+                getNetId().equals(that.getNetId());
     }
 
     public String getNetId() {
