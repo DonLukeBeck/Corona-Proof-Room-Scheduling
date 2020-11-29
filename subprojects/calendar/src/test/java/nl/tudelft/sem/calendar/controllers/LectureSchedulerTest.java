@@ -1,11 +1,7 @@
 package nl.tudelft.sem.calendar.controllers;
 
-import nl.tudelft.sem.calendar.entities.Course;
-import nl.tudelft.sem.calendar.entities.OnCampusCandidate;
-import nl.tudelft.sem.calendar.entities.RequestedLecture;
-import nl.tudelft.sem.calendar.entities.Room;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -17,9 +13,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Random;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import nl.tudelft.sem.calendar.entities.Course;
+import nl.tudelft.sem.calendar.entities.OnCampusCandidate;
+import nl.tudelft.sem.calendar.entities.RequestedLecture;
+import nl.tudelft.sem.calendar.entities.Room;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 class LectureSchedulerTest {
     private static LectureScheduler scheduler;
