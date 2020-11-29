@@ -78,7 +78,7 @@ class LectureSchedulerTest {
         testSchedLectures[1] = new ScheduledLecture(testCourses[1], testDates[0]);
     }
 
-    private static HashMap<LocalDate, List<RequestedLecture>> createMap(){
+    private static HashMap<LocalDate, List<RequestedLecture>> createMapOfLecturesByDay(){
         return new HashMap<>() {{
             put(testDates[0], Arrays.asList(testReqLectures[0],
                     testReqLectures[1], testReqLectures[2]));
@@ -95,49 +95,70 @@ class LectureSchedulerTest {
         }};
     }
 
-    @Test
-    void testScheduleAllLecturesMoreThanTwoWeeks() {
-        List<Room> realRoomList = new ArrayList<Room>();
+    private static List<Room> createRandomRooms(){
+        List<Room> realRoomList = new ArrayList<>();
         for(int i = 1; i <= 5; i++) {
             realRoomList.add(new Room(i, i * 10, "R-" + i));
         }
         Collections.shuffle(realRoomList);
+        return realRoomList;
+    }
 
-        List<String> realParticipants = new ArrayList<String>();
+    private static List<String> createRandomParticipants(){
+        List<String> randomParticipants = new ArrayList<>();
         for(int i = 1; i <= 300; i++) {
             Random r = new Random();
             char c = (char)(r.nextInt(26) + 'a');
-            realParticipants.add(i + "" + c + c + c + c);
+            randomParticipants.add(i + "" + c + c + c + c);
         }
+        return randomParticipants;
+    }
 
-        List<String> courseParticipants = new ArrayList<String>();
-        List<Course> realCourseList = new ArrayList<Course>();
+    private static List<Course> createRandomCoursesWithRandomStudents(List<String> allParticipants){
+        List<Course> randomCourses = new ArrayList<>();
         for(int i = 1; i <= 40; i++) {
-            Collections.shuffle(realParticipants);
+            Collections.shuffle(allParticipants);
             Random random = new Random();
             int size = random.nextInt(300 - 30) + 30;
-            courseParticipants = realParticipants.subList(0,size);
-            realCourseList.add(new Course(courseParticipants));
+            List<String> courseParticipants = allParticipants.subList(0,size);
+            randomCourses.add(new Course(courseParticipants));
         }
+        return randomCourses;
+    }
 
-        List<LocalDate> realDates = new ArrayList<LocalDate>();
+    private static List<LocalDate> createSubSequentDates(int numberOfDates){
+        List<LocalDate> dates = new ArrayList<>();
         LocalDate firstDate = LocalDate.of(2020,9,1);
-        for(int i = 1; i <= 60; i++) {
-            realDates.add(firstDate.plusDays(i));
+        for(int i = 1; i <= numberOfDates; i++) {
+            dates.add(firstDate.plusDays(i));
         }
+        return dates;
+    }
 
+    private static List<RequestedLecture> createRandomLectureRequests(){
+        List<String> realParticipants = createRandomParticipants();
+        List<Course> realCourseList = createRandomCoursesWithRandomStudents(realParticipants);
+        List<LocalDate> realDates = createSubSequentDates(10);
 
-        List<RequestedLecture> realRequestedLectures = new ArrayList<RequestedLecture>();
+        // Composing the lecture requests
+        List<RequestedLecture> realRequestedLectures = new ArrayList<>();
         for(int i = 1; i <= 100; i++) {
             Random random = new Random();
             int index = random.nextInt(240);
-            realRequestedLectures.add(new RequestedLecture(realCourseList.get(index % 40), realDates.get(index % 60), index));
+            realRequestedLectures.add(new RequestedLecture(realCourseList.get(index % 40),
+                    realDates.get(index % 10), index));
         }
+        return realRequestedLectures;
+    }
 
+    @Test
+    void testCompleteSchedulingAlgorithmWithRandomValues() {
+        List<Room> realRoomList = createRandomRooms();
+        List<RequestedLecture> realRequestedLectures = createRandomLectureRequests();
 
+        LectureScheduler realLectureScheduler = new LectureScheduler(realRoomList,
+                realRequestedLectures, startTime, endTime, timeGapLengthInMinutes);
 
-        LectureScheduler realLectureScheduler = new LectureScheduler(realRoomList, realRequestedLectures,
-                startTime, endTime, timeGapLengthInMinutes);
         List<ScheduledLecture> result = realLectureScheduler.scheduleAllLectures();
         for(int i = 0; i < result.size() - 1; i++) {
             for(int j = i + 1; j < result.size(); j++) {
@@ -145,18 +166,18 @@ class LectureSchedulerTest {
                 if(result.get(i).getDate().equals(result.get(j).getDate())) {
                     //assert that the rooms are sorted descending
                     if(result.get(i).getRoom() != null && result.get(j).getRoom() != null)
-                    assertTrue(result.get(i).getRoom().getCapacity() >= result.get(j).getRoom().getCapacity());
+                    assertTrue(result.get(i).getRoom().getCapacity() >=
+                            result.get(j).getRoom().getCapacity());
 
                     //assert that size of courses are sorted
-                    assertTrue(result.get(i).getStudentsOnCampus().size() >= result.get(j).getStudentsOnCampus().size());
+                    assertTrue(result.get(i).getStudentsOnCampus().size() >=
+                            result.get(j).getStudentsOnCampus().size());
                 }
-
-                //assert dates are sorted
-                assertTrue(result.get(i).getDate().isBefore(result.get(j).getDate()) || result.get(i).getDate().isEqual(result.get(j).getDate()));
+                //assert that the dates are sorted
+                assertTrue(result.get(i).getDate().isBefore(result.get(j).getDate()) ||
+                        result.get(i).getDate().isEqual(result.get(j).getDate()));
             }
         }
-
-
     }
 
     @Test
@@ -178,8 +199,10 @@ class LectureSchedulerTest {
         assertThat(testSchedLectures[1].getStudentsOnCampus())
                 .containsExactly("mbjdegoede","cparlar");
 
-        assertThat(allParticipants.get("mbjdegoede")).isEqualTo(testSchedLectures[1].getDate().plusDays(14));
-        assertThat(allParticipants.get("cparlar")).isEqualTo(testSchedLectures[1].getDate().plusDays(14));
+        assertThat(allParticipants.get("mbjdegoede")).isEqualTo(
+                testSchedLectures[1].getDate().plusDays(14));
+        assertThat(allParticipants.get("cparlar")).isEqualTo(
+                testSchedLectures[1].getDate().plusDays(14));
         assertThat(allParticipants.get("abobe")).isEqualTo(LocalDate.of(2020, 12, 26));
     }
 
@@ -193,15 +216,15 @@ class LectureSchedulerTest {
     @Test
     void testGroupLecturesByDay() {
         scheduler.groupLecturesByDay();
-        Map<LocalDate, List<RequestedLecture>> groupedByDay = createMap();
+        Map<LocalDate, List<RequestedLecture>> groupedByDay = createMapOfLecturesByDay();
         assertThat(scheduler.groupLecturesByDay()).isEqualTo(groupedByDay);
     }
 
     @Test
     void testGetSortedLecturesForDay() {
-        assertThat(scheduler.getSortedLecturesForDay(testDates[0], createMap()))
+        assertThat(scheduler.getSortedLecturesForDay(testDates[0], createMapOfLecturesByDay()))
                 .containsExactly(testReqLectures[1],testReqLectures[0],testReqLectures[2]);
-        assertThat(scheduler.getSortedLecturesForDay(testDates[1], createMap()))
+        assertThat(scheduler.getSortedLecturesForDay(testDates[1], createMapOfLecturesByDay()))
                 .containsExactly(testReqLectures[3]);
     }
 
