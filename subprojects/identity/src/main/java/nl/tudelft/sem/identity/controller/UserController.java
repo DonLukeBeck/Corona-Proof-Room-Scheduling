@@ -4,7 +4,9 @@ import nl.tudelft.sem.identity.entity.AuthenticationRequest;
 import nl.tudelft.sem.identity.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -41,16 +43,22 @@ public class UserController {
      * @throws Exception if authentication fails
      */
     @PostMapping("/login")
-    public String generateToken(@RequestBody AuthenticationRequest authRequest) throws Exception {
+    public String generateToken(@RequestBody AuthenticationRequest authRequest) throws AuthenticationException {
+        // TODO: prevent throwing exceptions on a public API
         try {
             //validate username and password
             authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(authRequest
-                            .getNetid(), authRequest.getPassword())
+                new UsernamePasswordAuthenticationToken(authRequest
+                    .getNetid(), authRequest.getPassword())
             );
-        } catch (Exception ex) {
+        } catch (AuthenticationServiceException ex) {
+            // service failure
+            // TODO: log somewhere, since this is an internal error
+            throw new AuthenticationServiceException(ex.getMessage());
+
+        } catch (AuthenticationException ex) {
             //authentication failure
-            throw new Exception("Invalid netid/password");
+            throw ex;
         }
         //generate web token if authentication successful
         return jwtUtil.generateToken(authRequest.getNetid());
