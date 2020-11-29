@@ -1,9 +1,9 @@
 package nl.tudelft.sem.calendar.entities;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class RoomTest {
     private Room room;

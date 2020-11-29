@@ -1,13 +1,11 @@
 package nl.tudelft.sem.calendar.entities;
-import org.apache.tomcat.jni.Local;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.time.LocalDate;
 import java.util.Arrays;
-
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 class RequestedLectureTest {
     private Course course;
@@ -17,10 +15,10 @@ class RequestedLectureTest {
 
     @BeforeEach
     void setUp() {
-       date = LocalDate.now();
-       course = new Course(Arrays.asList("mbjdegoede", "abobe"));
-       durationInMinutes = 90;
-       lecture = new RequestedLecture(course, date, durationInMinutes);
+        date = LocalDate.now();
+        course = new Course(Arrays.asList("mbjdegoede", "abobe"));
+        durationInMinutes = 90;
+        lecture = new RequestedLecture(course, date, durationInMinutes);
     }
 
     @Test

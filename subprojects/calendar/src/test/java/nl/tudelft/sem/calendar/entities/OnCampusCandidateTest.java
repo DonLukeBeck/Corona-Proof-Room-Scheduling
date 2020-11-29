@@ -1,10 +1,11 @@
 package nl.tudelft.sem.calendar.entities;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import java.time.LocalDate;
-
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 class OnCampusCandidateTest {
     private String netId;
@@ -19,19 +20,19 @@ class OnCampusCandidateTest {
     }
 
     @Test
-    void testEquals(){
+    void testEquals() {
         OnCampusCandidate candidate2 = new OnCampusCandidate(netId, deadline);
         assertEquals(candidate2, candidate);
     }
 
     @Test
-    void testNotAnEqualNetId(){
+    void testNotAnEqualNetId() {
         OnCampusCandidate candidate2 = new OnCampusCandidate("mbjdegoede", deadline);
         assertNotEquals(candidate2, candidate);
     }
 
     @Test
-    void testNotAnEqualDeadline(){
+    void testNotAnEqualDeadline() {
         OnCampusCandidate candidate2 = new OnCampusCandidate(netId, LocalDate.now().plusDays(1));
         assertNotEquals(candidate2, candidate);
     }

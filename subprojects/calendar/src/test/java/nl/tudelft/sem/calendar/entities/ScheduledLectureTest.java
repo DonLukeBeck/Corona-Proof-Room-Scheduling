@@ -1,14 +1,14 @@
 package nl.tudelft.sem.calendar.entities;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Arrays;
 import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 class ScheduledLectureTest {
     private Course course;
@@ -26,7 +26,7 @@ class ScheduledLectureTest {
         date = LocalDate.now();
         room = new Room(10, 200, "Drebbelweg IZ-2");
 
-        scheduledLecture = new ScheduledLecture(course,date);
+        scheduledLecture = new ScheduledLecture(course, date);
         scheduledLecture.setStartTime(startTime);
         scheduledLecture.setEndTime(endTime);
         scheduledLecture.setRoom(room);
@@ -85,7 +85,7 @@ class ScheduledLectureTest {
         assertTrue(scheduledLecture.getStudentsOnCampus().isEmpty());
         List<String> students2 = Arrays.asList("mbjdegoede", "abobe");
         scheduledLecture.addStudentsOnCampus(students2);
-        assertEquals(students2 ,scheduledLecture.getStudentsOnCampus());
+        assertEquals(students2, scheduledLecture.getStudentsOnCampus());
     }
 
     @Test
@@ -97,14 +97,14 @@ class ScheduledLectureTest {
     }
 
     @Test
-    void testSetCourse(){
+    void testSetCourse() {
         Course course2 = new Course(Arrays.asList("abobe"));
         scheduledLecture.setCourse(course2);
         assertEquals(course2, scheduledLecture.getCourse());
     }
 
     @Test
-    void testSetDate(){
+    void testSetDate() {
         LocalDate date2 = LocalDate.now();
         scheduledLecture.setDate(date2);
         assertEquals(date2, scheduledLecture.getDate());
