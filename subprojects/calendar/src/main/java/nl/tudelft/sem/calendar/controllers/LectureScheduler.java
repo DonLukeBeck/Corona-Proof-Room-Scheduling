@@ -45,10 +45,10 @@ public class LectureScheduler {
         Collections.sort(dates);
         sortRoomsByCapacity();
 
-        int roomIndex = 0;
         for (LocalDate date: dates) {
             // Reset room availability
             Arrays.fill(roomAvailability, startTime);
+            int roomIndex = 0;
 
             List<RequestedLecture> toScheduleThisDay = getSortedLecturesForDay(date, lecturesByDay);
             for (RequestedLecture toBeScheduled : toScheduleThisDay) {
