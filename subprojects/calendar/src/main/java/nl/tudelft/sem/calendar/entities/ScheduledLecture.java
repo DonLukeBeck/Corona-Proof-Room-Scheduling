@@ -16,10 +16,7 @@ public class ScheduledLecture {
     public ScheduledLecture(Course course, LocalDate date) {
         this.course = course;
         this.date = date;
-        this.startTime = null;
-        this.endTime = null;
-        this.room = null;
-        this.studentsOnCampus = new ArrayList<String>();
+        this.studentsOnCampus = new ArrayList<>();
     }
 
     public Course getCourse() {
@@ -73,6 +70,7 @@ public class ScheduledLecture {
     public void addStudentOnCampus(String netId) {
         this.studentsOnCampus.add(netId);
     }
+
     public void addStudentsOnCampus(List<String> netIds) {
         this.studentsOnCampus.addAll(netIds);
     }

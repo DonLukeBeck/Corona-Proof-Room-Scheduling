@@ -1,20 +1,19 @@
 package nl.tudelft.sem.calendar.controllers;
 
+import java.time.Duration;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.*;
+
 import nl.tudelft.sem.calendar.entities.OnCampusCandidate;
 import nl.tudelft.sem.calendar.entities.RequestedLecture;
 import nl.tudelft.sem.calendar.entities.Room;
 import nl.tudelft.sem.calendar.entities.ScheduledLecture;
 
-
-import java.time.Duration;
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.*;
 import static java.util.Comparator.reverseOrder;
 import static java.util.stream.Collectors.groupingBy;
 
 public class LectureScheduler {
-
     private List<Room> roomList;
     private LocalTime[] roomAvailability;
     private List<RequestedLecture> lecturesToSchedule;
@@ -36,7 +35,9 @@ public class LectureScheduler {
 
     public List<ScheduledLecture> scheduleAllLectures() {
         List<ScheduledLecture> scheduledLectures = new ArrayList<>();
-        if(lecturesToSchedule == null || lecturesToSchedule.size() == 0) return scheduledLectures;
+        if (lecturesToSchedule == null || lecturesToSchedule.size() == 0) {
+            return scheduledLectures;
+        }
 
         Map<String, LocalDate> allParticipants = new HashMap<>();
         Map<LocalDate, List<RequestedLecture>> lecturesByDay = groupLecturesByDay();
@@ -45,15 +46,17 @@ public class LectureScheduler {
         Collections.sort(dates);
         sortRoomsByCapacity();
 
-        for (LocalDate date: dates) {
+        for (LocalDate date : dates) {
             // Reset room availability
             Arrays.fill(roomAvailability, startTime);
             int roomIndex = 0;
 
             List<RequestedLecture> toScheduleThisDay = getSortedLecturesForDay(date, lecturesByDay);
             for (RequestedLecture toBeScheduled : toScheduleThisDay) {
-                ScheduledLecture scheduledLecture = new ScheduledLecture(toBeScheduled.getCourse(), toBeScheduled.getDate());
-                roomIndex = assignRoom(roomIndex, scheduledLecture, toBeScheduled.getDurationInMinutes());
+                ScheduledLecture scheduledLecture =
+                        new ScheduledLecture(toBeScheduled.getCourse(), toBeScheduled.getDate());
+                roomIndex = assignRoom(roomIndex,
+                        scheduledLecture, toBeScheduled.getDurationInMinutes());
                 assignStudents(scheduledLecture, allParticipants);
                 scheduledLectures.add(scheduledLecture);
             }
@@ -61,12 +64,15 @@ public class LectureScheduler {
         return scheduledLectures;
     }
 
-    public void assignStudents(ScheduledLecture scheduledLecture, Map<String, LocalDate> allParticipants) {
-        PriorityQueue<OnCampusCandidate> candidateSelector = createCandidateSelector(scheduledLecture.getDate(), scheduledLecture.getCourse().getParticipants(),allParticipants);
+    public void assignStudents(ScheduledLecture scheduledLecture, Map<String,
+            LocalDate> allParticipants) {
+        PriorityQueue<OnCampusCandidate> candidateSelector =
+                createCandidateSelector(scheduledLecture.getDate(),
+                        scheduledLecture.getCourse().getParticipants(), allParticipants);
 
         //Updated students in the map should be tested for!
         int studentCounter = 0;
-        while(!candidateSelector.isEmpty()
+        while (!candidateSelector.isEmpty()
                 && scheduledLecture.getRoom() != null
                 && studentCounter < scheduledLecture.getRoom().getCapacity()) {
             String selected = candidateSelector.remove().getNetId();
@@ -76,7 +82,7 @@ public class LectureScheduler {
         }
     }
 
-    public void sortRoomsByCapacity(){
+    public void sortRoomsByCapacity() {
         roomList.sort(Comparator.comparing(Room::getCapacity, reverseOrder()));
     }
 
@@ -84,15 +90,19 @@ public class LectureScheduler {
         return lecturesToSchedule.stream().collect(groupingBy(RequestedLecture::getDate));
     }
 
-    public List<RequestedLecture> getSortedLecturesForDay(LocalDate date, Map<LocalDate, List<RequestedLecture>> lecturesByDay) {
-        lecturesByDay.get(date).sort(Comparator.comparing(l -> l.getCourse().getParticipants().size(), reverseOrder()));
+    public List<RequestedLecture> getSortedLecturesForDay(LocalDate date, Map<LocalDate,
+            List<RequestedLecture>> lecturesByDay) {
+        lecturesByDay.get(date).sort(Comparator.comparing(
+                l -> l.getCourse().getParticipants().size(), reverseOrder()));
         return lecturesByDay.get(date);
     }
 
-    public PriorityQueue<OnCampusCandidate> createCandidateSelector(LocalDate lectureDate, List<String> courseParticipants, Map<String, LocalDate> allParticipants){
-        if(courseParticipants == null)
+    public PriorityQueue<OnCampusCandidate> createCandidateSelector(LocalDate lectureDate,
+            List<String> courseParticipants, Map<String, LocalDate>
+            allParticipants) {
+        if (courseParticipants == null) {
             return new PriorityQueue<>();
-
+        }
         PriorityQueue<OnCampusCandidate> candidates = new PriorityQueue<>(courseParticipants.size(),
                 Comparator.comparing(OnCampusCandidate::getDeadline));
 
@@ -107,15 +117,21 @@ public class LectureScheduler {
         return candidates;
     }
 
-    public int assignRoom(int roomSearchIndex, ScheduledLecture scheduledLecture, int durationInMinutes) {
-        while(roomSearchIndex < roomList.size()) {
-            if(durationInMinutes <= (int) Duration.between(roomAvailability[roomSearchIndex], endTime).toMinutes()) {
+    public int assignRoom(int roomSearchIndex, ScheduledLecture scheduledLecture,
+                          int durationInMinutes) {
+        while (roomSearchIndex < roomList.size()) {
+            if (durationInMinutes <= (int) Duration.between(
+                    roomAvailability[roomSearchIndex], endTime).toMinutes()) {
                 scheduledLecture.setRoom(roomList.get(roomSearchIndex));
                 scheduledLecture.setStartTime(roomAvailability[roomSearchIndex]);
-                scheduledLecture.setEndTime(roomAvailability[roomSearchIndex].plusMinutes(durationInMinutes));
-                roomAvailability[roomSearchIndex] = roomAvailability[roomSearchIndex].plusMinutes(durationInMinutes + timeGapLengthInMinutes);
+                scheduledLecture.setEndTime(
+                        roomAvailability[roomSearchIndex].plusMinutes(durationInMinutes));
+                roomAvailability[roomSearchIndex] = roomAvailability[roomSearchIndex]
+                        .plusMinutes(durationInMinutes + timeGapLengthInMinutes);
                 break;
-            } else roomSearchIndex++;
+            } else {
+                roomSearchIndex++;
+            }
         }
         return roomSearchIndex;
     }

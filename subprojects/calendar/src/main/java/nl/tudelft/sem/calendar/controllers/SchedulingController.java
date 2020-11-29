@@ -1,18 +1,12 @@
 package nl.tudelft.sem.calendar.controllers;
 
+import java.time.LocalTime;
+import java.util.List;
 import nl.tudelft.sem.calendar.communication.RestrictionManagementCommunicator;
 import nl.tudelft.sem.calendar.entities.RequestedLecture;
 import nl.tudelft.sem.calendar.entities.Room;
 import nl.tudelft.sem.calendar.entities.ScheduledLecture;
 
-import java.time.LocalTime;
-import java.util.List;
-
-//import nl.tudelft.sem.lecture_scheduling.repositories;
-//@EnableJpaRepositories("nl.tudelft.sem.lecture_scheduling.repositories")
-
-
-//@RestController
 public class SchedulingController {
 
     //@PostMapping("schedule-lectures")
@@ -31,7 +25,6 @@ public class SchedulingController {
                 endTime, timeGapLength); // Create the scheduler that does the scheduling
 
         List<ScheduledLecture> scheduledLectures = scheduler.scheduleAllLectures();
-        // Save lectures in right format into database
         return null;
     }
 }

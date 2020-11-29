@@ -1,4 +1,5 @@
 package nl.tudelft.sem.calendar.entities;
+
 import java.time.LocalDate;
 
 public class RequestedLecture {
@@ -6,7 +7,7 @@ public class RequestedLecture {
     private LocalDate date;
     private int durationInMinutes;
 
-    public RequestedLecture(Course course, LocalDate date, int durationInMinutes){
+    public RequestedLecture(Course course, LocalDate date, int durationInMinutes) {
         this.course = course;
         this.date = date;
         this.durationInMinutes = durationInMinutes;

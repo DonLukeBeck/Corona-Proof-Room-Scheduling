@@ -1,4 +1,5 @@
 package nl.tudelft.sem.calendar.entities;
+
 import java.util.List;
 
 public class Course {
