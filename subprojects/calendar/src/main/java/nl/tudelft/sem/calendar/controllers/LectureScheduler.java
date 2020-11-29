@@ -1,17 +1,25 @@
 package nl.tudelft.sem.calendar.controllers;
 
-import java.time.Duration;
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.*;
-
 import nl.tudelft.sem.calendar.entities.OnCampusCandidate;
 import nl.tudelft.sem.calendar.entities.RequestedLecture;
 import nl.tudelft.sem.calendar.entities.Room;
 import nl.tudelft.sem.calendar.entities.ScheduledLecture;
 
+import java.time.Duration;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.PriorityQueue;
+
 import static java.util.Comparator.reverseOrder;
 import static java.util.stream.Collectors.groupingBy;
+
 
 public class LectureScheduler {
     private List<Room> roomList;
@@ -98,7 +106,7 @@ public class LectureScheduler {
     }
 
     public PriorityQueue<OnCampusCandidate> createCandidateSelector(LocalDate lectureDate,
-            List<String> courseParticipants, Map<String, LocalDate>
+                                                                    List<String> courseParticipants, Map<String, LocalDate>
             allParticipants) {
         if (courseParticipants == null) {
             return new PriorityQueue<>();

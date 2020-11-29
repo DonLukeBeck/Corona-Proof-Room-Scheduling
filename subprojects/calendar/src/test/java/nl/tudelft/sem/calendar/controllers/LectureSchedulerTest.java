@@ -1,16 +1,25 @@
 package nl.tudelft.sem.calendar.controllers;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.*;
 import nl.tudelft.sem.calendar.entities.Course;
+import nl.tudelft.sem.calendar.entities.OnCampusCandidate;
 import nl.tudelft.sem.calendar.entities.RequestedLecture;
 import nl.tudelft.sem.calendar.entities.Room;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import java.time.LocalDate;W
+import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.PriorityQueue;
+import java.util.Random;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class LectureSchedulerTest {
     private static LectureScheduler scheduler;
@@ -261,7 +270,7 @@ class LectureSchedulerTest {
             new nl.tudelft.sem.calendar.entities.OnCampusCandidate("abobe",
                     LocalDate.of(2020, 12, 26)) };
 
-        PriorityQueue<nl.tudelft.sem.calendar.entities.OnCampusCandidate> result =
+        PriorityQueue<OnCampusCandidate> result =
                 scheduler.createCandidateSelector(lectureDate, courseParticipants, allParticipants);
 
         for (nl.tudelft.sem.calendar.entities.OnCampusCandidate onCampusCandidate : verification) {
