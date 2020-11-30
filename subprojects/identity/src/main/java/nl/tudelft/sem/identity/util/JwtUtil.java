@@ -3,8 +3,10 @@ package nl.tudelft.sem.identity.util;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import lombok.Getter;
@@ -15,6 +17,7 @@ import nl.tudelft.sem.identity.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -61,7 +64,7 @@ public class JwtUtil {
     public String generateToken(String username) {
         var user = userService.loadUserByUsername(username);
         var claims = new HashMap<String, Object>();
-        claims.put("scope", user.getAuthorities());
+        claims.put("scope", new ArrayList<GrantedAuthority>(user.getAuthorities()));
         return createToken(claims, username);
     }
 

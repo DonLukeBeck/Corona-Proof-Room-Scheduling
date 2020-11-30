@@ -10,13 +10,19 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Optional;
 import javax.xml.bind.DatatypeConverter;
 import nl.tudelft.sem.identity.controller.UserController;
+import nl.tudelft.sem.identity.entity.AuthenticationRequest;
 import nl.tudelft.sem.identity.entity.User;
 import nl.tudelft.sem.identity.repository.UserRepository;
+import nl.tudelft.sem.identity.service.UserService;
 import nl.tudelft.sem.identity.util.JwtUtil;
+import org.assertj.core.api.Condition;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +32,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
@@ -62,6 +69,9 @@ import org.springframework.test.web.servlet.MockMvc;
 @AutoConfigureMockMvc
 @WebMvcTest
 public class UserControllerTest {
+
+    ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
+
     private BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
     @Autowired
@@ -70,6 +80,8 @@ public class UserControllerTest {
     private MockMvc mockMvc;
 
     private User correctUser;
+
+    private AuthenticationRequest authenticationRequest;
 
     @Autowired
     WebApplicationContext webApplicationContext;
@@ -80,23 +92,29 @@ public class UserControllerTest {
     @BeforeEach
     public void setup() {
         this.mockMvc = webAppContextSetup(webApplicationContext).build();
-        this.correctUser = new User("CorrectNetID", encoder.encode("SecurePassword123"), "Student", false);
+        this.correctUser = new User("CorrectNetid", encoder.encode("SecurePassword123"), "student", false);
+        this.authenticationRequest = new AuthenticationRequest(correctUser.getNetid(),
+            "SecurePassword123");
     }
 
 
     @Test
     public void loginCorrect() throws Exception {
-        // when(userRepository.findByNetid(correctUser.getNetid()))
-        //     .thenReturn(correctUser);
+        when(userRepository.findByNetid(correctUser.getNetid())).thenReturn(correctUser);
 
-        // String uri = "/login";
-        // String jwt = mockMvc.perform(get(uri, correctUser.getNetid()).contentType(MediaType.APPLICATION_JSON_VALUE)).andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+        String uri = "/login";
+        String jwt = mockMvc.perform(post(uri).contentType(MediaType.APPLICATION_JSON_VALUE)
+            .content(objectMapper.writeValueAsString(authenticationRequest))).andExpect(status().isOk())
+            .andReturn().getResponse().getContentAsString();
 
-        // Claims claims = Jwts.parser().setSigningKey(jwtUtil.getSecret()).parseClaimsJws(jwt).getBody();
-        // assertThat(claims.getSubject()).isEqualTo("CorrectNetid");
-        // assertThat(claims.get("scope")).isEqualTo("Student");
-        // assertThat(claims.getIssuedAt()).isBefore(claims.getExpiration());
-
+        Claims claims = Jwts.parser().setSigningKey(jwtUtil.getSecret()).parseClaimsJws(jwt)
+            .getBody();
+        assertThat(claims.getSubject()).isEqualTo("CorrectNetid");
+        var scope = (ArrayList<LinkedHashMap>) claims.get("scope");
+        assertTrue(scope.get(0).containsValue("ROLE_STUDENT"));
+        var cond = new Condition<LinkedHashMap>(m -> m.containsValue("ROLE_STUDENT"), "Contains student");
+        assertThat(scope).haveExactly(1, cond);
+        assertThat(claims.getIssuedAt()).isBefore(claims.getExpiration());
     }
 
 }
