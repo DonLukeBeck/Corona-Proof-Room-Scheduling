@@ -18,6 +18,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @EnableWebSecurity
+@SuppressWarnings("PMD.BeanMembersShouldSerialize")
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
@@ -45,7 +46,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/create-courses").hasAnyRole("TEACHER")
                 .and().exceptionHandling().and().sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-        http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);;
+        http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
     }
 
     @Bean(name = BeanIds.AUTHENTICATION_MANAGER)

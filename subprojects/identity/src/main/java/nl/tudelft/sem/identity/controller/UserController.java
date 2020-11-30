@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @ComponentScan(basePackages = {"nl.tudelft.sem.identity.*"})
+@SuppressWarnings("PMD.BeanMembersShouldSerialize")
 public class UserController {
     @Autowired
     private JwtUtil jwtUtil;

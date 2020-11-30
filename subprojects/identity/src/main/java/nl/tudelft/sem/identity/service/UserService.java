@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @ComponentScan(basePackages = {"nl.tudelft.sem.identity.repository"})
+@SuppressWarnings("PMD.BeanMembersShouldSerialize")
 public class UserService implements UserDetailsService {
 
     @Autowired

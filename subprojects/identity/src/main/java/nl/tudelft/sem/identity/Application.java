@@ -17,30 +17,31 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 @EnableDiscoveryClient
 @SpringBootApplication
 @EnableJpaRepositories("nl.tudelft.sem.identity.repository")
+@SuppressWarnings("PMD.BeanMembersShouldSerialize")
 public class Application {
 
-	@Autowired
-	private UserRepository repository;
+    @Autowired
+    private UserRepository repository;
 
-	/**
-	 * Initialise a list of users to be added to the database.
-	 */
-	@PostConstruct
-	public void initUsers() {
+    /**
+     * Initialise a list of users to be added to the database.
+     */
+    @PostConstruct
+    public void initUsers() {
 
-		//password encoder to encode raw password in database
-		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+       	//password encoder to encode raw password in database
+       	BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
-		//list of user objects to be 'registered' in the database
-		List<User> users = Stream.of(
-				new User("luca", encoder.encode("1234"), "student", false),
-				new User("luka", encoder.encode("12345"), "teacher", true)
-		).collect(Collectors.toList());
-		repository.saveAll(users);
-	}
+       	//list of user objects to be 'registered' in the database
+       	List<User> users = Stream.of(
+       	    new User("luca", encoder.encode("1234"), "student", false),
+            new User("luka", encoder.encode("12345"), "teacher", true)
+       	).collect(Collectors.toList());
+       	repository.saveAll(users);
+    }
 
 
-	public static void main(String[] args) {
+    public static void main(String[] args) {
 		SpringApplication.run(Application.class, args);
 	}
 

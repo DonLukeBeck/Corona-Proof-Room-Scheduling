@@ -16,6 +16,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 @Component
+// since it uses a builder pattern, it thinks that a recently defined variable is undefined
+@SuppressWarnings({"PMD.BeanMembersShouldSerialize", "PMD.DataflowAnomalyAnalysis"})
 public class JwtFilter extends OncePerRequestFilter {
 
     @Autowired
