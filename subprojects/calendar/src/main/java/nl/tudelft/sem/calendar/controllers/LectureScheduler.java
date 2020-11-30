@@ -105,7 +105,7 @@ public class LectureScheduler {
     }
 
     public PriorityQueue<OnCampusCandidate> createCandidateSelector(LocalDate lectureDate,
-                                                                    List<String> courseParticipants, Map<String, LocalDate>
+            List<String> courseParticipants, Map<String, LocalDate>
             allParticipants) {
         if (courseParticipants == null) {
             return new PriorityQueue<>();
