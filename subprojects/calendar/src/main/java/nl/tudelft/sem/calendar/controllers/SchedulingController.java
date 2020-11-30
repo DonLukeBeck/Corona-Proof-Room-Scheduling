@@ -10,7 +10,8 @@ import nl.tudelft.sem.calendar.entities.ScheduledLecture;
 public class SchedulingController {
 
     /**
-     * This method forms the main API endpoint for the Scheduling functionality.
+     * This method will form the main API endpoint for the Scheduling functionality, once the
+     * connection face with the other services is determined, it will be implemented to match up.
      *
      * @param lecturesToSchedule the list of lectures to be scheduled
      * @return a string indicating success or failure

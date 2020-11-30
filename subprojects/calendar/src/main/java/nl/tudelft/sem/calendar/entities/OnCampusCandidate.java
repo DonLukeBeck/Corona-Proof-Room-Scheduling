@@ -72,7 +72,7 @@ public class OnCampusCandidate {
      * Returns the deadline of this student.
      *
      * @return a localdate indicating indicating the latest date at which
-     * a student should come to campus
+     *                  a student should come to campus
      */
     public LocalDate getDeadline() {
         return this.deadline;

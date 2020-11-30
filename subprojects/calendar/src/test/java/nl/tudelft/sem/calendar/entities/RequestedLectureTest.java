@@ -13,6 +13,10 @@ class RequestedLectureTest {
     private LocalDate date;
     private int durationInMinutes;
 
+    /**
+     * Creates a new requested lecture and attributes used for verification, used in all test
+     * cases.
+     */
     @BeforeEach
     void setUp() {
         date = LocalDate.now();
@@ -21,21 +25,33 @@ class RequestedLectureTest {
         lecture = new RequestedLecture(course, date, durationInMinutes);
     }
 
+    /**
+     * Tests the getter of the course attribute.
+     */
     @Test
     void testGetCourse() {
         assertEquals(course, lecture.getCourse());
     }
 
+    /**
+     * Tests the getter of the date attribute.
+     */
     @Test
     void testGetDate() {
         assertEquals(date, lecture.getDate());
     }
 
+    /**
+     * Tests the getter of the duration attribute.
+     */
     @Test
     void testGetDurationInMinutes() {
         assertEquals(durationInMinutes, lecture.getDurationInMinutes());
     }
 
+    /**
+     * Tests the setter of the course attribute.
+     */
     @Test
     void testSetCourse() {
         Course course2 = new Course(Arrays.asList("mbjdegoede", "abobe"));
@@ -43,13 +59,19 @@ class RequestedLectureTest {
         assertEquals(course2, lecture.getCourse());
     }
 
+    /**
+     * Tests the setter of the date attribute.
+     */
     @Test
-    void testSet() {
+    void testSetDate() {
         LocalDate date2 = LocalDate.now();
         lecture.setDate(date2);
         assertEquals(date2, lecture.getDate());
     }
 
+    /**
+     * Tests the setter of the duration in minutes attribute.
+     */
     @Test
     void testSetDurationInMinutes() {
         int duration2 = 100;

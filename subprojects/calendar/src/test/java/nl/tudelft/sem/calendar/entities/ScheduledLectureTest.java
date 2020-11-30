@@ -18,6 +18,9 @@ class ScheduledLectureTest {
     private Room room;
     private ScheduledLecture scheduledLecture;
 
+    /**
+     * Creates a new scheduled lecture and attributes used for verification in all test cases.
+     */
     @BeforeEach
     void setUp() {
         endTime = LocalTime.NOON;
@@ -32,54 +35,84 @@ class ScheduledLectureTest {
         scheduledLecture.setRoom(room);
     }
 
+    /**
+     * Tests the getter of the course attribute.
+     */
     @Test
     void testGetCourse() {
         assertEquals(course, scheduledLecture.getCourse());
     }
 
+    /**
+     * Tests the getter of the date attribute.
+     */
     @Test
     void testGetLocalDate() {
         assertEquals(date, scheduledLecture.getDate());
     }
 
+    /**
+     * Tests the getter of the start time attribute.
+     */
     @Test
     void testGetStartTime() {
         assertEquals(startTime, scheduledLecture.getStartTime());
     }
 
+    /**
+     * Tests the getter of the end time attribute.
+     */
     @Test
     void testGetEndTime() {
         assertEquals(endTime, scheduledLecture.getEndTime());
     }
 
+    /**
+     * Tests the getter of the room attribute.
+     */
     @Test
     void testGetRoom() {
         assertEquals(room, scheduledLecture.getRoom());
     }
 
+    /**
+     * Tests the getter of the list of students on campus attribute.
+     */
     @Test
     void testGetStudentsOnCampus() {
         assertTrue(scheduledLecture.getStudentsOnCampus().isEmpty());
     }
 
+    /**
+     * Tests the setter of the room attribute.
+     */
     @Test
     void testSetRoom() {
         scheduledLecture.setRoom(room);
         assertEquals(room, scheduledLecture.getRoom());
     }
 
+    /**
+     * Tests the setter of the start time attribute.
+     */
     @Test
     void testSetStartTime() {
         scheduledLecture.setStartTime(LocalTime.MIDNIGHT);
         assertEquals(LocalTime.MIDNIGHT, scheduledLecture.getStartTime());
     }
 
+    /**
+     * Tests the setter of the end time attribute.
+     */
     @Test
     void testSetEndTime() {
         scheduledLecture.setEndTime(LocalTime.NOON);
         assertEquals(LocalTime.NOON, scheduledLecture.getEndTime());
     }
 
+    /**
+     * Tests whether adding a list of netIds to the selected list of students works as expected.
+     */
     @Test
     void testAddStudentsOnCampus() {
         assertTrue(scheduledLecture.getStudentsOnCampus().isEmpty());
@@ -88,6 +121,9 @@ class ScheduledLectureTest {
         assertEquals(students2, scheduledLecture.getStudentsOnCampus());
     }
 
+    /**
+     * Tests whether adding a single netId to the selected list of students works as expected.
+     */
     @Test
     void testAddStudentOnCampus() {
         assertTrue(scheduledLecture.getStudentsOnCampus().isEmpty());
@@ -96,6 +132,9 @@ class ScheduledLectureTest {
         assertTrue(scheduledLecture.getStudentsOnCampus().contains(student2));
     }
 
+    /**
+     * Tests the setter of the course attribute.
+     */
     @Test
     void testSetCourse() {
         Course course2 = new Course(Arrays.asList("abobe"));
@@ -103,6 +142,9 @@ class ScheduledLectureTest {
         assertEquals(course2, scheduledLecture.getCourse());
     }
 
+    /**
+     * Tests the setter of the date attribute.
+     */
     @Test
     void testSetDate() {
         LocalDate date2 = LocalDate.now();
@@ -110,6 +152,9 @@ class ScheduledLectureTest {
         assertEquals(date2, scheduledLecture.getDate());
     }
 
+    /**
+     * Tests the setter of the list of selected students on campus attribute.
+     */
     @Test
     void testSetStudentsOnCampus() {
         assertTrue(scheduledLecture.getStudentsOnCampus().isEmpty());

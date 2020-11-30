@@ -11,7 +11,9 @@ class RoomTest {
     private int capacity;
     private String name;
 
-
+    /**
+     * Creates a room and attributes that are used for verification.
+     */
     @BeforeEach
     void setUp() {
         roomId = 10;
@@ -20,21 +22,33 @@ class RoomTest {
         room = new Room(roomId, capacity, name);
     }
 
+    /**
+     * Tests the getter for the roomId.
+     */
     @Test
     void testGetRoomId() {
         assertEquals(roomId, room.getRoomId());
     }
 
+    /**
+     * Tests the getter for the room name.
+     */
     @Test
     void testGetName() {
         assertEquals(name, room.getName());
     }
 
+    /**
+     * Tests the getter for the room capacity.
+     */
     @Test
     void testGetCapacity() {
         assertEquals(capacity, room.getCapacity());
     }
 
+    /**
+     * Tests the setter for the room id.
+     */
     @Test
     void testSetRoomId() {
         int roomId2 = 120;
@@ -42,6 +56,9 @@ class RoomTest {
         assertEquals(roomId2, room.getRoomId());
     }
 
+    /**
+     * Tests the setter for the room name.
+     */
     @Test
     void testSetName() {
         String name = "IZ_3";
@@ -49,6 +66,9 @@ class RoomTest {
         assertEquals(name, room.getName());
     }
 
+    /**
+     * Tests the setter for the room capacity.
+     */
     @Test
     void testSetCapacity() {
         int capacity2 = 560;

@@ -13,17 +13,26 @@ class CourseTest {
     private Course course;
     private List<String> participants;
 
+    /**
+     * Creates a course and a list of associated participants used in all the test cases.
+     */
     @BeforeEach
     void setUp() {
         participants = Arrays.asList("abobe", "mbjdegoede");
         course = new Course(participants);
     }
 
+    /**
+     * Tests the getter of the participant list.
+     */
     @Test
     void testGetParticipants() {
         assertEquals(participants, course.getParticipants());
     }
 
+    /**
+     * Tests the setter of the participant list.
+     */
     @Test
     void testSetParticipants() {
         List<String> participants2 = Arrays.asList("someNetId", "someNetId2");

@@ -162,11 +162,12 @@ public class LectureScheduler {
      *                           associated to this lecture
      * @param allParticipants    a map storing all the students and their deadlines
      * @return a priority queue in which the students from the course associated with the lecture
-     * are placed with increasing deadline, so that the students which haven't been to campus for
-     * the longest time are selected the first.
+     *
+     *      are placed with increasing deadline, so that the students which haven't been
+     *      to campus for the longest time are selected the first.
      */
     public PriorityQueue<OnCampusCandidate> createCandidateSelector(LocalDate lectureDate,
-                                                                    List<String> courseParticipants, Map<String, LocalDate> allParticipants) {
+                        List<String> courseParticipants, Map<String, LocalDate> allParticipants) {
         if (courseParticipants == null) {
             return new PriorityQueue<>();
         }
@@ -199,7 +200,7 @@ public class LectureScheduler {
      * @param scheduledLecture  the lecture to schedule
      * @param durationInMinutes the duration of the lecture to schedule
      * @return the index of the room found for this lecture, this enables calling this method with
-     * that value next time, so that fully booked rooms don't have to be checked again
+     *      that value next time, so that fully booked rooms don't have to be checked again
      */
     public int assignRoom(int roomSearchIndex, ScheduledLecture scheduledLecture,
                           int durationInMinutes) {
