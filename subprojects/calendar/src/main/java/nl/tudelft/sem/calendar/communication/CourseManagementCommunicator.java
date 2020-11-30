@@ -1,7 +1,7 @@
 package nl.tudelft.sem.calendar.communication;
 
 import java.util.List;
-import nl.tudelft.sem.calendar.entities.RequestedLecture;
+import nl.tudelft.sem.calendar.scheduling.RequestedLecture;
 
 public class CourseManagementCommunicator {
 

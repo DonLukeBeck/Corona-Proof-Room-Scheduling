@@ -1,4 +1,4 @@
-package nl.tudelft.sem.calendar.controllers;
+package nl.tudelft.sem.calendar.scheduling;
 
 import static java.util.Comparator.reverseOrder;
 import static java.util.stream.Collectors.groupingBy;
@@ -14,10 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
-import nl.tudelft.sem.calendar.entities.OnCampusCandidate;
-import nl.tudelft.sem.calendar.entities.RequestedLecture;
 import nl.tudelft.sem.calendar.entities.Room;
-import nl.tudelft.sem.calendar.entities.ScheduledLecture;
 
 
 public class LectureScheduler {

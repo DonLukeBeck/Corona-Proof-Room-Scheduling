@@ -14,9 +14,11 @@ import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Random;
 import nl.tudelft.sem.calendar.entities.Course;
-import nl.tudelft.sem.calendar.entities.OnCampusCandidate;
-import nl.tudelft.sem.calendar.entities.RequestedLecture;
+import nl.tudelft.sem.calendar.scheduling.OnCampusCandidate;
+import nl.tudelft.sem.calendar.scheduling.RequestedLecture;
 import nl.tudelft.sem.calendar.entities.Room;
+import nl.tudelft.sem.calendar.scheduling.LectureScheduler;
+import nl.tudelft.sem.calendar.scheduling.ScheduledLecture;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -31,7 +33,7 @@ class LectureSchedulerTest {
     // Objects used in the test cases, stored in arrays.
     private static Room[] testRooms;
     private static RequestedLecture[] testReqLectures;
-    private static nl.tudelft.sem.calendar.entities.ScheduledLecture[] testSchedLectures;
+    private static ScheduledLecture[] testSchedLectures;
     private static Course[] testCourses;
     private static LocalDate[] testDates;
     private static String[] netIds;
@@ -91,10 +93,10 @@ class LectureSchedulerTest {
         lecturesToSchedule = Arrays.asList(testReqLectures[0], testReqLectures[1],
                 testReqLectures[2], testReqLectures[3], testReqLectures[4]);
 
-        testSchedLectures = new nl.tudelft.sem.calendar.entities.ScheduledLecture[2];
-        testSchedLectures[0] = new nl.tudelft.sem.calendar.entities.ScheduledLecture(
+        testSchedLectures = new ScheduledLecture[2];
+        testSchedLectures[0] = new ScheduledLecture(
                 testCourses[0], testDates[0]);
-        testSchedLectures[1] = new nl.tudelft.sem.calendar.entities.ScheduledLecture(
+        testSchedLectures[1] = new ScheduledLecture(
                 testCourses[1], testDates[0]);
     }
 
@@ -251,7 +253,7 @@ class LectureSchedulerTest {
         LectureScheduler realLectureScheduler = new LectureScheduler(realRoomList,
                 realRequestedLectures, startTime, endTime, timeGapLengthInMinutes);
 
-        List<nl.tudelft.sem.calendar.entities.ScheduledLecture> result =
+        List<ScheduledLecture> result =
                 realLectureScheduler.scheduleAllLectures();
 
         // Going to the list of scheduled lectures, checking all the subsequent elements

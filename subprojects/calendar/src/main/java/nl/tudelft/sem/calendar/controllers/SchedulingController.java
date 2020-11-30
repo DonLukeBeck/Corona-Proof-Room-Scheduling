@@ -3,8 +3,9 @@ package nl.tudelft.sem.calendar.controllers;
 import java.time.LocalTime;
 import java.util.List;
 import nl.tudelft.sem.calendar.communication.RestrictionManagementCommunicator;
-import nl.tudelft.sem.calendar.entities.RequestedLecture;
+import nl.tudelft.sem.calendar.scheduling.RequestedLecture;
 import nl.tudelft.sem.calendar.entities.Room;
+import nl.tudelft.sem.calendar.scheduling.LectureScheduler;
 
 public class SchedulingController {
 

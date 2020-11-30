@@ -1,9 +1,11 @@
-package nl.tudelft.sem.calendar.entities;
+package nl.tudelft.sem.calendar.scheduling;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import nl.tudelft.sem.calendar.entities.Course;
+import nl.tudelft.sem.calendar.entities.Room;
 
 public class ScheduledLecture {
     private Course course;
