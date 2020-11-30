@@ -9,7 +9,12 @@ import nl.tudelft.sem.calendar.entities.ScheduledLecture;
 
 public class SchedulingController {
 
-    //@PostMapping("schedule-lectures")
+    /**
+     * This method forms the main API endpoint for the Scheduling functionality.
+     *
+     * @param lecturesToSchedule the list of lectures to be scheduled
+     * @return a string indicating success or failure
+     */
     public String schedulePlannedLectures(List<RequestedLecture> lecturesToSchedule) {
 
         LocalTime startTime = RestrictionManagementCommunicator.getStartTime(); // Make API call
