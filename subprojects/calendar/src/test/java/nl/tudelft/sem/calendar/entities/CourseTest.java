@@ -10,8 +10,8 @@ import org.junit.jupiter.api.Test;
 
 
 class CourseTest {
-    private Course course;
-    private List<String> participants;
+    private static Course course;
+    private static List<String> participants;
 
     /**
      * Creates a course and a list of associated participants used in all the test cases.

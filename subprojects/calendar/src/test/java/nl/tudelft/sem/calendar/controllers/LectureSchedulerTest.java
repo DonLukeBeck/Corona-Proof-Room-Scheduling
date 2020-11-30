@@ -34,6 +34,7 @@ class LectureSchedulerTest {
     private static nl.tudelft.sem.calendar.entities.ScheduledLecture[] testSchedLectures;
     private static Course[] testCourses;
     private static LocalDate[] testDates;
+    private static String[] netIds;
 
     /**
      * Helper method to create a set of rooms used in the test cases.
@@ -189,6 +190,7 @@ class LectureSchedulerTest {
     private static List<LocalDate> createSubSequentDates(int numberOfDates) {
         List<LocalDate> dates = new ArrayList<>();
         LocalDate firstDate = LocalDate.of(2020, 9, 1);
+        dates.add(firstDate);
         for (int i = 1; i <= numberOfDates; i++) {
             dates.add(firstDate.plusDays(i));
         }
@@ -202,8 +204,8 @@ class LectureSchedulerTest {
      * @return a list of randomly generated requested lectures.
      */
     private static List<RequestedLecture> createRandomLectureRequests() {
-        List<String> realParticipants = createRandomParticipants();
-        List<Course> realCourseList = createRandomCoursesWithRandomStudents(realParticipants);
+        List<Course> realCourseList = createRandomCoursesWithRandomStudents(
+                createRandomParticipants());
         List<LocalDate> realDates = createSubSequentDates(10);
 
         // Composing the lecture requests
@@ -227,6 +229,7 @@ class LectureSchedulerTest {
         createCourses();
         createDates();
         createLectures();
+        netIds = new String[] {"mbjdegoede", "abobe", "cparlar"};
         timeGapLengthInMinutes = 45;
         startTime = LocalTime.of(8, 45);
         endTime = LocalTime.of(17, 45);
@@ -300,13 +303,13 @@ class LectureSchedulerTest {
         scheduler.assignStudents(testSchedLectures[1], allParticipants);
 
         assertThat(testSchedLectures[1].getStudentsOnCampus())
-                .containsExactly("mbjdegoede", "cparlar");
+                .containsExactly(netIds[0], netIds[2]);
 
-        assertThat(allParticipants.get("mbjdegoede")).isEqualTo(
+        assertThat(allParticipants.get(netIds[0])).isEqualTo(
                 testSchedLectures[1].getDate().plusDays(14));
-        assertThat(allParticipants.get("cparlar")).isEqualTo(
+        assertThat(allParticipants.get(netIds[2])).isEqualTo(
                 testSchedLectures[1].getDate().plusDays(14));
-        assertThat(allParticipants.get("abobe")).isEqualTo(LocalDate.of(2020, 12, 26));
+        assertThat(allParticipants.get(netIds[1])).isEqualTo(LocalDate.of(2020, 12, 26));
     }
 
     /**
@@ -349,16 +352,16 @@ class LectureSchedulerTest {
      */
     @Test
     void testCreateCandidateSelector() {
-        List<String> courseParticipants = Arrays.asList("abobe", "mbjdegoede", "cparlar");
+        List<String> courseParticipants = Arrays.asList(netIds[1], netIds[0], netIds[2]);
         HashMap<String, LocalDate> allParticipants = createParticipants();
         LocalDate lectureDate = LocalDate.of(2020, 12, 18);
 
         OnCampusCandidate[] verification = {
-            new OnCampusCandidate("mbjdegoede",
+            new OnCampusCandidate(netIds[0],
                     LocalDate.of(2020, 12, 18)),
-            new OnCampusCandidate("cparlar",
+            new OnCampusCandidate(netIds[2],
                     LocalDate.of(2020, 12, 24)),
-            new OnCampusCandidate("abobe",
+            new OnCampusCandidate(netIds[0],
                     LocalDate.of(2020, 12, 26))
         };
 
@@ -370,8 +373,8 @@ class LectureSchedulerTest {
 
             assertThat(candidate.getDeadline()).isEqualTo(onCampusCandidate.getDeadline());
         }
-        assertThat(allParticipants.get("abobe")).isEqualTo(LocalDate.of(2020, 12, 26));
-        assertThat(allParticipants.get("mbjdegoede")).isEqualTo(LocalDate.of(2020, 12, 18));
+        assertThat(allParticipants.get(netIds[1])).isEqualTo(LocalDate.of(2020, 12, 26));
+        assertThat(allParticipants.get(netIds[0])).isEqualTo(LocalDate.of(2020, 12, 18));
     }
 
     /**
@@ -380,8 +383,7 @@ class LectureSchedulerTest {
     @Test
     void testAssignFirstLectureRoom() {
         scheduler.sortRoomsByCapacity();
-        scheduler.assignRoom(0, testSchedLectures[0],
-                testReqLectures[0].getDurationInMinutes());
+        scheduler.assignRoom(testSchedLectures[0], testReqLectures[0].getDurationInMinutes());
         assertThat(testSchedLectures[0].getRoom()).isEqualTo(testRooms[2]);
     }
 
@@ -391,8 +393,8 @@ class LectureSchedulerTest {
     @Test
     void testAssignFirstLectureNoRoomLeft() {
         scheduler.sortRoomsByCapacity();
-        scheduler.assignRoom(roomList.size(), testSchedLectures[0],
-                testReqLectures[0].getDurationInMinutes());
+        scheduler.setRoomSearchIndex(roomList.size());
+        scheduler.assignRoom(testSchedLectures[0], testReqLectures[0].getDurationInMinutes());
         assertThat(testSchedLectures[0].getRoom()).isNull();
     }
 
@@ -403,10 +405,8 @@ class LectureSchedulerTest {
     @Test
     void testAssignSecondLectureSameRoomWithinTime() {
         scheduler.sortRoomsByCapacity();
-        scheduler.assignRoom(0, testSchedLectures[0],
-                testReqLectures[0].getDurationInMinutes());
-        scheduler.assignRoom(0, testSchedLectures[1],
-                testReqLectures[1].getDurationInMinutes());
+        scheduler.assignRoom(testSchedLectures[0], testReqLectures[0].getDurationInMinutes());
+        scheduler.assignRoom(testSchedLectures[1], testReqLectures[1].getDurationInMinutes());
         assertThat(testSchedLectures[0].getRoom()).isEqualTo(testRooms[2]);
     }
 
@@ -417,9 +417,8 @@ class LectureSchedulerTest {
     @Test
     void testAssignSecondLectureSameRoomNotWithinTime() {
         scheduler.sortRoomsByCapacity();
-        scheduler.assignRoom(0, testSchedLectures[0], 540);
-        scheduler.assignRoom(0, testSchedLectures[1],
-                testReqLectures[1].getDurationInMinutes());
+        scheduler.assignRoom(testSchedLectures[0], 540);
+        scheduler.assignRoom(testSchedLectures[1], testReqLectures[1].getDurationInMinutes());
         assertThat(testSchedLectures[1].getRoom()).isEqualTo(testRooms[4]);
     }
 
@@ -430,9 +429,8 @@ class LectureSchedulerTest {
     @Test
     void testAssignSecondLectureSameRoomJustWithinTime() {
         scheduler.sortRoomsByCapacity();
-        scheduler.assignRoom(0, testSchedLectures[0], 185);
-        scheduler.assignRoom(0, testSchedLectures[1],
-                200);
+        scheduler.assignRoom(testSchedLectures[0], 185);
+        scheduler.assignRoom(testSchedLectures[1], 200);
         assertThat(testSchedLectures[1].getRoom()).isEqualTo(testRooms[2]);
     }
 
@@ -443,27 +441,45 @@ class LectureSchedulerTest {
     @Test
     void testAssignSecondLectureNoRoomLeft() {
         scheduler.sortRoomsByCapacity();
-        scheduler.assignRoom(roomList.size() - 1,
-                testSchedLectures[0], 540);
-        scheduler.assignRoom(roomList.size() - 1,
-                testSchedLectures[1], 200);
+        scheduler.setRoomSearchIndex(roomList.size() - 1);
+        scheduler.assignRoom(testSchedLectures[0], 540);
+        scheduler.assignRoom(testSchedLectures[1], 200);
         assertThat(testSchedLectures[1].getRoom()).isNull();
     }
 
     /**
      * Tests whether the time comparison to determine if a lecture still fits in a room works as it
      * should by trying to plan a lecture with a duration that would end up on an earlier time than
-     * the ending time, but the next day when it would be scheduled after the first lecture.
+     * the ending time, but the next day when it would be scheduled after the first lecture. It also
+     * checks whether the room search index has advanced by one after the lecture couldn't be
+     * scheduled in the room.
      */
     @Test
     void testAssignSecondLectureNoRoomLeftNextDayWrap() {
         scheduler.sortRoomsByCapacity();
-        int roomIndex = scheduler.assignRoom(roomList.size() - 1,
-                testSchedLectures[0], 540);
-        assertThat(roomIndex).isEqualTo(roomList.size() - 1);
-        int roomIndex2 = scheduler.assignRoom(roomIndex,
-                testSchedLectures[1], testReqLectures[1].getDurationInMinutes());
+        scheduler.setRoomSearchIndex(roomList.size() - 1);
+        scheduler.assignRoom(testSchedLectures[0], 540);
+        assertThat(scheduler.getRoomSearchIndex()).isEqualTo(roomList.size() - 1);
+        scheduler.assignRoom(testSchedLectures[1], testReqLectures[1].getDurationInMinutes());
         assertThat(testSchedLectures[1].getRoom()).isNull();
-        assertThat(roomIndex2).isEqualTo(roomList.size());
+        assertThat(scheduler.getRoomSearchIndex()).isEqualTo(roomList.size());
+    }
+
+    /**
+     * Tests the getter for the room list attribute.
+     */
+    @Test
+    void testGetRoomList() {
+        assertThat(scheduler.getRoomList()).isEqualTo(roomList);
+    }
+
+    /**
+     * Tests the getter and setter for the room search index attribute.
+     */
+    @Test
+    void testGetSetRoomSearchIndex() {
+        assertThat(scheduler.getRoomSearchIndex()).isEqualTo(0);
+        scheduler.setRoomSearchIndex(10);
+        assertThat(scheduler.getRoomSearchIndex()).isEqualTo(10);
     }
 }

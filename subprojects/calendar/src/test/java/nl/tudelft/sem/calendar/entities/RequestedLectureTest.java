@@ -8,10 +8,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class RequestedLectureTest {
-    private Course course;
-    private RequestedLecture lecture;
-    private LocalDate date;
-    private int durationInMinutes;
+    private static Course course;
+    private static RequestedLecture lecture;
+    private static LocalDate date;
+    private static int durationInMinutes;
 
     /**
      * Creates a new requested lecture and attributes used for verification, used in all test

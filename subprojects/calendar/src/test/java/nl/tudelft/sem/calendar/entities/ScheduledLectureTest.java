@@ -11,12 +11,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class ScheduledLectureTest {
-    private Course course;
-    private LocalDate date;
-    private LocalTime startTime;
-    private LocalTime endTime;
-    private Room room;
-    private ScheduledLecture scheduledLecture;
+    private static Course course;
+    private static LocalDate date;
+    private static LocalTime startTime;
+    private static LocalTime endTime;
+    private static Room room;
+    private static ScheduledLecture scheduledLecture;
 
     /**
      * Creates a new scheduled lecture and attributes used for verification in all test cases.
@@ -116,7 +116,7 @@ class ScheduledLectureTest {
     @Test
     void testAddStudentsOnCampus() {
         assertTrue(scheduledLecture.getStudentsOnCampus().isEmpty());
-        List<String> students2 = Arrays.asList("mbjdegoede", "abobe");
+        List<String> students2 = Arrays.asList("mbjdegoede", "cparlar");
         scheduledLecture.addStudentsOnCampus(students2);
         assertEquals(students2, scheduledLecture.getStudentsOnCampus());
     }
@@ -137,7 +137,7 @@ class ScheduledLectureTest {
      */
     @Test
     void testSetCourse() {
-        Course course2 = new Course(Arrays.asList("abobe"));
+        Course course2 = new Course(Arrays.asList("randomId"));
         scheduledLecture.setCourse(course2);
         assertEquals(course2, scheduledLecture.getCourse());
     }

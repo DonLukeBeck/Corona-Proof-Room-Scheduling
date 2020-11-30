@@ -27,6 +27,8 @@ public class LectureScheduler {
     private transient LocalTime startTime;
     private transient LocalTime endTime;
     private transient int timeGapLengthInMinutes;
+    private transient Map<String, LocalDate> allParticipants;
+    private transient int roomSearchIndex;
 
     /**
      * Creates a new instance of the LectureScheduler with a given list of rooms, lectures to be
@@ -49,6 +51,8 @@ public class LectureScheduler {
         this.endTime = endTime;
         this.timeGapLengthInMinutes = timeGapLengthInMinutes;
         this.roomAvailability = new LocalTime[roomList.size()];
+        this.allParticipants = new HashMap<>();
+        this.roomSearchIndex = 0;
         Arrays.fill(roomAvailability, startTime);
     }
 
@@ -64,7 +68,6 @@ public class LectureScheduler {
             return scheduledLectures;
         }
 
-        Map<String, LocalDate> allParticipants = new HashMap<>();
         Map<LocalDate, List<RequestedLecture>> lecturesByDay = groupLecturesByDay();
         List<LocalDate> dates = new ArrayList<>(lecturesByDay.keySet());
 
@@ -77,15 +80,14 @@ public class LectureScheduler {
 
             // Reset room availability for each new day
             Arrays.fill(roomAvailability, startTime);
-            int roomIndex = 0;
+            roomSearchIndex = 0;
 
             // Schedule all lectures for this day
             List<RequestedLecture> toScheduleThisDay = getSortedLecturesForDay(date, lecturesByDay);
             for (RequestedLecture toBeScheduled : toScheduleThisDay) {
                 ScheduledLecture scheduledLecture =
                         new ScheduledLecture(toBeScheduled.getCourse(), toBeScheduled.getDate());
-                roomIndex = assignRoom(roomIndex,
-                        scheduledLecture, toBeScheduled.getDurationInMinutes());
+                assignRoom(scheduledLecture, toBeScheduled.getDurationInMinutes());
                 assignStudents(scheduledLecture, allParticipants);
                 scheduledLectures.add(scheduledLecture);
             }
@@ -195,14 +197,10 @@ public class LectureScheduler {
      * a suitable room is found, the moment at which the room becomes availability again is updated
      * using the duration of the lecture and the time gap between any two lectures.
      *
-     * @param roomSearchIndex   the index of the room to start the search, increases when certain
-     *                          rooms are fully booked for the day
      * @param scheduledLecture  the lecture to schedule
      * @param durationInMinutes the duration of the lecture to schedule
-     * @return the index of the room found for this lecture, this enables calling this method with
-     *      that value next time, so that fully booked rooms don't have to be checked again
      */
-    public int assignRoom(int roomSearchIndex, ScheduledLecture scheduledLecture,
+    public void assignRoom(ScheduledLecture scheduledLecture,
                           int durationInMinutes) {
         while (roomSearchIndex < roomList.size()) {
             if (durationInMinutes <= (int) Duration.between(
@@ -218,7 +216,6 @@ public class LectureScheduler {
                 roomSearchIndex++;
             }
         }
-        return roomSearchIndex;
     }
 
     /**
@@ -228,5 +225,24 @@ public class LectureScheduler {
      */
     public List<Room> getRoomList() {
         return roomList;
+    }
+
+
+    /**
+     * Sets the room search index for scheduling, used for testing purposes.
+     *
+     * @param roomSearchIndex the index of where the scheduling algorithm should begin scheduling
+     */
+    public void setRoomSearchIndex(int roomSearchIndex) {
+        this.roomSearchIndex = roomSearchIndex;
+    }
+
+    /**
+     * Returns the room search index for scheduling, used for testing purposes.
+     *
+     * @return the most recent index of where the scheduling algorithm tries to schedule
+     */
+    public int getRoomSearchIndex() {
+        return this.roomSearchIndex;
     }
 }

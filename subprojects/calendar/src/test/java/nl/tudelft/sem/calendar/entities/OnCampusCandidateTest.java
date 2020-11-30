@@ -8,9 +8,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class OnCampusCandidateTest {
-    private String netId;
-    private LocalDate deadline;
-    private OnCampusCandidate candidate;
+    private static String netId;
+    private static LocalDate deadline;
+    private static OnCampusCandidate candidate;
 
     /**
      * Creates a test OnCampusCandidate and attributes used for verification used in all the

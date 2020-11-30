@@ -6,10 +6,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class RoomTest {
-    private Room room;
-    private int roomId;
-    private int capacity;
-    private String name;
+    private static Room room;
+    private static int roomId;
+    private static int capacity;
+    private static String name;
 
     /**
      * Creates a room and attributes that are used for verification.

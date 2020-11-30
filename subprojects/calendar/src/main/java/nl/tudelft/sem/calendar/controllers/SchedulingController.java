@@ -5,7 +5,6 @@ import java.util.List;
 import nl.tudelft.sem.calendar.communication.RestrictionManagementCommunicator;
 import nl.tudelft.sem.calendar.entities.RequestedLecture;
 import nl.tudelft.sem.calendar.entities.Room;
-import nl.tudelft.sem.calendar.entities.ScheduledLecture;
 
 public class SchedulingController {
 
@@ -30,7 +29,7 @@ public class SchedulingController {
         LectureScheduler scheduler = new LectureScheduler(rooms, lecturesToSchedule, startTime,
                 endTime, timeGapLength); // Create the scheduler that does the scheduling
 
-        List<ScheduledLecture> scheduledLectures = scheduler.scheduleAllLectures();
+        scheduler.scheduleAllLectures();
         return null;
     }
 }
