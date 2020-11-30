@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @SpringBootApplication
 @EntityScan("nl.tudelft.sem.restrictions")
 @EnableJpaRepositories("nl.tudelft.sem.restrictions")
+@SuppressWarnings("checkstyle:indentation")
 public class Application {
 	public static void main(String[] args) {
 		SpringApplication.run(Application.class, args);
