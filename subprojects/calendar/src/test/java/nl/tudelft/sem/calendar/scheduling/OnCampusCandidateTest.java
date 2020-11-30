@@ -1,10 +1,9 @@
-package nl.tudelft.sem.calendar.entities;
+package nl.tudelft.sem.calendar.scheduling;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import java.time.LocalDate;
-import nl.tudelft.sem.calendar.scheduling.OnCampusCandidate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

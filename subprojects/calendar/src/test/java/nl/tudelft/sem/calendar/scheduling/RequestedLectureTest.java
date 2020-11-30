@@ -1,10 +1,10 @@
-package nl.tudelft.sem.calendar.entities;
+package nl.tudelft.sem.calendar.scheduling;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.time.LocalDate;
 import java.util.Arrays;
-import nl.tudelft.sem.calendar.scheduling.RequestedLecture;
+import nl.tudelft.sem.calendar.entities.Course;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

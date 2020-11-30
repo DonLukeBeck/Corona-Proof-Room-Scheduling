@@ -1,4 +1,4 @@
-package nl.tudelft.sem.calendar.controllers;
+package nl.tudelft.sem.calendar.scheduling;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -14,11 +14,7 @@ import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Random;
 import nl.tudelft.sem.calendar.entities.Course;
-import nl.tudelft.sem.calendar.scheduling.OnCampusCandidate;
-import nl.tudelft.sem.calendar.scheduling.RequestedLecture;
 import nl.tudelft.sem.calendar.entities.Room;
-import nl.tudelft.sem.calendar.scheduling.LectureScheduler;
-import nl.tudelft.sem.calendar.scheduling.ScheduledLecture;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -206,8 +202,12 @@ class LectureSchedulerTest {
      * @return a list of randomly generated requested lectures.
      */
     private static List<RequestedLecture> createRandomLectureRequests() {
+        @SuppressWarnings("PMD.DataflowAnomalyAnalysis")
+        // there is no problem with using the realCourseList this way
         List<Course> realCourseList = createRandomCoursesWithRandomStudents(
                 createRandomParticipants());
+        @SuppressWarnings("PMD.DataflowAnomalyAnalysis")
+        // the same applies for the real dates
         List<LocalDate> realDates = createSubSequentDates(10);
 
         // Composing the lecture requests
@@ -367,6 +367,8 @@ class LectureSchedulerTest {
                     LocalDate.of(2020, 12, 26))
         };
 
+        @SuppressWarnings("PMD.DataflowAnomalyAnalysis")
+        // this is just the priority queue being created and checked afterwards.
         PriorityQueue<OnCampusCandidate> result =
                 scheduler.createCandidateSelector(lectureDate, courseParticipants, allParticipants);
 
