@@ -7,14 +7,31 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import nl.tudelft.sem.identity.repository.UserRepository;
+import nl.tudelft.sem.identity.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 @Service
+@NoArgsConstructor
+@ComponentScan(basePackages = {"nl.tudelft.sem.identity.service"})
 public class JwtUtil {
 
     //key to create token with
     private String secret = "semcoronaproofroomreservation";
+
+    @Autowired
+    UserService userService;
+
+    public String getSecret() {
+        return secret;
+    }
 
     //return netid
     public String extractNetid(String token) {
@@ -42,16 +59,19 @@ public class JwtUtil {
 
     //create token based on username
     public String generateToken(String username) {
-        Map<String, Object> claims = new HashMap<>();
+        var user = userService.loadUserByUsername(username);
+        var claims = new HashMap<String, Object>();
+        claims.put("scope", user.getAuthorities());
         return createToken(claims, username);
     }
 
     //create a 1 hour token for the netid on the issued date
     private String createToken(Map<String, Object> claims, String subject) {
+        var now = System.currentTimeMillis();
 
         return Jwts.builder().setClaims(claims)
-                .setSubject(subject).setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60))
+                .setSubject(subject).setIssuedAt(new Date(now))
+                .setExpiration(new Date(now + 1000 * 60 * 60))
                 .signWith(SignatureAlgorithm.HS256, secret).setHeaderParam("typ", "JWT").compact();
     }
 

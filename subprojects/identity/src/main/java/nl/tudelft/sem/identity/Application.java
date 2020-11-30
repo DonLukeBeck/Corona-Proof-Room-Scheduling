@@ -8,12 +8,15 @@ import nl.tudelft.sem.identity.entity.User;
 import nl.tudelft.sem.identity.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 @EnableDiscoveryClient
 @SpringBootApplication
+@EnableJpaRepositories("nl.tudelft.sem.identity.repository")
 public class Application {
 
 	@Autowired
