@@ -103,7 +103,7 @@ public class LectureScheduler {
             LocalDate> allParticipants) {
         PriorityQueue<OnCampusCandidate> candidateSelector =
                 createCandidateSelector(scheduledLecture.getDate(),
-                        scheduledLecture.getCourse().getParticipants(), allParticipants);
+                        scheduledLecture.getCourse().getNetIds(), allParticipants);
 
         int studentCounter = 0;
         while (!candidateSelector.isEmpty()
@@ -145,7 +145,7 @@ public class LectureScheduler {
     public List<RequestedLecture> getSortedLecturesForDay(LocalDate date, Map<LocalDate,
             List<RequestedLecture>> lecturesByDay) {
         lecturesByDay.get(date).sort(Comparator.comparing(
-                l -> l.getCourse().getParticipants().size(), reverseOrder()));
+                l -> l.getCourse().getNetIds().size(), reverseOrder()));
         return lecturesByDay.get(date);
     }
 

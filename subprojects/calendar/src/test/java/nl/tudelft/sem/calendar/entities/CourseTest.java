@@ -11,15 +11,18 @@ import org.junit.jupiter.api.Test;
 
 class CourseTest {
     private static Course course;
-    private static List<String> participants;
+    private static List<Enrollment> participants;
 
     /**
      * Creates a course and a list of associated participants used in all the test cases.
      */
     @BeforeEach
     void setUp() {
-        participants = Arrays.asList("abobe", "mbjdegoede");
-        course = new Course(participants);
+        participants = Arrays.asList(
+                Enrollment.builder().studentId("abobe").courseId("CSE2100").build(),
+                Enrollment.builder().studentId("mbjdegoede").courseId("CSE2100").build());
+
+        course = Course.builder().participantsList(participants).build();
     }
 
     /**
@@ -27,7 +30,7 @@ class CourseTest {
      */
     @Test
     void testGetParticipants() {
-        assertEquals(participants, course.getParticipants());
+        assertEquals(participants, course.getParticipantsList());
     }
 
     /**
@@ -35,8 +38,11 @@ class CourseTest {
      */
     @Test
     void testSetParticipants() {
-        List<String> participants2 = Arrays.asList("someNetId", "someNetId2");
-        course.setParticipants(participants2);
-        assertEquals(participants2, course.getParticipants());
+        List<Enrollment> participants2 = Arrays.asList(
+                Enrollment.builder().studentId("someNetId").courseId("CSE2100").build(),
+                Enrollment.builder().studentId("someNetId2").courseId("CSE2100").build());
+
+        course.setParticipantsList(participants2);
+        assertEquals(participants2, course.getParticipantsList());
     }
 }

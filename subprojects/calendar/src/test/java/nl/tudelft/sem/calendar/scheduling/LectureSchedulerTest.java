@@ -39,11 +39,11 @@ class LectureSchedulerTest {
      */
     private static void createRooms() {
         testRooms = new Room[5];
-        testRooms[0] = new Room(1, 2, "Class");
-        testRooms[1] = new Room(2, 20, "IZ - 2");
-        testRooms[2] = new Room(3, 30, "W - 2");
-        testRooms[3] = new Room(4, 15, "IZ - 4");
-        testRooms[4] = new Room(5, 25, "TS - 3");
+        testRooms[0] = new Room(1, "Class", 2);
+        testRooms[1] = new Room(2, "IZ - 2", 20);
+        testRooms[2] = new Room(3, "W - 2", 30);
+        testRooms[3] = new Room(4, "IZ - 4", 15);
+        testRooms[4] = new Room(5, "TS - 3", 25);
         roomList = Arrays.asList(testRooms[0], testRooms[1],
                 testRooms[2], testRooms[3], testRooms[4]);
     }
@@ -136,7 +136,7 @@ class LectureSchedulerTest {
     private static List<Room> createRandomRooms() {
         List<Room> realRoomList = new ArrayList<>();
         for (int i = 1; i <= 5; i++) {
-            realRoomList.add(new Room(i, i * 10, "R - " + i));
+            realRoomList.add(new Room(i,  "R - " + i, i * 10));
         }
         Collections.shuffle(realRoomList);
         return realRoomList;

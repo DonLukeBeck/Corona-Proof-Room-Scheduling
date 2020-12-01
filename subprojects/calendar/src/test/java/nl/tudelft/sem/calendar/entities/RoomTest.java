@@ -19,7 +19,7 @@ class RoomTest {
         roomId = 10;
         capacity = 200;
         name = "Drebbelweg IZ-2";
-        room = new Room(roomId, capacity, name);
+        room = new Room(roomId, name, capacity);
     }
 
     /**
