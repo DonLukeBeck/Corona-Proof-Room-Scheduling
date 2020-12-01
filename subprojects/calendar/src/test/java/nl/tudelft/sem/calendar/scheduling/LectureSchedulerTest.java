@@ -20,15 +20,20 @@ import nl.tudelft.sem.calendar.repositories.AttendanceRepository;
 import nl.tudelft.sem.calendar.repositories.LectureRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
+@SpringBootTest
 class LectureSchedulerTest {
-    private static LectureScheduler scheduler;
     private static List<Room> roomList;
     private static List<Lecture> lecturesToSchedule;
     private static LocalTime startTime;
     private static LocalTime endTime;
     private static int timeGapLengthInMinutes;
+
+    @Autowired
+    LectureScheduler scheduler;
 
     // We mock the repositories
     @MockBean
@@ -145,9 +150,14 @@ class LectureSchedulerTest {
         timeGapLengthInMinutes = 45;
         startTime = LocalTime.of(8, 45);
         endTime = LocalTime.of(17, 45);
-        scheduler = new LectureScheduler(lectureRepository, attendanceRepository, roomList, lecturesToSchedule,
-                startTime, endTime, timeGapLengthInMinutes);
+        scheduler.setFields(roomList, lecturesToSchedule, startTime, endTime, timeGapLengthInMinutes);
     }
+
+    @Test
+    void youdbetterwork(){
+        scheduler.scheduleAllLectures();
+    }
+
 
     /**
      * Tests whether all course participants are selected to attend the lecture on campus when the

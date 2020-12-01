@@ -23,22 +23,22 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Service;
 
+
 @Service
-@ComponentScan(basePackages = {"nl.tudelft.sem.calendar.repository"})
+@ComponentScan(basePackages = {"nl.tudelft.sem.identity.*"})
 public class LectureScheduler {
 
-    private List<Room> roomList;
-    private LocalTime[] roomAvailability;
-    private List<Lecture> lecturesToSchedule;
-    private LocalTime startTime;
-    private  LocalTime endTime;
-    private  int timeGapLengthInMinutes;
-    private  Map<String, LocalDate> allParticipants;
-    private  int roomSearchIndex;
+    private transient List<Room> roomList;
+    private transient LocalTime[] roomAvailability;
+    private transient List<Lecture> lecturesToSchedule;
+    private transient LocalTime startTime;
+    private transient LocalTime endTime;
+    private transient int timeGapLengthInMinutes;
+    private transient Map<String, LocalDate> allParticipants;
+    private transient int roomSearchIndex;
 
     @Autowired
     private LectureRepository lectureRepository;
-
     @Autowired
     private AttendanceRepository attendanceRepository;
 
@@ -54,7 +54,7 @@ public class LectureScheduler {
      * @param timeGapLengthInMinutes the time gap in minutes that should be placed between any two
      *                               lectures
      */
-    public LectureScheduler(List<Room> roomList, List<Lecture> lecturesToSchedule,
+    public void setFields(List<Room> roomList, List<Lecture> lecturesToSchedule,
                             LocalTime startTime, LocalTime endTime, int timeGapLengthInMinutes) {
 
         this.roomList = roomList;
@@ -128,20 +128,10 @@ public class LectureScheduler {
         }
 
         for (String participant : scheduledLecture.getCourse().getNetIds()) {
-            if (selectedStudents.contains(participant)) {
-                // create new db entry with attendance 1 for this student and lecture.
-                attendanceRepository.saveAndFlush(Attendance.builder()
-                        .lectureId(scheduledLecture.getLectureId()).physical(true)
-                        .studentId(participant).build());
-            }
-            else {
-                // create new db entry with attendance 0 for this student and lecture.
-                Attendance result =  Attendance.builder()
-                        .lectureId(scheduledLecture.getLectureId())
-                        .physical(false).studentId(participant).build();
-
-                attendanceRepository.saveAndFlush(result);
-            }
+            attendanceRepository.saveAndFlush(Attendance.builder()
+                    .lectureId(scheduledLecture.getLectureId())
+                    .physical(selectedStudents.contains(participant))
+                    .studentId(participant).build());
         }
     }
 
