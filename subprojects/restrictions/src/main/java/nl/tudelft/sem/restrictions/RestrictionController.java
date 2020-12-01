@@ -1,6 +1,8 @@
 package nl.tudelft.sem.restrictions;
 
 import java.time.LocalTime;
+import java.util.NoSuchElementException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -65,7 +67,7 @@ public class RestrictionController {
                 return r.getValue();
             }
         }
-        throw new IllegalArgumentException("No Restriction Found, Need to Create One!");
+        throw new NoSuchElementException("No Restriction Found, Need to Create One!");
     }
 
     /**
