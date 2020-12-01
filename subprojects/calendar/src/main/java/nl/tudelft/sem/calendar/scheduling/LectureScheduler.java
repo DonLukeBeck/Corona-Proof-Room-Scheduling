@@ -14,13 +14,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
+import nl.tudelft.sem.calendar.entities.Lecture;
 import nl.tudelft.sem.calendar.entities.Room;
 
 
 public class LectureScheduler {
     private transient List<Room> roomList;
     private transient LocalTime[] roomAvailability;
-    private transient List<RequestedLecture> lecturesToSchedule;
+    private transient List<Lecture> lecturesToSchedule;
     private transient LocalTime startTime;
     private transient LocalTime endTime;
     private transient int timeGapLengthInMinutes;
@@ -39,7 +40,7 @@ public class LectureScheduler {
      * @param timeGapLengthInMinutes the time gap in minutes that should be placed between any two
      *                               lectures
      */
-    public LectureScheduler(List<Room> roomList, List<RequestedLecture> lecturesToSchedule,
+    public LectureScheduler(List<Room> roomList, List<Lecture> lecturesToSchedule,
                             LocalTime startTime, LocalTime endTime, int timeGapLengthInMinutes) {
 
         this.roomList = roomList;
@@ -57,15 +58,10 @@ public class LectureScheduler {
      * This method forms the core of the scheduler. It transforms all the requested lectures into
      * scheduled lectures.
      *
-     * @return a list of scheduled lectures
      */
-    public List<ScheduledLecture> scheduleAllLectures() {
-        List<ScheduledLecture> scheduledLectures = new ArrayList<>();
-        if (lecturesToSchedule == null || lecturesToSchedule.size() == 0) {
-            return scheduledLectures;
-        }
+    public void scheduleAllLectures() {
 
-        Map<LocalDate, List<RequestedLecture>> lecturesByDay = groupLecturesByDay();
+        Map<LocalDate, List<Lecture>> lecturesByDay = groupLecturesByDay();
         List<LocalDate> dates = new ArrayList<>(lecturesByDay.keySet());
 
         // We process the requests in sorted order by date
@@ -80,39 +76,50 @@ public class LectureScheduler {
             roomSearchIndex = 0;
 
             // Schedule all lectures for this day
-            List<RequestedLecture> toScheduleThisDay = getSortedLecturesForDay(date, lecturesByDay);
-            for (RequestedLecture toBeScheduled : toScheduleThisDay) {
-                ScheduledLecture scheduledLecture =
-                        new ScheduledLecture(toBeScheduled.getCourse(), toBeScheduled.getDate());
-                assignRoom(scheduledLecture, toBeScheduled.getDurationInMinutes());
-                assignStudents(scheduledLecture, allParticipants);
-                scheduledLectures.add(scheduledLecture);
+            List<Lecture> toScheduleThisDay = getSortedLecturesForDay(date, lecturesByDay);
+            for (Lecture toBeScheduled : toScheduleThisDay) {
+                int capacity = assignRoom(toBeScheduled, toBeScheduled.getDurationInMinutes());
+                // save lecture in database
+                // let it return the id and set the id of the scheduledLecture to that id.
+                // then assign students
+                assignStudents(capacity, toBeScheduled, allParticipants);
             }
         }
-        return scheduledLectures;
     }
 
     /**
      * Assigns students to a scheduled lecture based on the capacity of the associated room and a
      * map storing the deadlines of all students.
      *
+     * @param capacity the capacity of the room in which the lecture is scheduled
      * @param scheduledLecture the lecture being scheduled
      * @param allParticipants  a map with the netIds and deadlines of all students
      */
-    public void assignStudents(ScheduledLecture scheduledLecture, Map<String,
+    public void assignStudents(int capacity, Lecture scheduledLecture, Map<String,
             LocalDate> allParticipants) {
         PriorityQueue<OnCampusCandidate> candidateSelector =
                 createCandidateSelector(scheduledLecture.getDate(),
                         scheduledLecture.getCourse().getNetIds(), allParticipants);
 
+        List<String> selectedStudents = new ArrayList<>();
+
         int studentCounter = 0;
         while (!candidateSelector.isEmpty()
-                && scheduledLecture.getRoom() != null
-                && studentCounter < scheduledLecture.getRoom().getCapacity()) {
+                && scheduledLecture.getRoomId() != 0
+                && studentCounter < capacity) {
             String selected = candidateSelector.remove().getNetId();
-            scheduledLecture.addStudentOnCampus(selected);
+            selectedStudents.add(selected);
             allParticipants.put(selected, scheduledLecture.getDate().plusDays(14));
             studentCounter++;
+        }
+
+        for (String participant : scheduledLecture.getCourse().getNetIds()) {
+            if (selectedStudents.contains(participant)) {
+                // create new db entry with attendance 1 for this student and lecture.
+            }
+            else {
+                // create new db entry with attendance 0 for this student and lecture.
+            }
         }
     }
 
@@ -130,8 +137,8 @@ public class LectureScheduler {
      *
      * @return a map grouping lecture requests by date
      */
-    public Map<LocalDate, List<RequestedLecture>> groupLecturesByDay() {
-        return lecturesToSchedule.stream().collect(groupingBy(RequestedLecture::getDate));
+    public Map<LocalDate, List<Lecture>> groupLecturesByDay() {
+        return lecturesToSchedule.stream().collect(groupingBy(Lecture::getDate));
     }
 
     /**
@@ -142,8 +149,8 @@ public class LectureScheduler {
      * @param lecturesByDay the map storing all lectures grouped by day
      * @return a list of requested lectures, sorted by the corresponding course size
      */
-    public List<RequestedLecture> getSortedLecturesForDay(LocalDate date, Map<LocalDate,
-            List<RequestedLecture>> lecturesByDay) {
+    public List<Lecture> getSortedLecturesForDay(LocalDate date, Map<LocalDate,
+            List<Lecture>> lecturesByDay) {
         lecturesByDay.get(date).sort(Comparator.comparing(
                 l -> l.getCourse().getNetIds().size(), reverseOrder()));
         return lecturesByDay.get(date);
@@ -194,23 +201,25 @@ public class LectureScheduler {
      *
      * @param scheduledLecture  the lecture to schedule
      * @param durationInMinutes the duration of the lecture to schedule
+     * @return the capacity of the room in which the lecture is now scheduled
      */
-    public void assignRoom(ScheduledLecture scheduledLecture,
+    public int assignRoom(Lecture scheduledLecture,
                           int durationInMinutes) {
         while (roomSearchIndex < roomList.size()) {
             if (durationInMinutes <= (int) Duration.between(
                     roomAvailability[roomSearchIndex], endTime).toMinutes()) {
-                scheduledLecture.setRoom(roomList.get(roomSearchIndex));
+                scheduledLecture.setRoomId(roomList.get(roomSearchIndex).getRoomId());
                 scheduledLecture.setStartTime(roomAvailability[roomSearchIndex]);
                 scheduledLecture.setEndTime(
                         roomAvailability[roomSearchIndex].plusMinutes(durationInMinutes));
                 roomAvailability[roomSearchIndex] = roomAvailability[roomSearchIndex]
                         .plusMinutes(durationInMinutes + timeGapLengthInMinutes);
-                break;
+                return roomList.get(roomSearchIndex).getCapacity();
             } else {
                 roomSearchIndex++;
             }
         }
+        return 0;
     }
 
     /**

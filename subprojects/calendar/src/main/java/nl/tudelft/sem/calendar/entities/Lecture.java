@@ -3,6 +3,8 @@ package nl.tudelft.sem.calendar.entities;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
@@ -12,6 +14,7 @@ import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.Generated;
 import lombok.NoArgsConstructor;
 
 @Entity
@@ -22,7 +25,9 @@ import lombok.NoArgsConstructor;
 @Builder
 public class Lecture {
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "lecture_id")
+    @Generated
     private Integer lectureId;
 
     @Column(name = "course_id")

@@ -3,9 +3,9 @@ package nl.tudelft.sem.calendar.controllers;
 import java.time.LocalTime;
 import java.util.List;
 import nl.tudelft.sem.calendar.communication.RestrictionManagementCommunicator;
+import nl.tudelft.sem.calendar.entities.Lecture;
 import nl.tudelft.sem.calendar.entities.Room;
 import nl.tudelft.sem.calendar.scheduling.LectureScheduler;
-import nl.tudelft.sem.calendar.scheduling.RequestedLecture;
 
 
 public class SchedulingController {
@@ -17,7 +17,7 @@ public class SchedulingController {
      * @param lecturesToSchedule the list of lectures to be scheduled
      * @return a string indicating success or failure
      */
-    public String schedulePlannedLectures(List<RequestedLecture> lecturesToSchedule) {
+    public String schedulePlannedLectures(List<Lecture> lecturesToSchedule) {
 
         // Make API call to retrieve the start time
         LocalTime startTime = RestrictionManagementCommunicator.getStartTime();
