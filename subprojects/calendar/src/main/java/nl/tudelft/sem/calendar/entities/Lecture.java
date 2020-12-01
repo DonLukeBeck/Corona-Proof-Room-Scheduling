@@ -42,4 +42,8 @@ public class Lecture {
 
     @OneToMany(mappedBy = "lecture_id", fetch = FetchType.LAZY)
     private List<Attendance> participantsList;
+
+    // What we get from the other microservice
+    private int durationInMinutes;
+    private Course course;
 }

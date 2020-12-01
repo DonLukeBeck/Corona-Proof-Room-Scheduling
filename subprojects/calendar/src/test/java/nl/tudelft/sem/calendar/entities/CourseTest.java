@@ -29,7 +29,7 @@ class CourseTest {
      * Tests the getter of the participant list.
      */
     @Test
-    void testGetParticipants() {
+    void testGetParticipantsList() {
         assertEquals(participants, course.getParticipantsList());
     }
 
@@ -37,12 +37,41 @@ class CourseTest {
      * Tests the setter of the participant list.
      */
     @Test
-    void testSetParticipants() {
+    void testSetParticipantsList() {
         List<Enrollment> participants2 = Arrays.asList(
                 Enrollment.builder().studentId("someNetId").courseId("CSE2100").build(),
                 Enrollment.builder().studentId("someNetId2").courseId("CSE2100").build());
 
         course.setParticipantsList(participants2);
         assertEquals(participants2, course.getParticipantsList());
+    }
+
+    @Test
+    void getNetIds() {
+    }
+
+    @Test
+    void getCourseId() {
+    }
+
+    @Test
+    void getCourseName() {
+    }
+
+    @Test
+    void getTeacherId() {
+    }
+
+    @Test
+    void setCourseId() {
+    }
+
+    @Test
+    void setCourseName() {
+    }
+
+    @Test
+    void setTeacherId() {
+
     }
 }

@@ -1,10 +1,6 @@
 package nl.tudelft.sem.calendar.entities;
 
-import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -13,24 +9,15 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "Course", schema = "public")
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
 @Builder
 public class Course {
-    @Column(name = "course_id")
     private String courseId;
-
-    @Column(name = "course_name")
     private String courseName;
-
-    @Column(name = "teacher_id")
     private String teacherId;
-
-    @OneToMany(mappedBy = "course_id", fetch = FetchType.LAZY)
     private List<Enrollment> participantsList;
-
 
     /**
      * Custom constructor to create courses with just a list of netIds. Used to test the scheduling
@@ -40,8 +27,7 @@ public class Course {
      */
     public Course(List<String> netIds) {
         participantsList = new ArrayList<>();
-        netIds.stream().forEach(netId -> participantsList
-                .add(new Enrollment(netId, courseId)));
+        netIds.stream().forEach(netId -> participantsList.add(new Enrollment(netId, courseId)));
     }
 
     /**
