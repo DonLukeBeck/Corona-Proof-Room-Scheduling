@@ -17,6 +17,7 @@ import nl.tudelft.sem.identity.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -60,7 +61,12 @@ public class JwtUtil {
         return extractExpiration(token).before(new Date());
     }
 
-    //create token based on username
+    /**
+     * Generate jwt token from incoming username.
+     *
+     * @param username the username to generate token for
+     * @return a jwt token for the username
+     */
     public String generateToken(String username) {
         var user = userService.loadUserByUsername(username);
         var claims = new HashMap<String, Object>();

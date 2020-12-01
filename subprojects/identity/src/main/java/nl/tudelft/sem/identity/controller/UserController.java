@@ -1,9 +1,9 @@
 package nl.tudelft.sem.identity.controller;
 
+import lombok.extern.slf4j.Slf4j;
 import nl.tudelft.sem.identity.entity.AuthenticationRequest;
 import nl.tudelft.sem.identity.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationServiceException;
@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @ComponentScan(basePackages = {"nl.tudelft.sem.identity.*"})
 @SuppressWarnings("PMD.BeanMembersShouldSerialize")
+@Slf4j
 public class UserController {
     @Autowired
     private JwtUtil jwtUtil;
@@ -47,7 +48,8 @@ public class UserController {
      * @throws AuthenticationException if authentication fails
      */
     @PostMapping("/login")
-    public String generateToken(@RequestBody AuthenticationRequest authRequest) throws AuthenticationException {
+    public String generateToken(@RequestBody AuthenticationRequest authRequest)
+            throws AuthenticationException {
         // TODO: prevent throwing exceptions on a public API
         try {
             //validate username and password
@@ -57,11 +59,12 @@ public class UserController {
             );
         } catch (AuthenticationServiceException ex) {
             // service failure
-            // TODO: log somewhere, since this is an internal error
+            log.info("Inside login of UserController");
             throw new AuthenticationServiceException(ex.getMessage());
 
         } catch (AuthenticationException ex) {
             //authentication failure
+            log.info("Inside login of UserController");
             throw ex;
         }
         //generate web token if authentication successful
