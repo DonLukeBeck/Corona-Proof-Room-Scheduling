@@ -36,6 +36,7 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
 @ContextConfiguration(classes = UserController.class)
 @AutoConfigureMockMvc
 @WebMvcTest
+// This class doesn't ever need to be serialized, so neither do it's members
 @SuppressWarnings("PMD.BeanMembersShouldSerialize")
 public class UserControllerTest {
 

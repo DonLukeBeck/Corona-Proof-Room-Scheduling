@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @ComponentScan(basePackages = {"nl.tudelft.sem.identity.*"})
+// The autowired beans don't need to be serialized
 @SuppressWarnings("PMD.BeanMembersShouldSerialize")
 @Slf4j
 public class UserController {
