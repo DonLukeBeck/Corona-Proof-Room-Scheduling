@@ -36,6 +36,7 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
 @ContextConfiguration(classes = UserController.class)
 @AutoConfigureMockMvc
 @WebMvcTest
+@SuppressWarnings("PMD.BeanMembersShouldSerialize")
 public class UserControllerTest {
 
     ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
