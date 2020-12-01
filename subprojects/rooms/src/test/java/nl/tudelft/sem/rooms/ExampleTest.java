@@ -1,4 +1,4 @@
-package nl.tudelft.sem.calendar;
+package nl.tudelft.sem.rooms;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

@@ -1,4 +1,4 @@
-package nl.tudelft.sem.calendar;
+package nl.tudelft.sem.rooms;
 
 public class Example {
     private String name;
