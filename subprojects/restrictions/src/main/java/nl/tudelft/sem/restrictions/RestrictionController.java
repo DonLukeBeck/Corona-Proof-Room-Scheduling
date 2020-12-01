@@ -2,6 +2,7 @@ package nl.tudelft.sem.restrictions;
 
 import java.time.LocalTime;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -64,7 +65,7 @@ public class RestrictionController {
                 return r.getValue();
             }
         }
-        return -999.9f;
+        throw new IllegalArgumentException("No Restriction Found, Need to Create One!");
     }
 
     /**
@@ -126,7 +127,7 @@ public class RestrictionController {
      *
      * @return float representing minimum seat number
      */
-    @PostMapping(path = "/getMinSeatsBig") // Map ONLY POST Requests
+    @GetMapping(path = "/getMinSeatsBig") // Map ONLY POST Requests
     public float getMinSeatsBig() {
         return getRestrictionVal("minSeatsBig");
     }
@@ -136,7 +137,7 @@ public class RestrictionController {
      *
      * @return time gap as  a float
      */
-    @PostMapping(path = "/getTimeGapLength") // Map ONLY POST Requests
+    @GetMapping(path = "/getTimeGapLength") // Map ONLY POST Requests
     public float getTimeGapLength() {
         return getRestrictionVal("gapTimeInMinutes");
     }
@@ -168,7 +169,7 @@ public class RestrictionController {
      *
      * @return start time as a localtime
      */
-    @PostMapping(path = "/getStartTime") // Map ONLY POST Requests
+    @GetMapping(path = "/getStartTime") // Map ONLY POST Requests
     public LocalTime getStartTime() {
         return LocalTime.ofSecondOfDay((int) getRestrictionVal("startTime"));
     }
@@ -178,13 +179,13 @@ public class RestrictionController {
      *
      * @return end time as a localtime
      */
-    @PostMapping(path = "/getEndTime") // Map ONLY POST Requests
+    @GetMapping(path = "/getEndTime") // Map ONLY POST Requests
     public LocalTime getEndTime() {
         return LocalTime.ofSecondOfDay((int) getRestrictionVal("endTime"));
     }
 
     /*
-    @PostMapping(path = "/getAllRoomsWithAdjustedCapacity") // Map ONLY POST Requests
+    @GetMapping(path = "/getAllRoomsWithAdjustedCapacity") // Map ONLY POST Requests
     public Iterable<Room> getAllRoomsWithAdjustedCapacity() {
         Iterable<Room> it = RoomController.getAllRooms();
         for (Room r : it) {
@@ -198,7 +199,7 @@ public class RestrictionController {
         return it;
     }
 
-    @PostMapping(path = "/getRoomWithAdjustedCapacity") // Map ONLY POST Requests
+    @GetMapping(path = "/getRoomWithAdjustedCapacity") // Map ONLY POST Requests
     Room getRoomWithAdjustedCapacity(int roomId) {
         Room r = RoomController.getRoom(roomId);
         int cap = r.getCapacity();
