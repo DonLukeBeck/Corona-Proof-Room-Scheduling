@@ -14,19 +14,33 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
+import nl.tudelft.sem.calendar.entities.Attendance;
 import nl.tudelft.sem.calendar.entities.Lecture;
 import nl.tudelft.sem.calendar.entities.Room;
+import nl.tudelft.sem.calendar.repositories.AttendanceRepository;
+import nl.tudelft.sem.calendar.repositories.LectureRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.stereotype.Service;
 
-
+@Service
+@ComponentScan(basePackages = {"nl.tudelft.sem.calendar.repository"})
 public class LectureScheduler {
-    private transient List<Room> roomList;
-    private transient LocalTime[] roomAvailability;
-    private transient List<Lecture> lecturesToSchedule;
-    private transient LocalTime startTime;
-    private transient LocalTime endTime;
-    private transient int timeGapLengthInMinutes;
-    private transient Map<String, LocalDate> allParticipants;
-    private transient int roomSearchIndex;
+
+    private List<Room> roomList;
+    private LocalTime[] roomAvailability;
+    private List<Lecture> lecturesToSchedule;
+    private LocalTime startTime;
+    private  LocalTime endTime;
+    private  int timeGapLengthInMinutes;
+    private  Map<String, LocalDate> allParticipants;
+    private  int roomSearchIndex;
+
+    @Autowired
+    private LectureRepository lectureRepository;
+
+    @Autowired
+    private AttendanceRepository attendanceRepository;
 
     /**
      * Creates a new instance of the LectureScheduler with a given list of rooms, lectures to be
@@ -80,7 +94,7 @@ public class LectureScheduler {
             for (Lecture toBeScheduled : toScheduleThisDay) {
                 int capacity = assignRoom(toBeScheduled, toBeScheduled.getDurationInMinutes());
                 // save lecture in database
-                // let it return the id and set the id of the scheduledLecture to that id.
+                lectureRepository.saveAndFlush(toBeScheduled);
                 // then assign students
                 assignStudents(capacity, toBeScheduled, allParticipants);
             }
@@ -105,7 +119,7 @@ public class LectureScheduler {
 
         int studentCounter = 0;
         while (!candidateSelector.isEmpty()
-                && scheduledLecture.getRoomId() != 0
+                && scheduledLecture.getRoomId() != null
                 && studentCounter < capacity) {
             String selected = candidateSelector.remove().getNetId();
             selectedStudents.add(selected);
@@ -116,9 +130,17 @@ public class LectureScheduler {
         for (String participant : scheduledLecture.getCourse().getNetIds()) {
             if (selectedStudents.contains(participant)) {
                 // create new db entry with attendance 1 for this student and lecture.
+                attendanceRepository.saveAndFlush(Attendance.builder()
+                        .lectureId(scheduledLecture.getLectureId()).physical(true)
+                        .studentId(participant).build());
             }
             else {
                 // create new db entry with attendance 0 for this student and lecture.
+                Attendance result =  Attendance.builder()
+                        .lectureId(scheduledLecture.getLectureId())
+                        .physical(false).studentId(participant).build();
+
+                attendanceRepository.saveAndFlush(result);
             }
         }
     }

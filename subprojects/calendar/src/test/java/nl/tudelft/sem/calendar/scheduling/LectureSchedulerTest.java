@@ -1,35 +1,44 @@
 package nl.tudelft.sem.calendar.scheduling;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
-import java.util.Random;
+import nl.tudelft.sem.calendar.entities.Attendance;
 import nl.tudelft.sem.calendar.entities.Course;
+import nl.tudelft.sem.calendar.entities.Lecture;
 import nl.tudelft.sem.calendar.entities.Room;
+import nl.tudelft.sem.calendar.repositories.AttendanceRepository;
+import nl.tudelft.sem.calendar.repositories.LectureRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
 class LectureSchedulerTest {
     private static LectureScheduler scheduler;
     private static List<Room> roomList;
-    private static List<RequestedLecture> lecturesToSchedule;
+    private static List<Lecture> lecturesToSchedule;
     private static LocalTime startTime;
     private static LocalTime endTime;
     private static int timeGapLengthInMinutes;
 
+    // We mock the repositories
+    @MockBean
+    LectureRepository lectureRepository;
+    @MockBean
+    AttendanceRepository attendanceRepository;
+
     // Objects used in the test cases, stored in arrays.
     private static Room[] testRooms;
-    private static RequestedLecture[] testReqLectures;
-    private static ScheduledLecture[] testSchedLectures;
+    private static Lecture[] lectures;
     private static Course[] testCourses;
     private static LocalDate[] testDates;
     private static String[] netIds;
@@ -75,25 +84,20 @@ class LectureSchedulerTest {
      * verification in the test cases.
      */
     private static void createLectures() {
-        testReqLectures = new RequestedLecture[5];
-        testReqLectures[0] = new RequestedLecture(
-                testCourses[0], testDates[0], 90);
-        testReqLectures[1] = new RequestedLecture(
-                testCourses[1], testDates[0], 540);
-        testReqLectures[2] = new RequestedLecture(
-                testCourses[2], testDates[0], 100);
-        testReqLectures[3] = new RequestedLecture(
-                testCourses[0], testDates[1], 90);
-        testReqLectures[4] = new RequestedLecture(
-                testCourses[0], testDates[2], 200);
-        lecturesToSchedule = Arrays.asList(testReqLectures[0], testReqLectures[1],
-                testReqLectures[2], testReqLectures[3], testReqLectures[4]);
+        lectures = new Lecture[5];
+        lectures[0] = Lecture.builder()
+                .course(testCourses[0]).date(testDates[0]).durationInMinutes(90).build();
+        lectures[1] = Lecture.builder()
+                .course(testCourses[1]).date(testDates[0]).durationInMinutes(540).build();
+        lectures[2] = Lecture.builder()
+                .course(testCourses[2]).date(testDates[0]).durationInMinutes(100).build();
+        lectures[3] = Lecture.builder()
+                .course(testCourses[0]).date(testDates[1]).durationInMinutes(90).build();
+        lectures[4] = Lecture.builder()
+                .course(testCourses[0]).date(testDates[2]).durationInMinutes(200).build();
 
-        testSchedLectures = new ScheduledLecture[2];
-        testSchedLectures[0] = new ScheduledLecture(
-                testCourses[0], testDates[0]);
-        testSchedLectures[1] = new ScheduledLecture(
-                testCourses[1], testDates[0]);
+        lecturesToSchedule = Arrays.asList(lectures[0], lectures[1],
+                lectures[2], lectures[3], lectures[4]);
     }
 
     /**
@@ -101,13 +105,13 @@ class LectureSchedulerTest {
      *
      * @return a map of the lecture requests grouped by day.
      */
-    private static HashMap<LocalDate, List<RequestedLecture>> createMapOfLecturesByDay() {
+    private static HashMap<LocalDate, List<Lecture>> createMapOfLecturesByDay() {
         return new HashMap<>() {
             {
-                put(testDates[0], Arrays.asList(testReqLectures[0],
-                        testReqLectures[1], testReqLectures[2]));
-                put(testDates[1], Arrays.asList(testReqLectures[3]));
-                put(testDates[2], Arrays.asList(testReqLectures[4]));
+                put(testDates[0], Arrays.asList(lectures[0],
+                        lectures[1],lectures[2]));
+                put(testDates[1], Arrays.asList(lectures[3]));
+                put(testDates[2], Arrays.asList(lectures[4]));
             }
         };
     }
@@ -128,100 +132,6 @@ class LectureSchedulerTest {
     }
 
     /**
-     * Helper method to create random rooms used in the integration like
-     * testCompleteSchedulingAlgorithmWithRandomValues method.
-     *
-     * @return a list of randomly generated rooms.
-     */
-    private static List<Room> createRandomRooms() {
-        List<Room> realRoomList = new ArrayList<>();
-        for (int i = 1; i <= 5; i++) {
-            realRoomList.add(new Room(i,  "R - " + i, i * 10));
-        }
-        Collections.shuffle(realRoomList);
-        return realRoomList;
-    }
-
-    /**
-     * Helper method to create random participants used in the integration like
-     * testCompleteSchedulingAlgorithmWithRandomValues method.
-     *
-     * @return a list of randomly generated netIds.
-     */
-    private static List<String> createRandomParticipants() {
-        List<String> randomParticipants = new ArrayList<>();
-        for (int i = 1; i <= 300; i++) {
-            Random r = new Random();
-            char c = (char) (r.nextInt(26) + 'a');
-            randomParticipants.add(i + "" + c + c + c + c);
-        }
-        return randomParticipants;
-    }
-
-    /**
-     * Helper method to create random courses with random students, used in the integration like
-     * testCompleteSchedulingAlgorithmWithRandomValues method.
-     *
-     * @return a list of randomly generated courses, each having randomly picked students associated
-     *      with them.
-     */
-    private static List<Course> createRandomCoursesWithRandomStudents(
-            List<String> allParticipants) {
-        List<Course> randomCourses = new ArrayList<>();
-        for (int i = 1; i <= 40; i++) {
-            Collections.shuffle(allParticipants);
-            Random random = new Random();
-            int size = random.nextInt(300 - 30) + 30;
-            List<String> courseParticipants = allParticipants.subList(0, size);
-            randomCourses.add(new Course(courseParticipants));
-        }
-        return randomCourses;
-    }
-
-    /**
-     * Helper method to create a given number of subsequent dates used in the sed in the integration
-     * like testCompleteSchedulingAlgorithmWithRandomValues method.
-     *
-     * @param numberOfDates the number of subsequent dates to generate
-     * @return a list of subsequent dates
-     */
-    private static List<LocalDate> createSubSequentDates(int numberOfDates) {
-        List<LocalDate> dates = new ArrayList<>();
-        LocalDate firstDate = LocalDate.of(2020, 9, 1);
-        dates.add(firstDate);
-        for (int i = 1; i <= numberOfDates; i++) {
-            dates.add(firstDate.plusDays(i));
-        }
-        return dates;
-    }
-
-    /**
-     * Helper method to create random lecture requests, used in the sed in the integration like
-     * testCompleteSchedulingAlgorithmWithRandomValues method.
-     *
-     * @return a list of randomly generated requested lectures.
-     */
-    private static List<RequestedLecture> createRandomLectureRequests() {
-        @SuppressWarnings("PMD.DataflowAnomalyAnalysis")
-        // there is no problem with using the realCourseList this way
-        List<Course> realCourseList = createRandomCoursesWithRandomStudents(
-                createRandomParticipants());
-        @SuppressWarnings("PMD.DataflowAnomalyAnalysis")
-        // the same applies for the real dates
-        List<LocalDate> realDates = createSubSequentDates(10);
-
-        // Composing the lecture requests
-        List<RequestedLecture> realRequestedLectures = new ArrayList<>();
-        for (int i = 1; i <= 100; i++) {
-            Random random = new Random();
-            int index = random.nextInt(240);
-            realRequestedLectures.add(new RequestedLecture(realCourseList.get(index % 40),
-                    realDates.get(index % 10), index));
-        }
-        return realRequestedLectures;
-    }
-
-    /**
      * Creates a lecture scheduler next to a bunch of rooms, courses, dates and lectures used for
      * verification in all test cases.
      */
@@ -235,43 +145,8 @@ class LectureSchedulerTest {
         timeGapLengthInMinutes = 45;
         startTime = LocalTime.of(8, 45);
         endTime = LocalTime.of(17, 45);
-        scheduler = new LectureScheduler(roomList, lecturesToSchedule,
+        scheduler = new LectureScheduler(lectureRepository, attendanceRepository, roomList, lecturesToSchedule,
                 startTime, endTime, timeGapLengthInMinutes);
-    }
-
-    /**
-     * Integration like test method that tests the entire algorithm with a large number of randomly
-     * generated lectures, rooms courses and students. It tests whether all individually tested
-     * components work together as expected. The result list can be manually inspected to verify
-     * that the algorithm performs as in the requirements.
-     */
-    @Test
-    void testCompleteSchedulingAlgorithmWithRandomValues() {
-        List<Room> realRoomList = createRandomRooms();
-        List<RequestedLecture> realRequestedLectures = createRandomLectureRequests();
-
-        LectureScheduler realLectureScheduler = new LectureScheduler(realRoomList,
-                realRequestedLectures, startTime, endTime, timeGapLengthInMinutes);
-
-        List<ScheduledLecture> result =
-                realLectureScheduler.scheduleAllLectures();
-
-        // Going to the list of scheduled lectures, checking all the subsequent elements
-        for (int i = 0; i < result.size() - 2; i++) {
-            if (result.get(i).getDate().equals(result.get(i+1).getDate())) {
-                //assert that the rooms are sorted in descending order
-                if (result.get(i).getRoom() != null && result.get(i+1).getRoom() != null) {
-                    assertTrue(result.get(i).getRoom().getCapacity()
-                            >= result.get(i+1).getRoom().getCapacity());
-                }
-                //assert that size of courses are sorted in descending order
-                assertTrue(result.get(i).getStudentsOnCampus().size()
-                        >= result.get(i+1).getStudentsOnCampus().size());
-            }
-            //assert that the dates are sorted in ascending order
-            assertTrue(result.get(i).getDate().isBefore(result.get(i+1).getDate())
-                    || result.get(i).getDate().isEqual(result.get(i+1).getDate()));
-        }
     }
 
     /**
@@ -282,10 +157,10 @@ class LectureSchedulerTest {
     @Test
     void testAssignStudentsEnoughCapacity() {
         Map<String, LocalDate> allParticipants = createParticipants();
-        testSchedLectures[1].setRoom(testRooms[1]);
-        assertThat(testSchedLectures[1].getStudentsOnCampus()).isEmpty();
-        scheduler.assignStudents(testSchedLectures[1], allParticipants);
-        assertThat(testSchedLectures[1].getStudentsOnCampus().size()).isEqualTo(3);
+        scheduler.assignStudents(testRooms[1].getCapacity(), lectures[1], allParticipants);
+        verify(attendanceRepository, times(3)).saveAndFlush(Attendance.builder()
+                .lectureId(lectures[1].getLectureId()).physical(true)
+                .studentId(any()).build());
     }
 
     /**
@@ -296,19 +171,21 @@ class LectureSchedulerTest {
      */
     @Test
     void testAssignStudentsButNotEnoughCapacity() {
-        Map<String, LocalDate> allParticipants = createParticipants();
-        testSchedLectures[1].setRoom(testRooms[0]);
-        assertThat(testSchedLectures[1].getStudentsOnCampus()).isEmpty();
-        scheduler.assignStudents(testSchedLectures[1], allParticipants);
+        //        Map<String, LocalDate> allParticipants = createParticipants();
+        //        testSchedLectures[1].setRoom(testRooms[0]);
+        //        assertThat(testSchedLectures[1].getStudentsOnCampus()).isEmpty();
+        //        scheduler.assignStudents(testSchedLectures[1], allParticipants);
+        //
+        //        assertThat(testSchedLectures[1].getStudentsOnCampus())
+        //                .containsExactly(netIds[0], netIds[2]);
+        //
+        //        assertThat(allParticipants.get(netIds[0])).isEqualTo(
+        //                testSchedLectures[1].getDate().plusDays(14));
+        //        assertThat(allParticipants.get(netIds[2])).isEqualTo(
+        //                testSchedLectures[1].getDate().plusDays(14));
+        //        assertThat(allParticipants.get(netIds[1])).isEqualTo(LocalDate.of(2020, 12, 26));
 
-        assertThat(testSchedLectures[1].getStudentsOnCampus())
-                .containsExactly(netIds[0], netIds[2]);
-
-        assertThat(allParticipants.get(netIds[0])).isEqualTo(
-                testSchedLectures[1].getDate().plusDays(14));
-        assertThat(allParticipants.get(netIds[2])).isEqualTo(
-                testSchedLectures[1].getDate().plusDays(14));
-        assertThat(allParticipants.get(netIds[1])).isEqualTo(LocalDate.of(2020, 12, 26));
+        // use mock and assume that called in particular way.
     }
 
     /**
@@ -327,7 +204,7 @@ class LectureSchedulerTest {
     @Test
     void testGroupLecturesByDay() {
         scheduler.groupLecturesByDay();
-        Map<LocalDate, List<RequestedLecture>> groupedByDay = createMapOfLecturesByDay();
+        Map<LocalDate, List<Lecture>> groupedByDay = createMapOfLecturesByDay();
         assertThat(scheduler.groupLecturesByDay()).isEqualTo(groupedByDay);
     }
 
@@ -337,9 +214,9 @@ class LectureSchedulerTest {
     @Test
     void testGetSortedLecturesForDay() {
         assertThat(scheduler.getSortedLecturesForDay(testDates[0], createMapOfLecturesByDay()))
-                .containsExactly(testReqLectures[1], testReqLectures[0], testReqLectures[2]);
+                .containsExactly(lectures[1], lectures[0], lectures[2]);
         assertThat(scheduler.getSortedLecturesForDay(testDates[1], createMapOfLecturesByDay()))
-                .containsExactly(testReqLectures[3]);
+                .containsExactly(lectures[3]);
     }
 
     /**
@@ -384,43 +261,48 @@ class LectureSchedulerTest {
     @Test
     void testAssignFirstLectureRoom() {
         scheduler.sortRoomsByCapacity();
-        scheduler.assignRoom(testSchedLectures[0], testReqLectures[0].getDurationInMinutes());
-        assertThat(testSchedLectures[0].getRoom()).isEqualTo(testRooms[2]);
+        scheduler.assignRoom(lectures[0], lectures[0].getDurationInMinutes());
+        assertThat(lectures[0].getRoomId()).isEqualTo(testRooms[2].getRoomId());
     }
 
     /**
      * Tests whether the lecture is not scheduled in any room if there's no available room.
+     * It also tests whether the right room capacity is returned.
      */
     @Test
     void testAssignFirstLectureNoRoomLeft() {
         scheduler.sortRoomsByCapacity();
         scheduler.setRoomSearchIndex(roomList.size());
-        scheduler.assignRoom(testSchedLectures[0], testReqLectures[0].getDurationInMinutes());
-        assertThat(testSchedLectures[0].getRoom()).isNull();
+        assertThat(scheduler.assignRoom(lectures[0],
+                lectures[0].getDurationInMinutes())).isEqualTo(0);
+        assertThat(lectures[0].getRoomId()).isNull();
     }
 
     /**
      * Tests whether a second lecture to be scheduled is scheduled in the same room if it still fits
-     * for that day.
+     * for that day. It also tests whether the right room capacity is returned.
      */
     @Test
     void testAssignSecondLectureSameRoomWithinTime() {
         scheduler.sortRoomsByCapacity();
-        scheduler.assignRoom(testSchedLectures[0], testReqLectures[0].getDurationInMinutes());
-        scheduler.assignRoom(testSchedLectures[1], testReqLectures[1].getDurationInMinutes());
-        assertThat(testSchedLectures[0].getRoom()).isEqualTo(testRooms[2]);
+        scheduler.assignRoom(lectures[0], lectures[0].getDurationInMinutes());
+        assertThat(scheduler.assignRoom(lectures[2],
+                lectures[2].getDurationInMinutes())).isEqualTo(testRooms[2].getCapacity());
+        assertThat(lectures[2].getRoomId()).isEqualTo(testRooms[2].getRoomId());
     }
 
     /**
      * Tests whether a second lecture to be scheduled is scheduled in the one but biggest room if
-     * the lecture doesn't fit in the largest room after the first lecture.
+     * the lecture doesn't fit in the largest room after the first lecture. It also tests whether
+     * the right room capacity is returned.
      */
     @Test
     void testAssignSecondLectureSameRoomNotWithinTime() {
         scheduler.sortRoomsByCapacity();
-        scheduler.assignRoom(testSchedLectures[0], 540);
-        scheduler.assignRoom(testSchedLectures[1], testReqLectures[1].getDurationInMinutes());
-        assertThat(testSchedLectures[1].getRoom()).isEqualTo(testRooms[4]);
+        scheduler.assignRoom(lectures[0], 540);
+        assertThat(scheduler.assignRoom(lectures[1],
+                lectures[1].getDurationInMinutes())).isEqualTo(testRooms[4].getCapacity());
+        assertThat(lectures[1].getRoomId()).isEqualTo(testRooms[4].getRoomId());
     }
 
     /**
@@ -430,9 +312,9 @@ class LectureSchedulerTest {
     @Test
     void testAssignSecondLectureSameRoomJustWithinTime() {
         scheduler.sortRoomsByCapacity();
-        scheduler.assignRoom(testSchedLectures[0], 185);
-        scheduler.assignRoom(testSchedLectures[1], 200);
-        assertThat(testSchedLectures[1].getRoom()).isEqualTo(testRooms[2]);
+        scheduler.assignRoom(lectures[0], 185);
+        scheduler.assignRoom(lectures[1], 200);
+        assertThat(lectures[1].getRoomId()).isEqualTo(testRooms[2].getRoomId());
     }
 
     /**
@@ -443,9 +325,9 @@ class LectureSchedulerTest {
     void testAssignSecondLectureNoRoomLeft() {
         scheduler.sortRoomsByCapacity();
         scheduler.setRoomSearchIndex(roomList.size() - 1);
-        scheduler.assignRoom(testSchedLectures[0], 540);
-        scheduler.assignRoom(testSchedLectures[1], 200);
-        assertThat(testSchedLectures[1].getRoom()).isNull();
+        scheduler.assignRoom(lectures[0], 540);
+        scheduler.assignRoom(lectures[1], 200);
+        assertThat(lectures[1].getRoomId()).isNull();
     }
 
     /**
@@ -459,10 +341,10 @@ class LectureSchedulerTest {
     void testAssignSecondLectureNoRoomLeftNextDayWrap() {
         scheduler.sortRoomsByCapacity();
         scheduler.setRoomSearchIndex(roomList.size() - 1);
-        scheduler.assignRoom(testSchedLectures[0], 540);
+        scheduler.assignRoom(lectures[0], 540);
         assertThat(scheduler.getRoomSearchIndex()).isEqualTo(roomList.size() - 1);
-        scheduler.assignRoom(testSchedLectures[1], testReqLectures[1].getDurationInMinutes());
-        assertThat(testSchedLectures[1].getRoom()).isNull();
+        scheduler.assignRoom(lectures[1], lectures[1].getDurationInMinutes());
+        assertThat(lectures[1].getRoomId()).isNull();
         assertThat(scheduler.getRoomSearchIndex()).isEqualTo(roomList.size());
     }
 

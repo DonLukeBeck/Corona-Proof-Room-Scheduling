@@ -3,6 +3,7 @@ package nl.tudelft.sem.calendar.entities;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
@@ -18,9 +19,11 @@ import lombok.NoArgsConstructor;
 @Data
 @Builder
 public class Attendance {
+    @Id
     @Column(name = "student_id")
     private String studentId;
 
+    @Id
     @Column(name = "lecture_id")
     private Integer lectureId;
 

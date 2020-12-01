@@ -1,7 +1,5 @@
 package nl.tudelft.sem.calendar.entities;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 import org.junit.jupiter.api.Test;
 
 class AttendanceTest {

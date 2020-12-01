@@ -6,8 +6,9 @@ import nl.tudelft.sem.calendar.communication.RestrictionManagementCommunicator;
 import nl.tudelft.sem.calendar.entities.Lecture;
 import nl.tudelft.sem.calendar.entities.Room;
 import nl.tudelft.sem.calendar.scheduling.LectureScheduler;
+import org.springframework.web.bind.annotation.RestController;
 
-
+@RestController
 public class SchedulingController {
 
     /**
