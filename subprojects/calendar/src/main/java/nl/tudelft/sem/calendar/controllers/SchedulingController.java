@@ -19,18 +19,18 @@ public class SchedulingController {
      */
     public String schedulePlannedLectures(List<RequestedLecture> lecturesToSchedule) {
 
-        LocalTime startTime = RestrictionManagementCommunicator.getStartTime(); // Make API call
-        // to retrieve the start time
-        LocalTime endTime = RestrictionManagementCommunicator.getEndTime(); // Make API call to
-        // retrieve the end time
-        int timeGapLength = RestrictionManagementCommunicator.getTimeGapLength(); // Make API
-        // call to retrieve time gap length
-        List<Room> rooms = RestrictionManagementCommunicator.getAllRoomsWithAdjustedCapacity();
+        // Make API call to retrieve the start time
+        LocalTime startTime = RestrictionManagementCommunicator.getStartTime();
+        // Make API call to retrieve the end time
+        LocalTime endTime = RestrictionManagementCommunicator.getEndTime();
+        // Make API call to retrieve time gap length
+        int timeGapLength = RestrictionManagementCommunicator.getTimeGapLength();
         // Make API call to retrieve rooms with restricted capacity
-
+        List<Room> rooms = RestrictionManagementCommunicator.getAllRoomsWithAdjustedCapacity();
+        // Create the scheduler that does the scheduling
         LectureScheduler scheduler = new LectureScheduler(rooms, lecturesToSchedule, startTime,
-                endTime, timeGapLength); // Create the scheduler that does the scheduling
-
+                endTime, timeGapLength);
+        // Schedule the lecture
         scheduler.scheduleAllLectures();
         return null;
     }

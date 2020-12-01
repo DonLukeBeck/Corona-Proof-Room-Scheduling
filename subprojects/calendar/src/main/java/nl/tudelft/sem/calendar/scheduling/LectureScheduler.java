@@ -57,7 +57,7 @@ public class LectureScheduler {
      * This method forms the core of the scheduler. It transforms all the requested lectures into
      * scheduled lectures.
      *
-     * @return a list of scheduled lectures.
+     * @return a list of scheduled lectures
      */
     public List<ScheduledLecture> scheduleAllLectures() {
         List<ScheduledLecture> scheduledLectures = new ArrayList<>();
@@ -97,9 +97,7 @@ public class LectureScheduler {
      * map storing the deadlines of all students.
      *
      * @param scheduledLecture the lecture being scheduled
-     * @param allParticipants  a map with the netIds and deadlines of all students. This map is used
-     *                         to keep track of which students should be selected to attend this
-     *                         lecture based on their deadlines.
+     * @param allParticipants  a map with the netIds and deadlines of all students
      */
     public void assignStudents(ScheduledLecture scheduledLecture, Map<String,
             LocalDate> allParticipants) {

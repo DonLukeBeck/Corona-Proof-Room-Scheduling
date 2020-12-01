@@ -115,7 +115,7 @@ class LectureSchedulerTest {
     /**
      * Helper method to create a Map of course participants, each having their own deadline.
      *
-     * @return a map with teh studentIds and the deadlines of the course participants.
+     * @return a map with the studentIds and the deadlines of the course participants.
      */
     private static HashMap<String, LocalDate> createParticipants() {
         return new HashMap<>() {
@@ -257,23 +257,20 @@ class LectureSchedulerTest {
                 realLectureScheduler.scheduleAllLectures();
 
         // Going to the list of scheduled lectures, checking all the subsequent elements
-        for (int i = 0; i < result.size() - 1; i++) {
-            for (int j = i + 1; j < result.size(); j++) {
-
-                if (result.get(i).getDate().equals(result.get(j).getDate())) {
-                    //assert that the rooms are sorted in descending order
-                    if (result.get(i).getRoom() != null && result.get(j).getRoom() != null) {
-                        assertTrue(result.get(i).getRoom().getCapacity()
-                                >= result.get(j).getRoom().getCapacity());
-                    }
-                    //assert that size of courses are sorted in descending order
-                    assertTrue(result.get(i).getStudentsOnCampus().size()
-                            >= result.get(j).getStudentsOnCampus().size());
+        for (int i = 0; i < result.size() - 2; i++) {
+            if (result.get(i).getDate().equals(result.get(i+1).getDate())) {
+                //assert that the rooms are sorted in descending order
+                if (result.get(i).getRoom() != null && result.get(i+1).getRoom() != null) {
+                    assertTrue(result.get(i).getRoom().getCapacity()
+                            >= result.get(i+1).getRoom().getCapacity());
                 }
-                //assert that the dates are sorted in ascending order
-                assertTrue(result.get(i).getDate().isBefore(result.get(j).getDate())
-                        || result.get(i).getDate().isEqual(result.get(j).getDate()));
+                //assert that size of courses are sorted in descending order
+                assertTrue(result.get(i).getStudentsOnCampus().size()
+                        >= result.get(i+1).getStudentsOnCampus().size());
             }
+            //assert that the dates are sorted in ascending order
+            assertTrue(result.get(i).getDate().isBefore(result.get(i+1).getDate())
+                    || result.get(i).getDate().isEqual(result.get(i+1).getDate()));
         }
     }
 
