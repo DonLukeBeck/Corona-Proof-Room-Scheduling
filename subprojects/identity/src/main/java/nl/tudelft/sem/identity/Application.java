@@ -20,6 +20,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 @EnableDiscoveryClient
 @SpringBootApplication
 @EnableJpaRepositories("nl.tudelft.sem.identity.repository")
+// This class doesn't ever need to be serialized, so neither do it's members
 @SuppressWarnings("PMD.BeanMembersShouldSerialize")
 public class Application {
 
