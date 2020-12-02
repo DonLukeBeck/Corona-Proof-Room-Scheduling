@@ -11,7 +11,7 @@ public class UserTest {
     private static User user;
 
     /**
-     * Method to setup all the paramaters before each test.
+     * Method to setup all the parameters before each test.
      */
     @BeforeEach
     public void setup() {
