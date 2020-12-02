@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController // This means that this class is a RestController
@@ -19,14 +18,20 @@ public class RestrictionController {
     private transient RestrictionRepository restrictionRepository;
 
     /**
-     * Instantiates repository needed.
+     * Initializes the repository that is being used.
+     *
+     * @param restrictionRepository the repository that will be used
      */
     public RestrictionController(RestrictionRepository restrictionRepository) {
         this.restrictionRepository = restrictionRepository;
     }
 
     /**
-     * Adds a new restrictions with provided parameters.
+     * Creates a new restriction or updates it.
+     *
+     * @param name of the restriction
+     * @param value of the restriction (float)
+     * @return message containing the action that has been done
      */
     public String addNewRestriction(String name, float value) {
         for (Restriction r : restrictionRepository.findAll()) {
@@ -34,8 +39,11 @@ public class RestrictionController {
                 if (r.getValue() == value) {
                     return "Already Exists";
                 } else {
-                    r.setValue(value);
-                    restrictionRepository.save(r);
+                    restrictionRepository.delete(r);
+                    Restriction rn = new Restriction();
+                    rn.setName(name);
+                    rn.setValue(value);
+                    restrictionRepository.save(rn);
                     return "Updated";
                 }
             }
@@ -48,7 +56,10 @@ public class RestrictionController {
     }
 
     /**
-     * Fetches restrictions value with given name form the database.
+     * This function returns the value of a given restriction.
+     *
+     * @param name of the restriction
+     * @return the value of the restriction or -999.9 if does not exists
      */
     public float getRestrictionVal(String name) {
         for (Restriction r : restrictionRepository.findAll()) {
@@ -187,7 +198,7 @@ public class RestrictionController {
                 r.setCapacity(cap*(getCapacityRestriction(false)/100));
             }
         }
-        return -10000;
+        return it;
     }
 
     @GetMapping(path = "/getRoomWithAdjustedCapacity") // Map ONLY POST Requests
@@ -203,5 +214,5 @@ public class RestrictionController {
     }
     */
 
-
 }
+
