@@ -61,12 +61,12 @@ public class UserController {
         } catch (AuthenticationServiceException ex) {
             // service failure
             log.info("Inside login of UserController");
-            throw new AuthenticationServiceException(ex.getMessage());
+            return "Service failure";
 
         } catch (AuthenticationException ex) {
             //authentication failure
             log.info("Inside login of UserController");
-            throw ex;
+            return "Authentication failure";
         }
         //generate web token if authentication successful
         return jwtUtil.generateToken(authRequest.getNetid());
