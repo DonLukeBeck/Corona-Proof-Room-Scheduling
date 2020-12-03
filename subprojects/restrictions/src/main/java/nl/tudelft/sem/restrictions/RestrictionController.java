@@ -1,6 +1,7 @@
 package nl.tudelft.sem.restrictions;
 
 import java.time.LocalTime;
+import java.util.Optional;
 import java.util.NoSuchElementException;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,18 +35,17 @@ public class RestrictionController {
      * @return message containing the action that has been done
      */
     public String addNewRestriction(String name, float value) {
-        for (Restriction r : restrictionRepository.findAll()) {
-            if (r.getName().equals(name)) {
-                if (r.getValue() == value) {
-                    return "Already Exists";
-                } else {
-                    restrictionRepository.delete(r);
-                    Restriction rn = new Restriction();
-                    rn.setName(name);
-                    rn.setValue(value);
-                    restrictionRepository.save(rn);
-                    return "Updated";
-                }
+        Optional <Restriction> r = restrictionRepository.getRestrictionByName(name);
+        if (r.isPresent()) {
+            if (r.get().getValue() == value) {
+                return "Already Exists";
+            } else {
+                restrictionRepository.delete(r.get());
+                Restriction rn = new Restriction();
+                rn.setName(name);
+                rn.setValue(value);
+                restrictionRepository.save(rn);
+                return "Updated";
             }
         }
         Restriction rn = new Restriction();
@@ -62,10 +62,9 @@ public class RestrictionController {
      * @return the value of the restriction or -999.9 if does not exists
      */
     public float getRestrictionVal(String name) {
-        for (Restriction r : restrictionRepository.findAll()) {
-            if (r.getName().equals(name)) {
-                return r.getValue();
-            }
+        Optional <Restriction> r = restrictionRepository.getRestrictionByName(name);
+        if (r.isPresent()) {
+            return r.get().getValue();
         }
         throw new NoSuchElementException("No Restriction Found, Need to Create One!");
     }

@@ -2,7 +2,6 @@ package nl.tudelft.sem.identity.controller;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import io.jsonwebtoken.Claims;
