@@ -106,7 +106,8 @@ class LectureTest {
     }
 
     @Test
-    void getCourse() {
+    void testGetCourse() {
+        assertEquals(course, lecture.getCourse());
     }
 
     @Test
