@@ -154,8 +154,18 @@ class LectureSchedulerTest {
     }
 
     @Test
-    void youdbetterwork(){
+    void testScheduleAllLectures() {
+
+        // to be implemented. should do integration like test, we can again pass list with
+        // a lot of lectures to be scheduled and then verify that the repositories are called
+        // with certain attributes
+
         scheduler.scheduleAllLectures();
+    }
+
+    @Test
+    void testSetFields() {
+        // to be implemented, test for initialization
     }
 
 
@@ -171,6 +181,8 @@ class LectureSchedulerTest {
         verify(attendanceRepository, times(3)).saveAndFlush(Attendance.builder()
                 .lectureId(lectures[1].getLectureId()).physical(true)
                 .studentId(any()).build());
+
+        // make test more specific, verify not any student, but their exact details.
     }
 
     /**
@@ -250,6 +262,8 @@ class LectureSchedulerTest {
             new OnCampusCandidate(netIds[0],
                     LocalDate.of(2020, 12, 26))
         };
+
+        // maybe split this test case up into multiple parts??
 
         @SuppressWarnings("PMD.DataflowAnomalyAnalysis")
         // this is just the priority queue being created and checked afterwards.

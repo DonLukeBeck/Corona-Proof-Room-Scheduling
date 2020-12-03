@@ -31,7 +31,15 @@ class LectureTest {
     }
 
     @Test
-    void getParticipantsList() {
+    void getAttendances() {
+    }
+
+    @Test
+    void getDurationInMinutes() {
+    }
+
+    @Test
+    void getCourse() {
     }
 
     @Test
@@ -59,6 +67,14 @@ class LectureTest {
     }
 
     @Test
-    void setParticipantsList() {
+    void setAttendances() {
+    }
+
+    @Test
+    void setDurationInMinutes() {
+    }
+
+    @Test
+    void setCourse() {
     }
 }

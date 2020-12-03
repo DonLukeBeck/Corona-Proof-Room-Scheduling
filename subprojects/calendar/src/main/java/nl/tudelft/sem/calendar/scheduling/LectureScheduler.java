@@ -43,7 +43,7 @@ public class LectureScheduler {
     private AttendanceRepository attendanceRepository;
 
     /**
-     * Creates a new instance of the LectureScheduler with a given list of rooms, lectures to be
+     * Initializes the LectureScheduler with a given list of rooms, lectures to be
      * scheduled, scheduling start and ending times and the time gap that should be used wil
      * scheduling.
      *
@@ -93,8 +93,8 @@ public class LectureScheduler {
             List<Lecture> toScheduleThisDay = getSortedLecturesForDay(date, lecturesByDay);
             for (Lecture toBeScheduled : toScheduleThisDay) {
                 int capacity = assignRoom(toBeScheduled, toBeScheduled.getDurationInMinutes());
-                // save lecture in database
-                lectureRepository.saveAndFlush(toBeScheduled);
+                // save lecture in database and update it with id
+                toBeScheduled = lectureRepository.saveAndFlush(toBeScheduled);
                 // then assign students
                 assignStudents(capacity, toBeScheduled, allParticipants);
             }
@@ -121,6 +121,7 @@ public class LectureScheduler {
         while (!candidateSelector.isEmpty()
                 && scheduledLecture.getRoomId() != null
                 && studentCounter < capacity) {
+
             String selected = candidateSelector.remove().getNetId();
             selectedStudents.add(selected);
             allParticipants.put(selected, scheduledLecture.getDate().plusDays(14));
@@ -215,17 +216,19 @@ public class LectureScheduler {
      * @param durationInMinutes the duration of the lecture to schedule
      * @return the capacity of the room in which the lecture is now scheduled
      */
-    public int assignRoom(Lecture scheduledLecture,
-                          int durationInMinutes) {
+    public int assignRoom(Lecture scheduledLecture, int durationInMinutes) {
         while (roomSearchIndex < roomList.size()) {
             if (durationInMinutes <= (int) Duration.between(
                     roomAvailability[roomSearchIndex], endTime).toMinutes()) {
+
                 scheduledLecture.setRoomId(roomList.get(roomSearchIndex).getRoomId());
                 scheduledLecture.setStartTime(roomAvailability[roomSearchIndex]);
                 scheduledLecture.setEndTime(
                         roomAvailability[roomSearchIndex].plusMinutes(durationInMinutes));
+
                 roomAvailability[roomSearchIndex] = roomAvailability[roomSearchIndex]
                         .plusMinutes(durationInMinutes + timeGapLengthInMinutes);
+
                 return roomList.get(roomSearchIndex).getCapacity();
             } else {
                 roomSearchIndex++;
