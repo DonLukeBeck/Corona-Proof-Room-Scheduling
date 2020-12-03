@@ -261,7 +261,13 @@ public class LectureScheduler {
      *
      * @return the most recent index of where the scheduling algorithm tries to schedule
      */
-    public int getRoomSearchIndex() {
-        return this.roomSearchIndex;
-    }
+    public int getRoomSearchIndex() { return this.roomSearchIndex; }
+
+    public List<Lecture> getLecturesList() { return this.lecturesToSchedule; }
+
+    public LocalTime getStartTime() { return this.startTime; }
+
+    public LocalTime getEndTime() {return this.endTime; }
+
+    public int getTimeGapLengthInMinutes() {return this.timeGapLengthInMinutes; }
 }

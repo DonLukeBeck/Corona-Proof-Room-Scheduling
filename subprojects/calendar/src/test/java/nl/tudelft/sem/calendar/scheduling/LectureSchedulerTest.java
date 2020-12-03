@@ -1,6 +1,7 @@
 package nl.tudelft.sem.calendar.scheduling;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -160,12 +161,16 @@ class LectureSchedulerTest {
         // a lot of lectures to be scheduled and then verify that the repositories are called
         // with certain attributes
 
-        scheduler.scheduleAllLectures();
+        //scheduler.scheduleAllLectures();
     }
 
     @Test
     void testSetFields() {
-        // to be implemented, test for initialization
+        assertEquals(roomList, scheduler.getRoomList());
+        assertEquals(lecturesToSchedule, scheduler.getLecturesList());
+        assertEquals(startTime, scheduler.getStartTime());
+        assertEquals(endTime, scheduler.getEndTime());
+        assertEquals(timeGapLengthInMinutes, scheduler.getTimeGapLengthInMinutes());
     }
 
 
