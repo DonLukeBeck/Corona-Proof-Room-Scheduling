@@ -2,12 +2,70 @@ package nl.tudelft.sem.calendar.entities;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-class LectureTest {
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
+class LectureTest {
+    private Integer lectureId;
+    private String courseId;
+    private Integer roomId;
+    private LocalTime startTime;
+    private LocalTime endTime;
+    private LocalDate date;
+    List<Attendance> attendances;
+    private int durationInMinutes;
+    private Course course;
+
+    String studentId;
+    Boolean physical;
+    Attendance attendance;
+    String courseName;
+    String teacherId;
+    List<Enrollment> participants;
+    /**
+     * Creates a lecture and attributes that are used for verification.
+     */
+    @BeforeEach
+    void setUp() {
+        lectureId = 1;
+        courseId = "CSE1305";
+        roomId = 10;
+        startTime = LocalTime.NOON;
+        endTime = LocalTime.MIDNIGHT;
+        date = LocalDate.now();
+        studentId = "mbjdegoede";
+        physical = false;
+        attendance = Attendance.builder()
+                .lectureId(lectureId)
+                .physical(physical)
+                .studentId(studentId).build();
+        attendances = new ArrayList<Attendance>();
+        attendances.add(attendance);
+        durationInMinutes = 90;
+        courseId = "CSE1305";
+        courseName = "ADS";
+        teacherId = "rkrebbers";
+
+        participants = Arrays.asList(
+                Enrollment.builder().studentId("abobe").courseId("CSE2100").build(),
+                Enrollment.builder().studentId("mbjdegoede").courseId("CSE2100").build());
+
+        course = Course.builder()
+                .participantsList(participants)
+                .courseId(courseId)
+                .courseName(courseName)
+                .teacherId(teacherId).build();
+
+    }
     @Test
     void getLectureId() {
+
     }
 
     @Test
