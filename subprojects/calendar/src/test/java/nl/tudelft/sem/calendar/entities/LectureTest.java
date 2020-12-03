@@ -21,6 +21,7 @@ class LectureTest {
     List<Attendance> attendances;
     private int durationInMinutes;
     private Course course;
+    private Lecture lecture;
 
     String studentId;
     Boolean physical;
@@ -61,11 +62,12 @@ class LectureTest {
                 .courseId(courseId)
                 .courseName(courseName)
                 .teacherId(teacherId).build();
+        lecture = new Lecture(lectureId, courseId, roomId, startTime, endTime, date, attendances, durationInMinutes, course);
 
     }
     @Test
-    void getLectureId() {
-
+    void testGetLectureId() {
+        assertEquals(1, lecture.getLectureId());
     }
 
     @Test
