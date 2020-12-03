@@ -91,7 +91,8 @@ class LectureTest {
     }
 
     @Test
-    void getDate() {
+    void testGetDate() {
+        assertEquals(LocalDate.now(),lecture.getDate());
     }
 
     @Test
