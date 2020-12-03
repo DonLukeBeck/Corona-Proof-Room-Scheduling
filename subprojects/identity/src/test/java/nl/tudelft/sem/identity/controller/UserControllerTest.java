@@ -3,6 +3,7 @@ package nl.tudelft.sem.identity.controller;
 import static org.assertj.core.api.Assertions.assertThat;
 
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import io.jsonwebtoken.Claims;
@@ -80,9 +81,9 @@ public class UserControllerTest {
         Claims claims = Jwts.parser().setSigningKey(jwtUtil.getSecret()).parseClaimsJws(jwt)
             .getBody();
         assertThat(claims.getSubject()).isEqualTo("CorrectNetid");
-        var scope = (ArrayList<LinkedHashMap>) claims.get("scope");
+        ArrayList<LinkedHashMap<String, Object>> scope =  claims.get("scope", ArrayList.class);
         assertTrue(scope.get(0).containsValue("ROLE_STUDENT"));
-        var cond = new Condition<LinkedHashMap>(m -> m.containsValue("ROLE_STUDENT"), "Contains student");
+        var cond = new Condition<LinkedHashMap<String, Object>>(m -> m.containsValue("ROLE_STUDENT"), "Contains student");
         assertThat(scope).haveExactly(1, cond);
         assertThat(claims.getIssuedAt()).isBefore(claims.getExpiration());
     }
