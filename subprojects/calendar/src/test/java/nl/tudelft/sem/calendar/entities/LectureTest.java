@@ -123,7 +123,9 @@ class LectureTest {
     }
 
     @Test
-    void setRoomId() {
+    void testSetRoomId() {
+        lecture.setRoomId(20);
+        assertEquals(20, lecture.getRoomId());
     }
 
     @Test
