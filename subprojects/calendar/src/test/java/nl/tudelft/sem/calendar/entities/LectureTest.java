@@ -135,7 +135,9 @@ class LectureTest {
     }
 
     @Test
-    void setEndTime() {
+    void testSetEndTime() {
+        lecture.setEndTime(LocalTime.of(10,50));
+        assertEquals(LocalTime.of(10,50), lecture.getEndTime());
     }
 
     @Test
