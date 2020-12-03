@@ -165,6 +165,14 @@ class LectureTest {
     }
 
     @Test
-    void setCourse() {
+    void testSetCourse() {
+        Course course1 = Course.builder()
+                .participantsList(participants)
+                .courseId(courseId)
+                .courseName("CSE1400")
+                .teacherId(teacherId).build();
+        lecture.setCourse(course1);
+        assertEquals(course1, lecture.getCourse());
+
     }
 }
