@@ -81,7 +81,8 @@ class LectureTest {
     }
 
     @Test
-    void getStartTime() {
+    void testGetStartTime() {
+        assertEquals(LocalTime.NOON, lecture.getStartTime());
     }
 
     @Test
