@@ -43,7 +43,8 @@ class RestrictionControllerTest {
         this.rest1.setName("test");
 
         this.rest2 = new Restriction("test2", 2.0f);
-
+        
+        restrictionController = new RestrictionController(restrictionRepository);
         when(restrictionRepository.getRestrictionByName(rest1.getName()))
                 .thenReturn(java.util.Optional.ofNullable(rest1));
         when(restrictionRepository.getRestrictionByName(rest2.getName()))
