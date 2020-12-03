@@ -159,7 +159,9 @@ class LectureTest {
     }
 
     @Test
-    void setDurationInMinutes() {
+    void testSetDurationInMinutes() {
+        lecture.setDurationInMinutes(100);
+        assertEquals(100, lecture.getDurationInMinutes());
     }
 
     @Test
