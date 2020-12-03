@@ -117,7 +117,9 @@ class LectureTest {
     }
 
     @Test
-    void setCourseId() {
+    void testSetCourseId() {
+        lecture.setCourseId("CSE2305");
+        assertEquals("CSE2305",lecture.getCourseId());
     }
 
     @Test
