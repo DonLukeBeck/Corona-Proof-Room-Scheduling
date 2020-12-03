@@ -76,7 +76,8 @@ class LectureTest {
     }
 
     @Test
-    void getRoomId() {
+    void testGetRoomId() {
+        assertEquals(10, lecture.getRoomId());
     }
 
     @Test
