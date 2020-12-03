@@ -147,7 +147,15 @@ class LectureTest {
     }
 
     @Test
-    void setAttendances() {
+    void testSetAttendances() {
+        Attendance attendance1 = Attendance.builder()
+                .lectureId(15)
+                .physical(true)
+                .studentId("abobe").build();
+        List<Attendance> att = new ArrayList<Attendance>();
+        att.add(attendance1);
+        lecture.setAttendances(att);
+        assertEquals(att, lecture.getAttendances());
     }
 
     @Test
