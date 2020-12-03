@@ -96,7 +96,8 @@ class LectureTest {
     }
 
     @Test
-    void getAttendances() {
+    void testGetAttendances() {
+        assertEquals(attendances, lecture.getAttendances());
     }
 
     @Test
