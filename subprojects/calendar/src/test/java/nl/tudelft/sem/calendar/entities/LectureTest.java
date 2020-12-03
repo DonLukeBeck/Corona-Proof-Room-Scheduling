@@ -111,7 +111,9 @@ class LectureTest {
     }
 
     @Test
-    void setLectureId() {
+    void testSetLectureId() {
+        lecture.setLectureId(5);
+        assertEquals(5, lecture.getLectureId());
     }
 
     @Test
