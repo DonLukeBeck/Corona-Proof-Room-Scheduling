@@ -129,7 +129,9 @@ class LectureTest {
     }
 
     @Test
-    void setStartTime() {
+    void testSetStartTime() {
+        lecture.setStartTime(LocalTime.of(9,35));
+        assertEquals(LocalTime.of(9,35), lecture.getStartTime());
     }
 
     @Test
