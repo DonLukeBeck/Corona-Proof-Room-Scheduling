@@ -8,11 +8,8 @@ import static org.mockito.Mockito.verify;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.PriorityQueue;
+import java.util.*;
+
 import nl.tudelft.sem.calendar.entities.Attendance;
 import nl.tudelft.sem.calendar.entities.Course;
 import nl.tudelft.sem.calendar.entities.Lecture;
@@ -72,7 +69,7 @@ class LectureSchedulerTest {
                 Arrays.asList("someNetId", "someNetId2"));
         testCourses[1] = new Course(
                 Arrays.asList("abobe", "mbjdegoede", "cparlar"));
-        testCourses[2] = new Course(Arrays.asList("mdavid"));
+        testCourses[2] = new Course(Collections.singletonList("mdavid"));
     }
 
     /**
@@ -116,8 +113,8 @@ class LectureSchedulerTest {
             {
                 put(testDates[0], Arrays.asList(lectures[0],
                         lectures[1],lectures[2]));
-                put(testDates[1], Arrays.asList(lectures[3]));
-                put(testDates[2], Arrays.asList(lectures[4]));
+                put(testDates[1], Collections.singletonList(lectures[3]));
+                put(testDates[2], Collections.singletonList(lectures[4]));
             }
         };
     }
@@ -186,6 +183,9 @@ class LectureSchedulerTest {
         verify(attendanceRepository, times(3)).saveAndFlush(Attendance.builder()
                 .lectureId(lectures[1].getLectureId()).physical(true)
                 .studentId(any()).build());
+
+        //Attendance attendance = Attendance.builder().lectureId(lectures[2].getLectureId()).physical(true).studentId("abobe").build();
+        //verify(attendanceRepository, times(1)).saveAndFlush();
 
         // make test more specific, verify not any student, but their exact details.
     }
