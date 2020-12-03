@@ -40,10 +40,10 @@ public class JwtValidate {
      * Get the claims from the compact jws, a cryptographically signed jwt
      *
      * @param jwt the compacted version of the jwt
-     * @return the set of claims
+     * @return the set of claims or {@code null} if not valid
      */
     public Claims claims(String jwt) {
-        return parser.parseClaimsJws(jwt).getBody();
+        return isValid(jwt) ? parser.parseClaimsJws(jwt).getBody() : null;
     }
 
     /**
@@ -53,7 +53,8 @@ public class JwtValidate {
      * @return the username
      */
     public String username(String jwt) {
-        return this.claims(jwt).getSubject();
+        Claims claims = this.claims(jwt);
+        return claims != null ? claims.getSubject() : null;
     }
 
     /**
@@ -63,7 +64,7 @@ public class JwtValidate {
      * @return true if the jwt belongs to a student, false otherwise
      */
     public boolean isStudent(String jwt) {
-        return this.isStudent(this.claims(jwt));
+        return this.isValid(jwt) && this.isStudent(this.claims(jwt));
     }
 
     /**
@@ -83,7 +84,7 @@ public class JwtValidate {
      * @return true if the jwt belongs to a teacher, false otherwise
      */
     public boolean isTeacher(String jwt) {
-        return this.isTeacher(this.claims(jwt));
+        return this.isValid(jwt) && this.isTeacher(this.claims(jwt));
     }
 
     /**
