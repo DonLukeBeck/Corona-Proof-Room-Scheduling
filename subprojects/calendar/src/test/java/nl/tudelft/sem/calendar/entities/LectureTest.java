@@ -141,7 +141,9 @@ class LectureTest {
     }
 
     @Test
-    void setDate() {
+    void testSetDate() {
+        lecture.setDate(LocalDate.of(2020,10,28));
+        assertEquals(LocalDate.of(2020,10,28), lecture.getDate());
     }
 
     @Test
