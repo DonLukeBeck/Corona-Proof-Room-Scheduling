@@ -1,7 +1,6 @@
-package nl.tudelft.sem.calendar.scheduling;
+package nl.tudelft.sem.courses;
 
 import java.time.LocalDate;
-import nl.tudelft.sem.calendar.entities.Course;
 
 public class RequestedLecture {
 

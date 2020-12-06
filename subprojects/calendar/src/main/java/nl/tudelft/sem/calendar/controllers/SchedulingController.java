@@ -34,4 +34,5 @@ public class SchedulingController {
         scheduler.scheduleAllLectures();
         return null;
     }
+
 }
