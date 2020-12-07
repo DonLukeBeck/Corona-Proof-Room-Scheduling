@@ -24,32 +24,32 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 
 @SpringBootTest
 class LectureSchedulerTest {
-    private static List<Room> roomList;
-    private static List<Lecture> lecturesToSchedule;
-    private static LocalTime startTime;
-    private static LocalTime endTime;
-    private static int timeGapLengthInMinutes;
+    private transient List<Room> roomList;
+    private transient List<Lecture> lecturesToSchedule;
+    private transient LocalTime startTime;
+    private transient LocalTime endTime;
+    private transient int timeGapLengthInMinutes;
 
     @Autowired
-    LectureScheduler scheduler;
+    transient LectureScheduler scheduler;
 
     // We mock the repositories
     @MockBean
-    LectureRepository lectureRepository;
+    transient LectureRepository lectureRepository;
     @MockBean
-    AttendanceRepository attendanceRepository;
+    transient AttendanceRepository attendanceRepository;
 
     // Objects used in the test cases, stored in arrays.
-    private static Room[] testRooms;
-    private static Lecture[] lectures;
-    private static Course[] testCourses;
-    private static LocalDate[] testDates;
-    private static String[] netIds;
+    private transient Room[] testRooms;
+    private transient Lecture[] lectures;
+    private transient Course[] testCourses;
+    private transient LocalDate[] testDates;
+    private transient String[] netIds;
 
     /**
      * Helper method to create a set of rooms used in the test cases.
      */
-    private static void createRooms() {
+    private void createRooms() {
         testRooms = new Room[5];
         testRooms[0] = new Room(1, "Class", 2);
         testRooms[1] = new Room(2, "IZ - 2", 20);
@@ -63,7 +63,7 @@ class LectureSchedulerTest {
     /**
      * Helper method to create a set of courses used in the test cases.
      */
-    private static void createCourses() {
+    private void createCourses() {
         testCourses = new Course[3];
         testCourses[0] = new Course(
                 Arrays.asList("someNetId", "someNetId2"));
@@ -75,7 +75,7 @@ class LectureSchedulerTest {
     /**
      * Helper method to create a set of dates used in the test cases.
      */
-    private static void createDates() {
+    private void createDates() {
         testDates = new LocalDate[3];
         testDates[0] = LocalDate.of(2020, 2, 1);
         testDates[1] = LocalDate.of(2020, 2, 13);
@@ -86,7 +86,7 @@ class LectureSchedulerTest {
      * Helper method to create a set of lecture requests and scheduled lectures used for
      * verification in the test cases.
      */
-    private static void createLectures() {
+    private void createLectures() {
         lectures = new Lecture[5];
         lectures[0] = Lecture.builder()
                 .course(testCourses[0]).date(testDates[0]).durationInMinutes(90).build();
@@ -108,7 +108,7 @@ class LectureSchedulerTest {
      *
      * @return a map of the lecture requests grouped by day.
      */
-    private static HashMap<LocalDate, List<Lecture>> createMapOfLecturesByDay() {
+    private HashMap<LocalDate, List<Lecture>> createMapOfLecturesByDay() {
         return new HashMap<>() {
             {
                 put(testDates[0], Arrays.asList(lectures[0],
@@ -124,7 +124,7 @@ class LectureSchedulerTest {
      *
      * @return a map with the studentIds and the deadlines of the course participants.
      */
-    private static HashMap<String, LocalDate> createParticipants() {
+    private HashMap<String, LocalDate> createParticipants() {
         return new HashMap<>() {
             {
                 put("abobe", LocalDate.of(2020, 12, 26));

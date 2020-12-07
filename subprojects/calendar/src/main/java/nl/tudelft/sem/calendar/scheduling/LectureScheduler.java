@@ -38,9 +38,9 @@ public class LectureScheduler {
     private transient int roomSearchIndex;
 
     @Autowired
-    private LectureRepository lectureRepository;
+    private transient LectureRepository lectureRepository;
     @Autowired
-    private AttendanceRepository attendanceRepository;
+    private transient AttendanceRepository attendanceRepository;
 
     /**
      * Initializes the LectureScheduler with a given list of rooms, lectures to be
@@ -109,6 +109,9 @@ public class LectureScheduler {
      * @param scheduledLecture the lecture being scheduled
      * @param allParticipants  a map with the netIds and deadlines of all students
      */
+    // This isn't a DU-anomaly since `selectedStudents` is being read when the participants are
+    // being stored in the database
+    @SuppressWarnings("PMD.DataflowAnomalyAnalysis")
     public void assignStudents(int capacity, Lecture scheduledLecture, Map<String,
             LocalDate> allParticipants) {
         PriorityQueue<OnCampusCandidate> candidateSelector =
