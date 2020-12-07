@@ -1,8 +1,8 @@
 package nl.tudelft.sem.calendar.entities;
-
-import java.io.Serializable;
 import javax.persistence.Embeddable;
+import java.io.Serializable;
 import lombok.Data;
+import lombok.Generated;
 
 @Embeddable
 @Data
