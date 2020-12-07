@@ -6,9 +6,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class EnrollmentTest {
-    private String studentId;
-    private String courseId;
-    private Enrollment enrollment;
+    private transient String studentId;
+    private transient String courseId;
+    private transient Enrollment enrollment;
 
     /**
      * Creates an enrollment and its attributes used in all test cases.

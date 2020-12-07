@@ -12,23 +12,23 @@ import java.util.Arrays;
 import java.util.List;
 
 class LectureTest {
-    private Integer lectureId;
-    private String courseId;
-    private Integer roomId;
-    private LocalTime startTime;
-    private LocalTime endTime;
-    private LocalDate date;
-    List<Attendance> attendances;
-    private int durationInMinutes;
-    private Course course;
-    private Lecture lecture;
+    private transient Integer lectureId;
+    private transient String courseId;
+    private transient Integer roomId;
+    private transient LocalTime startTime;
+    private transient LocalTime endTime;
+    private transient LocalDate date;
+    private transient List<Attendance> attendances;
+    private transient int durationInMinutes;
+    private transient Course course;
+    private transient Lecture lecture;
 
-    String studentId;
-    Boolean physical;
-    Attendance attendance;
-    String courseName;
-    String teacherId;
-    List<Enrollment> participants;
+    private transient String studentId;
+    private transient Boolean physical;
+    private transient Attendance attendance;
+    private transient String courseName;
+    private transient String teacherId;
+    private transient List<Enrollment> participants;
     /**
      * Creates a lecture and attributes that are used for verification.
      */

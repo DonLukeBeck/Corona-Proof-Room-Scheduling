@@ -15,6 +15,7 @@ class CourseTest {
     private static String courseName;
     private static String teacherId;
     private static List<Enrollment> participants;
+    private static String exampleCourseName = "CSE2100";
 
     /**
      * Creates a course and its attributes used in all test cases.
@@ -27,8 +28,8 @@ class CourseTest {
         teacherId = "rkrebbers";
 
         participants = Arrays.asList(
-                Enrollment.builder().studentId("abobe").courseId("CSE2100").build(),
-                Enrollment.builder().studentId("mbjdegoede").courseId("CSE2100").build());
+                Enrollment.builder().studentId("abobe").courseId(exampleCourseName).build(),
+                Enrollment.builder().studentId("mbjdegoede").courseId(exampleCourseName).build());
 
         course = Course.builder()
                 .participantsList(participants)
@@ -51,8 +52,8 @@ class CourseTest {
     @Test
     void testSetParticipantsList() {
         List<Enrollment> participants2 = Arrays.asList(
-                Enrollment.builder().studentId("someNetId").courseId("CSE2100").build(),
-                Enrollment.builder().studentId("someNetId2").courseId("CSE2100").build());
+                Enrollment.builder().studentId("someNetId").courseId(exampleCourseName).build(),
+                Enrollment.builder().studentId("someNetId2").courseId(exampleCourseName).build());
 
         course.setParticipantsList(participants2);
         assertEquals(participants2, course.getParticipantsList());
