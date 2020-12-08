@@ -25,6 +25,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.context.WebApplicationContext;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -84,6 +85,28 @@ public class UserControllerTest {
         var cond = new Condition<LinkedHashMap>(m -> m.containsValue("ROLE_STUDENT"), "Contains student");
         assertThat(scope).haveExactly(1, cond);
         assertThat(claims.getIssuedAt()).isBefore(claims.getExpiration());
+    }
+
+    @Test
+    public void loginFailedPassword() throws Exception {
+        when(userRepository.findByNetid(correctUser.getNetid())).thenReturn(correctUser);
+        authenticationRequest.setPassword("1234");
+        String uri = "/login";
+        String jwt = mockMvc.perform(post(uri).contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(objectMapper.writeValueAsString(authenticationRequest))).andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+        assertEquals(jwt, "Authentication failure");
+    }
+
+    @Test
+    public void loginFailedUsername() throws Exception {
+        authenticationRequest.setNetid("fail");
+        when(userRepository.findByNetid(correctUser.getNetid())).thenReturn(correctUser);
+        String uri = "/login";
+        String jwt = mockMvc.perform(post(uri).contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(objectMapper.writeValueAsString(authenticationRequest))).andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+        assertEquals(jwt, "Authentication failure");
     }
 
 }
