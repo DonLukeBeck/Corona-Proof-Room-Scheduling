@@ -1,11 +1,10 @@
 package nl.tudelft.sem.courses;
 
 import java.time.ZoneId;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
-import java.util.stream.Collector;
+import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -29,28 +28,28 @@ public class LectureController {
     /**
      * Get endpoint to retrieve all lectures
      *
-     * @return A list of {@link Lecture}s
+     * @return A list of {@link BareLecture}s
      */
     @GetMapping("/lectures")
     @ResponseBody
     public ResponseEntity<?> listLectures() {
-        return ResponseEntity.ok(lectureRepository.findAll());
+        return ResponseEntity.ok(
+            bareFromLecture(lectureRepository.findAll().stream()).collect(Collectors.toList()));
     }
 
     /**
      * Get endpoint to retrieve all lectures after a certain date
      *
-     * @return A list of {@link RequestedLecture}s
+     * @return A list of {@link BareLecture}s
      */
     @GetMapping("/date/{date}")
     @ResponseBody
     public ResponseEntity<?> listLecturesAfterDate(@PathVariable("date") Date date) {
-        return ResponseEntity.ok(lectureRepository.findAll().stream().filter(l -> l.getScheduledDate().after(date))
-            .map(lecture -> new RequestedLecture(
-                courseRepository.findById(lecture.getCourseId()).get(),
-                lecture.getScheduledDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate(),
-                lecture.getDuration())).collect(Collectors.toList()));
-
+        return ResponseEntity.ok(bareFromLecture(lectureRepository.findAll().stream()
+            .filter(l -> l.getScheduledDate().after(date))).collect(Collectors.toList()));
     }
 
+    private Stream<BareLecture> bareFromLecture(Stream<Lecture> s) {
+        return s.map(l -> new BareLecture(l.getCourseId(), l.getScheduledDate(), l.getDuration()));
+    }
 }
