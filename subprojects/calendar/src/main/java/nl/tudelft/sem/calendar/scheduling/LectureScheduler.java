@@ -22,6 +22,7 @@ import nl.tudelft.sem.calendar.repositories.LectureRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 
 @Service
@@ -95,6 +96,7 @@ public class LectureScheduler {
                 int capacity = assignRoom(toBeScheduled, toBeScheduled.getDurationInMinutes());
                 // save lecture in database and update it with id
                 toBeScheduled = lectureRepository.saveAndFlush(toBeScheduled);
+
                 // then assign students
                 assignStudents(capacity, toBeScheduled, allParticipants);
             }

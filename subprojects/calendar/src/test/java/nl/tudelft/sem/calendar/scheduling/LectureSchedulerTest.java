@@ -3,8 +3,7 @@ package nl.tudelft.sem.calendar.scheduling;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -18,9 +17,16 @@ import nl.tudelft.sem.calendar.repositories.AttendanceRepository;
 import nl.tudelft.sem.calendar.repositories.LectureRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.ApplicationContext;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @SpringBootTest
 class LectureSchedulerTest {
@@ -31,13 +37,15 @@ class LectureSchedulerTest {
     private transient int timeGapLengthInMinutes;
 
     @Autowired
-    transient LectureScheduler scheduler;
+    ApplicationContext context;
+    @Autowired
+    LectureScheduler scheduler;
 
     // We mock the repositories
     @MockBean
-    transient LectureRepository lectureRepository;
+    LectureRepository lectureRepository;
     @MockBean
-    transient AttendanceRepository attendanceRepository;
+    AttendanceRepository attendanceRepository;
 
     // Objects used in the test cases, stored in arrays.
     private transient Room[] testRooms;
@@ -151,15 +159,25 @@ class LectureSchedulerTest {
         scheduler.setFields(roomList, lecturesToSchedule, startTime, endTime, timeGapLengthInMinutes);
     }
 
-    @Test
+    /*@Test
     void testScheduleAllLectures() {
+        scheduler.scheduleAllLectures();
+        Lecture lecture1 = lectures[0];
+        doReturn(lecture1).when(lectureRepository).saveAndFlush(lecture1);
+                verify(lectureRepository,times(1)).saveAndFlush(any());
+    }*/
 
-        // to be implemented. should do integration like test, we can again pass list with
-        // a lot of lectures to be scheduled and then verify that the repositories are called
-        // with certain attributes
+    @Test
+    public void testLectureMock() {
+        when(lectureRepository.saveAndFlush(any())).thenReturn(lectures[0]);
 
-        //scheduler.scheduleAllLectures();
+        LectureRepository lectureRepository = context.getBean(LectureRepository.class);
+        Lecture lecture = lectureRepository.saveAndFlush(lectures[0]);
+
+        assertEquals(lectures[0], lecture);
+        verify(lectureRepository).saveAndFlush(any());
     }
+
 
 
     /**
