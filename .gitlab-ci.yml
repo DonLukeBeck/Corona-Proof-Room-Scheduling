@@ -10,30 +10,23 @@ build:
   stage: build
   script:
     gradle build
-  rules:
-    - if: '$CI_COMMIT_REF_NAME == "master"'
-    - when: manual
 
 checkStyle:
   stage: staticAnalysis
   script:
     gradle checkstyleMain checkStyleTest
-  rules:
-    - when: on_success
 
 PMD:
   stage: staticAnalysis
   script:
       gradle pmdMain pmdTest
-  rules:
-    - when: on_success
 
 test:
   stage: test
   script:
     - gradle test
     - gradle jacocoTestReport
-    # instruction coverage (may replace later with branch coverage)
+    # Branch coverage
     # this is easier than trying to get the coverage from the html/xml
     - for f in subprojects/*; do 
           tail -n+2 "$f"/build/reports/jacoco/test/jacocoTestReport.csv
@@ -41,18 +34,16 @@ test:
         done
     - awk -F "," 'NF>1
         {
-          totalLines += $4 + $5; coveredLines += $5
+          totalBranches += $6 + $7; coveredBranches += $7
         }
         END {
-          print "(" 100*coveredLines/totalLines "%) covered"
+          print "(" 100*coveredBranches/totalBranches "%) covered"
         }' build/reports/jacoco/test/jacocoTestReport.csv
   coverage: /\(\d+.\d+\%\) covered/
   artifacts:
     paths:
       - build/reports/jacoco/test/jacocoTestReport.xml
     expire_in: 1 week
-  rules:
-    - when: on_success
 
 # with kind help from the docs: https://docs.gitlab.com/ee/user/project/merge_requests/test_coverage_visualization.html
 coverage:
@@ -69,6 +60,4 @@ coverage:
   artifacts:
     reports:
       cobertura: build/cobertura.xml
-  rules:
-    - when: on_success
 
