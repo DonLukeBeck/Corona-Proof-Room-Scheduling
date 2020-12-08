@@ -161,6 +161,10 @@ class LectureSchedulerTest {
         //scheduler.scheduleAllLectures();
     }
 
+
+    /**
+     * Tests whether all properties of the scheduler are correctly set upon initialization.
+     */
     @Test
     void testSetFields() {
         assertEquals(roomList, scheduler.getRoomList());
@@ -168,8 +172,12 @@ class LectureSchedulerTest {
         assertEquals(startTime, scheduler.getStartTime());
         assertEquals(endTime, scheduler.getEndTime());
         assertEquals(timeGapLengthInMinutes, scheduler.getTimeGapLengthInMinutes());
+        assertEquals(new HashMap<String, LocalDate>(), scheduler.getAllParticipants());
+        assertEquals(0, scheduler.getRoomSearchIndex());
+        for(LocalTime lt: scheduler.getRoomAvailability()) {
+            assertEquals(startTime, lt);
+        }
     }
-
 
     /**
      * Tests whether all course participants are selected to attend the lecture on campus when the

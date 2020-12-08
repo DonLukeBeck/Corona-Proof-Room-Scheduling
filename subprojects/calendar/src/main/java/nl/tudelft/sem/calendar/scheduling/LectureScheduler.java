@@ -273,4 +273,10 @@ public class LectureScheduler {
     public LocalTime getEndTime() {return this.endTime; }
 
     public int getTimeGapLengthInMinutes() {return this.timeGapLengthInMinutes; }
+
+    public LocalTime[] getRoomAvailability() { return this.roomAvailability; }
+
+    public Map<String, LocalDate> getAllParticipants() {
+        return allParticipants;
+    }
 }
