@@ -151,7 +151,7 @@ public class SchedulingController {
      * @param courseId the course for which the user will be absent.
      * @param date the date on which the lecture would have took place
      *
-     * @return a string with 'success' or 'error'
+     * @return a string with 'success' if done
      */
     @PostMapping(path = "/indicateAbsence")
     @SuppressWarnings({"PMD.DataflowAnomalyAnalysis", "PMD.AvoidDuplicateLiterals"})
@@ -169,10 +169,9 @@ public class SchedulingController {
             attendanceRepository.delete(a);
             a.setPhysical(false);
             attendanceRepository.save(a);
-            return "Succes";
         }
 
-        return "Error";
+        return "Succes";
     }
 
 }
