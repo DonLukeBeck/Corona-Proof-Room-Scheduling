@@ -84,7 +84,7 @@ public class SchedulingController {
             lectureIds.add(a.getLectureId());
         }
         for (Integer i : lectureIds) {
-            lectures = lectureRepository.findByLectureId(i);
+            lectures.addAll(lectureRepository.findByLectureId(i));
         }
         return lectures;
     }
@@ -108,8 +108,8 @@ public class SchedulingController {
             lectureIds.add(a.getLectureId());
         }
 
-        for (Lecture l : lectureRepository.findAll()) {
-            if (lectureIds.contains(l.getLectureId()) && l.getDate() == date) {
+        for (Lecture l : lectureRepository.findByDate(date)) {
+            if (lectureIds.contains(l.getLectureId())) {
                 lectures.add(l);
             }
         }
@@ -135,8 +135,8 @@ public class SchedulingController {
             lectureIds.add(a.getLectureId());
         }
 
-        for (Lecture l : lectureRepository.findAll()) {
-            if (lectureIds.contains(l.getLectureId()) && l.getCourseId() == courseId) {
+        for (Lecture l : lectureRepository.findByCourseId(courseId)) {
+            if (lectureIds.contains(l.getLectureId())) {
                 lectures.add(l);
             }
         }
@@ -165,13 +165,11 @@ public class SchedulingController {
             }
         }
 
-        for (Attendance a : attendanceRepository.findAll()) {
-            if (a.getLectureId() == lectureId && a.getStudentId().equals(userId)) {
-                attendanceRepository.delete(a);
-                a.setPhysical(false);
-                attendanceRepository.save(a);
-                return "Succes";
-            }
+        for (Attendance a : attendanceRepository.findByLecureIdAndStudentId(lectureId, courseId)) {
+            attendanceRepository.delete(a);
+            a.setPhysical(false);
+            attendanceRepository.save(a);
+            return "Succes";
         }
 
         return "Error";

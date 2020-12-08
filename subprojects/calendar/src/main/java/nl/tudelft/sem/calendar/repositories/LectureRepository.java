@@ -1,5 +1,6 @@
 package nl.tudelft.sem.calendar.repositories;
 
+import java.time.LocalDate;
 import java.util.List;
 import nl.tudelft.sem.calendar.entities.Lecture;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -10,4 +11,6 @@ public interface LectureRepository extends JpaRepository<Lecture, Long> {
 
     List<Lecture> findAll();
     List<Lecture> findByLectureId(long lectureId);
+    List<Lecture> findByCourseId(String courseId);
+    List<Lecture> findByDate(LocalDate date);
 }
