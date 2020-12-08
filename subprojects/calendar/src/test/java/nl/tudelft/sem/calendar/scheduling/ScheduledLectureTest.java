@@ -29,7 +29,7 @@ class ScheduledLectureTest {
         startTime = LocalTime.MIDNIGHT;
         course = new Course(Arrays.asList("mbjdegoede", "abobe"));
         date = LocalDate.now();
-        room = new Room(10, 200, "Drebbelweg IZ-2");
+        room = new Room(10, "Drebbelweg IZ-2", 200);
 
         scheduledLecture = new ScheduledLecture(course, date);
         scheduledLecture.setStartTime(startTime);
