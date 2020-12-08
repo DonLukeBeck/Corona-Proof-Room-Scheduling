@@ -78,17 +78,13 @@ public class SchedulingController {
     // we need to add specific values to lectureIds
     // we need to suppress this warning for every method
     public List getMyPersonalSchedule(String userId) {
-        ArrayList<Lecture> lectures = new ArrayList<>();
+        List<Lecture> lectures = new ArrayList<>();
         ArrayList<Integer> lectureIds = new ArrayList<>();
-        for (Attendance a : attendanceRepository.findAll()) {
-            if (a.getStudentId().equals(userId)) {
-                lectureIds.add(a.getLectureId());
-            }
+        for (Attendance a : attendanceRepository.findByStudentId(userId)) {
+            lectureIds.add(a.getLectureId());
         }
-        for (Lecture l : lectureRepository.findAll()) {
-            if (lectureIds.contains(l.getLectureId())) {
-                lectures.add(l);
-            }
+        for (Integer i : lectureIds) {
+            lectures = lectureRepository.findByLectureId(i);
         }
         return lectures;
     }
@@ -108,11 +104,10 @@ public class SchedulingController {
     public List getMyPersonalScheduleForDay(String userId, LocalDate date) {
         ArrayList<Lecture> lectures = new ArrayList<>();
         ArrayList<Integer> lectureIds = new ArrayList<>();
-        for (Attendance a : attendanceRepository.findAll()) {
-            if (a.getStudentId().equals(userId)) {
-                lectureIds.add(a.getLectureId());
-            }
+        for (Attendance a : attendanceRepository.findByStudentId(userId)) {
+            lectureIds.add(a.getLectureId());
         }
+
         for (Lecture l : lectureRepository.findAll()) {
             if (lectureIds.contains(l.getLectureId()) && l.getDate() == date) {
                 lectures.add(l);
@@ -136,11 +131,10 @@ public class SchedulingController {
     public List getMyPersonalScheduleForCourse(String userId, String courseId) {
         ArrayList<Lecture> lectures = new ArrayList<>();
         ArrayList<Integer> lectureIds = new ArrayList<>();
-        for (Attendance a : attendanceRepository.findAll()) {
-            if (a.getStudentId().equals(userId)) {
-                lectureIds.add(a.getLectureId());
-            }
+        for (Attendance a : attendanceRepository.findByStudentId(userId)) {
+            lectureIds.add(a.getLectureId());
         }
+
         for (Lecture l : lectureRepository.findAll()) {
             if (lectureIds.contains(l.getLectureId()) && l.getCourseId() == courseId) {
                 lectures.add(l);
@@ -174,6 +168,8 @@ public class SchedulingController {
         for (Attendance a : attendanceRepository.findAll()) {
             if (a.getLectureId() == lectureId && a.getStudentId().equals(userId)) {
                 attendanceRepository.delete(a);
+                a.setPhysical(false);
+                attendanceRepository.save(a);
                 return "Succes";
             }
         }
