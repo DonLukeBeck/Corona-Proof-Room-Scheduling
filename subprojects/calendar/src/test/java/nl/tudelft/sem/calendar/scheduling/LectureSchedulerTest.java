@@ -186,16 +186,23 @@ class LectureSchedulerTest {
      */
     @Test
     void testAssignStudentsEnoughCapacity() {
+
+        lectures[1].setRoomId(testRooms[1].getRoomId());
         Map<String, LocalDate> allParticipants = createParticipants();
         scheduler.assignStudents(testRooms[1].getCapacity(), lectures[1], allParticipants);
-        verify(attendanceRepository, times(3)).saveAndFlush(Attendance.builder()
-                .lectureId(lectures[1].getLectureId()).physical(true)
-                .studentId(any()).build());
 
-        //Attendance attendance = Attendance.builder().lectureId(lectures[2].getLectureId()).physical(true).studentId("abobe").build();
-        //verify(attendanceRepository, times(1)).saveAndFlush();
 
-        // make test more specific, verify not any student, but their exact details.
+        Attendance attendance1 = Attendance.builder().lectureId(lectures[1].getLectureId())
+        .physical(true).studentId("abobe").build();
+            verify(attendanceRepository, times(1)).saveAndFlush(attendance1);
+
+        Attendance attendance2 = Attendance.builder().lectureId(lectures[1].getLectureId())
+        .physical(true).studentId("mbjdegoede").build();
+                verify(attendanceRepository, times(1)).saveAndFlush(attendance2);
+
+        Attendance attendance3 = Attendance.builder().lectureId(lectures[1].getLectureId())
+        .physical(true).studentId("cparlar").build();
+                verify(attendanceRepository, times(1)).saveAndFlush(attendance3);
     }
 
     /**
@@ -206,21 +213,24 @@ class LectureSchedulerTest {
      */
     @Test
     void testAssignStudentsButNotEnoughCapacity() {
-        //        Map<String, LocalDate> allParticipants = createParticipants();
-        //        testSchedLectures[1].setRoom(testRooms[0]);
-        //        assertThat(testSchedLectures[1].getStudentsOnCampus()).isEmpty();
-        //        scheduler.assignStudents(testSchedLectures[1], allParticipants);
-        //
-        //        assertThat(testSchedLectures[1].getStudentsOnCampus())
-        //                .containsExactly(netIds[0], netIds[2]);
-        //
-        //        assertThat(allParticipants.get(netIds[0])).isEqualTo(
-        //                testSchedLectures[1].getDate().plusDays(14));
-        //        assertThat(allParticipants.get(netIds[2])).isEqualTo(
-        //                testSchedLectures[1].getDate().plusDays(14));
-        //        assertThat(allParticipants.get(netIds[1])).isEqualTo(LocalDate.of(2020, 12, 26));
+        lectures[1].setRoomId(testRooms[0].getRoomId());
+        Map<String, LocalDate> allParticipants = createParticipants();
+        scheduler.assignStudents(testRooms[0].getCapacity(), lectures[1], allParticipants);
 
-        // use mock and assume that called in particular way.
+
+        Attendance attendance1 = Attendance.builder().lectureId(lectures[1].getLectureId())
+                .physical(false).studentId("abobe").build();
+        verify(attendanceRepository, times(1)).saveAndFlush(attendance1);
+
+        Attendance attendance2 = Attendance.builder().lectureId(lectures[1].getLectureId())
+                .physical(true).studentId("mbjdegoede").build();
+        verify(attendanceRepository, times(1)).saveAndFlush(attendance2);
+
+        Attendance attendance3 = Attendance.builder().lectureId(lectures[1].getLectureId())
+                .physical(true).studentId("cparlar").build();
+        verify(attendanceRepository, times(1)).saveAndFlush(attendance3);
+
+        verify(attendanceRepository, times(3)).saveAndFlush(any());
     }
 
     /**
