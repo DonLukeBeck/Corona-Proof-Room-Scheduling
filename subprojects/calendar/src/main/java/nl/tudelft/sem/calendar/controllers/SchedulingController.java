@@ -1,19 +1,39 @@
 package nl.tudelft.sem.calendar.controllers;
 
+import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 import nl.tudelft.sem.calendar.communication.RestrictionManagementCommunicator;
+import nl.tudelft.sem.calendar.entities.Attendance;
 import nl.tudelft.sem.calendar.entities.Lecture;
 import nl.tudelft.sem.calendar.entities.Room;
+import nl.tudelft.sem.calendar.repositories.AttendanceRepository;
+import nl.tudelft.sem.calendar.repositories.LectureRepository;
 import nl.tudelft.sem.calendar.scheduling.LectureScheduler;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class SchedulingController {
+
     @Autowired
     transient LectureScheduler lectureScheduler;
+
+    @Autowired
+    private transient AttendanceRepository attendanceRepository;
+
+    @Autowired
+    private transient LectureRepository lectureRepository;
+
+    public SchedulingController(AttendanceRepository attendanceRepository,
+                                LectureRepository lectureRepository) {
+        this.attendanceRepository = attendanceRepository;
+        this.lectureRepository = lectureRepository;
+    }
+
     /**
      * This method will form the main API endpoint for the Scheduling functionality, once the
      * connection face with the other services is determined, it will be implemented to match up.
@@ -45,4 +65,120 @@ public class SchedulingController {
             return "Failure!";
         }
     }
+
+    /**
+     * This method will return the personal schedule of a user.
+     *
+     * @param userId the userId of the user.
+     *
+     * @return returns a list with the lectures for a the user
+     */
+    @GetMapping(path = "/getMyPersonalSchedule") // Map ONLY GET Requests
+    @SuppressWarnings({"PMD.DataflowAnomalyAnalysis", "PMD.AvoidDuplicateLiterals"})
+    // we need to add specific values to lectureIds
+    // we need to suppress this warning for every method
+    public List getMyPersonalSchedule(String userId) {
+        ArrayList<Lecture> lectures = new ArrayList<>();
+        ArrayList<Integer> lectureIds = new ArrayList<>();
+        for (Attendance a : attendanceRepository.findAll()) {
+            if (a.getStudentId().equals(userId)) {
+                lectureIds.add(a.getLectureId());
+            }
+        }
+        for (Lecture l : lectureRepository.findAll()) {
+            if (lectureIds.contains(l.getLectureId())) {
+                lectures.add(l);
+            }
+        }
+        return lectures;
+    }
+
+    /**
+     * This method will return the personal schedule of a user for a given day.
+     *
+     * @param userId the userId of the user.
+     * @param date the date for which the schedule must be given.
+     *
+     * @return returns a list with the lectures for a the user for a given day
+     */
+    @GetMapping(path = "/getMyPersonalScheduleForDay") // Map ONLY GET Requests
+    @SuppressWarnings({"PMD.DataflowAnomalyAnalysis", "PMD.AvoidDuplicateLiterals"})
+    // we need to add specific values to lectureIds
+    // we need to suppress this warning for every method
+    public List getMyPersonalScheduleForDay(String userId, LocalDate date) {
+        ArrayList<Lecture> lectures = new ArrayList<>();
+        ArrayList<Integer> lectureIds = new ArrayList<>();
+        for (Attendance a : attendanceRepository.findAll()) {
+            if (a.getStudentId().equals(userId)) {
+                lectureIds.add(a.getLectureId());
+            }
+        }
+        for (Lecture l : lectureRepository.findAll()) {
+            if (lectureIds.contains(l.getLectureId()) && l.getDate() == date) {
+                lectures.add(l);
+            }
+        }
+        return lectures;
+    }
+
+    /**
+     * This method will return the personal schedule of a user for a given course.
+     *
+     * @param userId the userId of the user.
+     * @param courseId the course for which the schedule must be given.
+     *
+     * @return returns a list with the lectures for a the user for a given course
+     */
+    @GetMapping(path = "/getMyPersonalScheduleForCourse") // Map ONLY GET Requests
+    @SuppressWarnings({"PMD.DataflowAnomalyAnalysis", "PMD.AvoidDuplicateLiterals"})
+    // we need to add specific values to lectureIds
+    // we need to suppress this warning for every method
+    public List getMyPersonalScheduleForCourse(String userId, String courseId) {
+        ArrayList<Lecture> lectures = new ArrayList<>();
+        ArrayList<Integer> lectureIds = new ArrayList<>();
+        for (Attendance a : attendanceRepository.findAll()) {
+            if (a.getStudentId().equals(userId)) {
+                lectureIds.add(a.getLectureId());
+            }
+        }
+        for (Lecture l : lectureRepository.findAll()) {
+            if (lectureIds.contains(l.getLectureId()) && l.getCourseId() == courseId) {
+                lectures.add(l);
+            }
+        }
+        return lectures;
+    }
+
+    /**
+     * This method is used by a user to indicate that
+     * the user will be absent during a fysical lecture.
+     *
+     * @param userId the userId of the user.
+     * @param courseId the course for which the user will be absent.
+     * @param date the date on which the lecture would have took place
+     *
+     * @return a string with 'success' or 'error'
+     */
+    @PostMapping(path = "/indicateAbsence")
+    @SuppressWarnings({"PMD.DataflowAnomalyAnalysis", "PMD.AvoidDuplicateLiterals"})
+    // we need to add specific values to lectureIds
+    // we need to suppress this warning for every method
+    public String indicateAbsence(String userId, String courseId, LocalDate date) {
+        int lectureId = 0;
+        for (Lecture l : lectureRepository.findAll()) {
+            if (l.getCourseId().equals(courseId) && l.getDate() == date) {
+                lectureId = l.getLectureId();
+            }
+        }
+
+        for (Attendance a : attendanceRepository.findAll()) {
+            if (a.getLectureId() == lectureId && a.getStudentId().equals(userId)) {
+                attendanceRepository.delete(a);
+                return "Succes";
+            }
+        }
+
+        return "Error";
+    }
+
 }
