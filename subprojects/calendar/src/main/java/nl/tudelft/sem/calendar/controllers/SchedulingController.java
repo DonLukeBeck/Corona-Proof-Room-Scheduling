@@ -165,7 +165,7 @@ public class SchedulingController {
             }
         }
 
-        for (Attendance a : attendanceRepository.findByLecureIdAndStudentId(lectureId, courseId)) {
+        for (Attendance a : attendanceRepository.findByLecureIdAndStudentId(lectureId, userId)) {
             attendanceRepository.delete(a);
             a.setPhysical(false);
             attendanceRepository.save(a);
