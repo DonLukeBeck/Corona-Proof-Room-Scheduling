@@ -15,11 +15,11 @@ class AttendanceTest {
     private static String studentId;
     private static boolean physical;
 
-    @BeforeEach
     /**
      * Creates an attendance entry used in all the test cases.
      */
-    void setup(){
+    @BeforeEach
+    void setup() {
         lectureId = 10;
         studentId = "mbjdegoede";
         physical = false;

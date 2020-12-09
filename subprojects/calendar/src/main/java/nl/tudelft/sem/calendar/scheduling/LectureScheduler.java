@@ -230,7 +230,7 @@ public class LectureScheduler {
      * @param scheduledLecture  the lecture to schedule
      * @param durationInMinutes the duration of the lecture to schedule
      * @return the capacity of the room in which the lecture is now scheduled,
-     * used to assign students to it.
+     *      used to assign students to it.
      */
     public int assignRoom(Lecture scheduledLecture, int durationInMinutes) {
         while (roomSearchIndex < roomList.size()) {
@@ -282,42 +282,54 @@ public class LectureScheduler {
      *
      * @return the most recent index of where the scheduling algorithm tries to schedule
      */
-    public int getRoomSearchIndex() { return this.roomSearchIndex; }
+    public int getRoomSearchIndex() {
+        return this.roomSearchIndex;
+    }
 
     /**
      * Returns the list of lectures to be scheduled, used for testing purposes.
      *
      * @return the list of lectures to be schedule
      */
-    public List<Lecture> getLecturesList() { return this.lecturesToSchedule; }
+    public List<Lecture> getLecturesList() {
+        return this.lecturesToSchedule;
+    }
 
     /**
      * Returns the time to start the scheduling at, used for testing purposes.
      *
      * @return the time to start the scheduling at
      */
-    public LocalTime getStartTime() { return this.startTime; }
+    public LocalTime getStartTime() {
+        return this.startTime;
+    }
 
     /**
      * Returns the time to end the scheduling at, used for testing purposes.
      *
      * @return the time to end the scheduling at
      */
-    public LocalTime getEndTime() {return this.endTime; }
+    public LocalTime getEndTime() {
+        return this.endTime;
+    }
 
     /**
      * Returns the time gap in minutes between any two lectures, used for testing purposes.
      *
      * @return time gap in minutes between any two lectures
      */
-    public int getTimeGapLengthInMinutes() {return this.timeGapLengthInMinutes; }
+    public int getTimeGapLengthInMinutes() {
+        return this.timeGapLengthInMinutes;
+    }
 
     /**
      * Returns the array with availability times for each room, used for testing purposes.
      *
      * @return the array with availability times for each room
      */
-    public LocalTime[] getRoomAvailability() { return this.roomAvailability; }
+    public LocalTime[] getRoomAvailability() {
+        return this.roomAvailability;
+    }
 
     /**
      * Returns the map with course participants and their deadlines, used for testing purposes.

@@ -22,10 +22,10 @@ public class Attendance {
     @EmbeddedId
     private AttendanceId attendanceId;
 
-    @Column(name = "student_id", insertable=false, updatable = false)
+    @Column(name = "student_id", insertable = false, updatable = false)
     private String studentId;
 
-    @Column(name = "lecture_id", insertable=false, updatable = false)
+    @Column(name = "lecture_id", insertable = false, updatable = false)
     private Integer lectureId;
 
     @Column(name = "physical")

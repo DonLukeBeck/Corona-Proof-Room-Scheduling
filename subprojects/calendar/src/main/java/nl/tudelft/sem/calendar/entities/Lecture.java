@@ -1,5 +1,8 @@
 package nl.tudelft.sem.calendar.entities;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -9,9 +12,6 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

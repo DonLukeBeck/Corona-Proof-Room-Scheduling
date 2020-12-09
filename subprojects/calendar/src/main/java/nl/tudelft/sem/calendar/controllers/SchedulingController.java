@@ -12,8 +12,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class SchedulingController {
+
     @Autowired
     transient LectureScheduler lectureScheduler;
+
     /**
      * This method will form the main API endpoint for the Scheduling functionality, once the
      * connection face with the other services is determined, it will be implemented to match up.
@@ -40,8 +42,7 @@ public class SchedulingController {
             lectureScheduler.scheduleAllLectures();
 
             return "Success!";
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             return "Failure!";
         }
     }

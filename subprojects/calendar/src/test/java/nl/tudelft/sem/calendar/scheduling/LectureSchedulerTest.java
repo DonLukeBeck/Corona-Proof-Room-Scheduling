@@ -121,7 +121,7 @@ class LectureSchedulerTest {
         return new HashMap<>() {
             {
                 put(testDates[0], Arrays.asList(lectures[0],
-                        lectures[1],lectures[2]));
+                        lectures[1], lectures[2]));
                 put(testDates[1], Collections.singletonList(lectures[3]));
                 put(testDates[2], Collections.singletonList(lectures[4]));
             }
@@ -157,7 +157,8 @@ class LectureSchedulerTest {
         timeGapLengthInMinutes = 45;
         startTime = LocalTime.of(8, 45);
         endTime = LocalTime.of(17, 45);
-        scheduler.setFields(roomList, lecturesToSchedule, startTime, endTime, timeGapLengthInMinutes);
+        scheduler.setFields(roomList, lecturesToSchedule, startTime,
+                endTime, timeGapLengthInMinutes);
     }
 
     /**
@@ -207,7 +208,8 @@ class LectureSchedulerTest {
         assertEquals(timeGapLengthInMinutes, scheduler.getTimeGapLengthInMinutes());
         assertEquals(new HashMap<String, LocalDate>(), scheduler.getAllParticipants());
         assertEquals(0, scheduler.getRoomSearchIndex());
-        for(LocalTime lt: scheduler.getRoomAvailability()) {
+
+        for (LocalTime lt : scheduler.getRoomAvailability()) {
             assertEquals(startTime, lt);
         }
     }
@@ -225,20 +227,19 @@ class LectureSchedulerTest {
         scheduler.assignStudents(testRooms[1].getCapacity(), lectures[1], allParticipants);
 
         Attendance attendance1 = Attendance.builder().lectureId(lectures[1].getLectureId())
-        .physical(true).studentId("abobe").build();
-            verify(attendanceRepository, times(1))
-                    .saveAndFlush(attendance1);
+            .physical(true).studentId(netIds[1]).build();
+
+        verify(attendanceRepository, times(1)).saveAndFlush(attendance1);
 
         Attendance attendance2 = Attendance.builder().lectureId(lectures[1]
-                .getLectureId()).physical(true).studentId("mbjdegoede").build();
-                verify(attendanceRepository, times(1))
-                        .saveAndFlush(attendance2);
+            .getLectureId()).physical(true).studentId(netIds[0]).build();
+
+        verify(attendanceRepository, times(1)).saveAndFlush(attendance2);
 
         Attendance attendance3 = Attendance.builder().lectureId(lectures[1].getLectureId())
-        .physical(true).studentId("cparlar").build();
-                verify(attendanceRepository, times(1))
-                        .saveAndFlush(attendance3);
+            .physical(true).studentId(netIds[2]).build();
 
+        verify(attendanceRepository, times(1)).saveAndFlush(attendance3);
         verifyNoMoreInteractions(attendanceRepository);
     }
 
@@ -256,15 +257,15 @@ class LectureSchedulerTest {
 
 
         Attendance attendance1 = Attendance.builder().lectureId(lectures[1].getLectureId())
-                .physical(false).studentId("abobe").build();
+                .physical(false).studentId(netIds[1]).build();
         verify(attendanceRepository, times(1)).saveAndFlush(attendance1);
 
         Attendance attendance2 = Attendance.builder().lectureId(lectures[1].getLectureId())
-                .physical(true).studentId("mbjdegoede").build();
+                .physical(true).studentId(netIds[0]).build();
         verify(attendanceRepository, times(1)).saveAndFlush(attendance2);
 
         Attendance attendance3 = Attendance.builder().lectureId(lectures[1].getLectureId())
-                .physical(true).studentId("cparlar").build();
+                .physical(true).studentId(netIds[2]).build();
         verify(attendanceRepository, times(1)).saveAndFlush(attendance3);
 
         verifyNoMoreInteractions(attendanceRepository);

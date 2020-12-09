@@ -54,7 +54,7 @@ class LectureTest {
         teacherId = "rkrebbers";
 
         participants = Arrays.asList(
-                Enrollment.builder().studentId("abobe").courseId("CSE2100").build(),
+                Enrollment.builder().studentId("abobe").courseId("CSE2100").build(), 
                 Enrollment.builder().studentId("mbjdegoede").courseId("CSE2100").build());
 
         course = Course.builder()
@@ -62,7 +62,7 @@ class LectureTest {
                 .courseId(courseId)
                 .courseName(courseName)
                 .teacherId(teacherId).build();
-        lecture = new Lecture(lectureId, courseId, roomId, startTime,
+        lecture = new Lecture(lectureId, courseId, roomId, startTime, 
                 endTime, date, attendances, durationInMinutes, course);
 
     }
@@ -112,7 +112,7 @@ class LectureTest {
      */
     @Test
     void testGetDate() {
-        assertEquals(LocalDate.now(),lecture.getDate());
+        assertEquals(LocalDate.now(), lecture.getDate());
     }
 
     /**
@@ -154,7 +154,7 @@ class LectureTest {
     @Test
     void testSetCourseId() {
         lecture.setCourseId("CSE2305");
-        assertEquals("CSE2305",lecture.getCourseId());
+        assertEquals("CSE2305", lecture.getCourseId());
     }
 
     /**
@@ -171,8 +171,8 @@ class LectureTest {
      */
     @Test
     void testSetStartTime() {
-        lecture.setStartTime(LocalTime.of(9,35));
-        assertEquals(LocalTime.of(9,35), lecture.getStartTime());
+        lecture.setStartTime(LocalTime.of(9, 35));
+        assertEquals(LocalTime.of(9, 35), lecture.getStartTime());
     }
 
     /**
@@ -180,8 +180,8 @@ class LectureTest {
      */
     @Test
     void testSetEndTime() {
-        lecture.setEndTime(LocalTime.of(10,50));
-        assertEquals(LocalTime.of(10,50), lecture.getEndTime());
+        lecture.setEndTime(LocalTime.of(10, 50));
+        assertEquals(LocalTime.of(10, 50), lecture.getEndTime());
     }
 
     /**
@@ -189,8 +189,8 @@ class LectureTest {
      */
     @Test
     void testSetDate() {
-        lecture.setDate(LocalDate.of(2020,10,28));
-        assertEquals(LocalDate.of(2020,10,28), lecture.getDate());
+        lecture.setDate(LocalDate.of(2020, 10, 28));
+        assertEquals(LocalDate.of(2020, 10, 28), lecture.getDate());
     }
 
     /**
