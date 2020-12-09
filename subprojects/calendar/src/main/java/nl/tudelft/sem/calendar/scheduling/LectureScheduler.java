@@ -22,7 +22,6 @@ import nl.tudelft.sem.calendar.repositories.LectureRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 
 @Service
@@ -94,10 +93,10 @@ public class LectureScheduler {
             List<Lecture> toScheduleThisDay = getSortedLecturesForDay(date, lecturesByDay);
             for (Lecture toBeScheduled : toScheduleThisDay) {
                 int capacity = assignRoom(toBeScheduled, toBeScheduled.getDurationInMinutes());
-                // save lecture in database and update it with id
+                // save lecture in database and update it with a version including an id
                 toBeScheduled = lectureRepository.saveAndFlush(toBeScheduled);
 
-                // then assign students
+                // then assign students to this lecture with id
                 assignStudents(capacity, toBeScheduled, allParticipants);
             }
         }
@@ -105,7 +104,9 @@ public class LectureScheduler {
 
     /**
      * Assigns students to a scheduled lecture based on the capacity of the associated room and a
-     * map storing the deadlines of all students.
+     * map storing the deadlines of all students. All students elected for the on-campus lecture
+     * will get an attendance entry in the database with the physical bit set to true. The other
+     * students will have it set to false.
      *
      * @param capacity the capacity of the room in which the lecture is scheduled
      * @param scheduledLecture the lecture being scheduled
@@ -116,6 +117,8 @@ public class LectureScheduler {
     @SuppressWarnings("PMD.DataflowAnomalyAnalysis")
     public void assignStudents(int capacity, Lecture scheduledLecture, Map<String,
             LocalDate> allParticipants) {
+
+        // Use a priority queue to select students based on the closest deadline.
         PriorityQueue<OnCampusCandidate> candidateSelector =
                 createCandidateSelector(scheduledLecture.getDate(),
                         scheduledLecture.getCourse().getNetIds(), allParticipants);
@@ -127,15 +130,21 @@ public class LectureScheduler {
                 && scheduledLecture.getRoomId() != null
                 && studentCounter < capacity) {
 
+            // Select students from the priority queue.
             String selected = candidateSelector.remove().getNetId();
             selectedStudents.add(selected);
+            // When selected to attend a lecture on-campus, a student's
+            // deadline is advanced with 14 days.
             allParticipants.put(selected, scheduledLecture.getDate().plusDays(14));
             studentCounter++;
         }
 
+        // Save the attendances for this lecture in the database.
+        //TODO: refactor this to be a separate method
         for (String participant : scheduledLecture.getCourse().getNetIds()) {
             attendanceRepository.saveAndFlush(Attendance.builder()
                     .lectureId(scheduledLecture.getLectureId())
+                    // Physical bit is true if students are selected, false if not.
                     .physical(selectedStudents.contains(participant))
                     .studentId(participant).build());
         }
@@ -193,6 +202,7 @@ public class LectureScheduler {
         if (courseParticipants == null) {
             return new PriorityQueue<>();
         }
+
         PriorityQueue<OnCampusCandidate> candidates = new PriorityQueue<>(courseParticipants.size(),
                 Comparator.comparing(OnCampusCandidate::getDeadline));
 
@@ -219,13 +229,17 @@ public class LectureScheduler {
      *
      * @param scheduledLecture  the lecture to schedule
      * @param durationInMinutes the duration of the lecture to schedule
-     * @return the capacity of the room in which the lecture is now scheduled
+     * @return the capacity of the room in which the lecture is now scheduled,
+     * used to assign students to it.
      */
     public int assignRoom(Lecture scheduledLecture, int durationInMinutes) {
         while (roomSearchIndex < roomList.size()) {
+            // Check if it fits in the current room at the current day
             if (durationInMinutes <= (int) Duration.between(
                     roomAvailability[roomSearchIndex], endTime).toMinutes()) {
 
+                // Schedule the lecture in the currently selected room
+                // update its start and ending time, and the availability of the room.
                 scheduledLecture.setRoomId(roomList.get(roomSearchIndex).getRoomId());
                 scheduledLecture.setStartTime(roomAvailability[roomSearchIndex]);
                 scheduledLecture.setEndTime(
@@ -236,9 +250,11 @@ public class LectureScheduler {
 
                 return roomList.get(roomSearchIndex).getCapacity();
             } else {
+                // Move to the next room
                 roomSearchIndex++;
             }
         }
+        // No suitable room could be found
         return 0;
     }
 
@@ -268,16 +284,46 @@ public class LectureScheduler {
      */
     public int getRoomSearchIndex() { return this.roomSearchIndex; }
 
+    /**
+     * Returns the list of lectures to be scheduled, used for testing purposes.
+     *
+     * @return the list of lectures to be schedule
+     */
     public List<Lecture> getLecturesList() { return this.lecturesToSchedule; }
 
+    /**
+     * Returns the time to start the scheduling at, used for testing purposes.
+     *
+     * @return the time to start the scheduling at
+     */
     public LocalTime getStartTime() { return this.startTime; }
 
+    /**
+     * Returns the time to end the scheduling at, used for testing purposes.
+     *
+     * @return the time to end the scheduling at
+     */
     public LocalTime getEndTime() {return this.endTime; }
 
+    /**
+     * Returns the time gap in minutes between any two lectures, used for testing purposes.
+     *
+     * @return time gap in minutes between any two lectures
+     */
     public int getTimeGapLengthInMinutes() {return this.timeGapLengthInMinutes; }
 
+    /**
+     * Returns the array with availability times for each room, used for testing purposes.
+     *
+     * @return the array with availability times for each room
+     */
     public LocalTime[] getRoomAvailability() { return this.roomAvailability; }
 
+    /**
+     * Returns the map with course participants and their deadlines, used for testing purposes.
+     *
+     * @return the map with course participants and their deadlines
+     */
     public Map<String, LocalDate> getAllParticipants() {
         return allParticipants;
     }

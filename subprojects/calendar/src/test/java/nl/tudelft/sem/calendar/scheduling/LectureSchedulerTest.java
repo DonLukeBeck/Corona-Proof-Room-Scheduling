@@ -3,12 +3,19 @@ package nl.tudelft.sem.calendar.scheduling;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.*;
-
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.PriorityQueue;
 import nl.tudelft.sem.calendar.entities.Attendance;
 import nl.tudelft.sem.calendar.entities.Course;
 import nl.tudelft.sem.calendar.entities.Lecture;
@@ -17,16 +24,10 @@ import nl.tudelft.sem.calendar.repositories.AttendanceRepository;
 import nl.tudelft.sem.calendar.repositories.LectureRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.ApplicationContext;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @SpringBootTest
 class LectureSchedulerTest {
@@ -37,15 +38,15 @@ class LectureSchedulerTest {
     private transient int timeGapLengthInMinutes;
 
     @Autowired
-    ApplicationContext context;
+    private transient ApplicationContext context;
     @Autowired
-    LectureScheduler scheduler;
+    private transient LectureScheduler scheduler;
 
     // We mock the repositories
     @MockBean
-    LectureRepository lectureRepository;
+    private transient LectureRepository lectureRepository;
     @MockBean
-    AttendanceRepository attendanceRepository;
+    private transient AttendanceRepository attendanceRepository;
 
     // Objects used in the test cases, stored in arrays.
     private transient Room[] testRooms;
@@ -159,18 +160,9 @@ class LectureSchedulerTest {
         scheduler.setFields(roomList, lecturesToSchedule, startTime, endTime, timeGapLengthInMinutes);
     }
 
-    @Test
-    void testScheduleAllLectures() {
-        Lecture lecture1 = lectures[0];
-        when(lectureRepository.saveAndFlush(lectures[0])).thenReturn(lectures[0]);
-        when(lectureRepository.saveAndFlush(lectures[1])).thenReturn(lectures[1]);
-        when(lectureRepository.saveAndFlush(lectures[2])).thenReturn(lectures[2]);
-        when(lectureRepository.saveAndFlush(lectures[3])).thenReturn(lectures[3]);
-        when(lectureRepository.saveAndFlush(lectures[4])).thenReturn(lectures[4]);
-        scheduler.scheduleAllLectures();
-        verify(lectureRepository, times(5)).saveAndFlush(any());
-    }
-
+    /**
+     * Tests whether stubbing the mock gives the expected outcome.
+     */
     @Test
     public void testLectureMock() {
         when(lectureRepository.saveAndFlush(any())).thenReturn(lectures[0]);
@@ -182,7 +174,26 @@ class LectureSchedulerTest {
         verify(lectureRepository).saveAndFlush(any());
     }
 
+    /**
+     * Tests whether all to be scheduled lectures make an interaction with the lectureRepository
+     * to be stored in the database after scheduling.
+     */
+    @Test
+    void testScheduleAllLectures() {
+        when(lectureRepository.saveAndFlush(lectures[0])).thenReturn(lectures[0]);
+        when(lectureRepository.saveAndFlush(lectures[1])).thenReturn(lectures[1]);
+        when(lectureRepository.saveAndFlush(lectures[2])).thenReturn(lectures[2]);
+        when(lectureRepository.saveAndFlush(lectures[3])).thenReturn(lectures[3]);
+        when(lectureRepository.saveAndFlush(lectures[4])).thenReturn(lectures[4]);
+        scheduler.scheduleAllLectures();
 
+        verify(lectureRepository, times(1)).saveAndFlush(lectures[0]);
+        verify(lectureRepository, times(1)).saveAndFlush(lectures[1]);
+        verify(lectureRepository, times(1)).saveAndFlush(lectures[2]);
+        verify(lectureRepository, times(1)).saveAndFlush(lectures[3]);
+        verify(lectureRepository, times(1)).saveAndFlush(lectures[4]);
+        verifyNoMoreInteractions(lectureRepository);
+    }
 
     /**
      * Tests whether all properties of the scheduler are correctly set upon initialization.
@@ -213,18 +224,22 @@ class LectureSchedulerTest {
         Map<String, LocalDate> allParticipants = createParticipants();
         scheduler.assignStudents(testRooms[1].getCapacity(), lectures[1], allParticipants);
 
-
         Attendance attendance1 = Attendance.builder().lectureId(lectures[1].getLectureId())
         .physical(true).studentId("abobe").build();
-            verify(attendanceRepository, times(1)).saveAndFlush(attendance1);
+            verify(attendanceRepository, times(1))
+                    .saveAndFlush(attendance1);
 
-        Attendance attendance2 = Attendance.builder().lectureId(lectures[1].getLectureId())
-        .physical(true).studentId("mbjdegoede").build();
-                verify(attendanceRepository, times(1)).saveAndFlush(attendance2);
+        Attendance attendance2 = Attendance.builder().lectureId(lectures[1]
+                .getLectureId()).physical(true).studentId("mbjdegoede").build();
+                verify(attendanceRepository, times(1))
+                        .saveAndFlush(attendance2);
 
         Attendance attendance3 = Attendance.builder().lectureId(lectures[1].getLectureId())
         .physical(true).studentId("cparlar").build();
-                verify(attendanceRepository, times(1)).saveAndFlush(attendance3);
+                verify(attendanceRepository, times(1))
+                        .saveAndFlush(attendance3);
+
+        verifyNoMoreInteractions(attendanceRepository);
     }
 
     /**
@@ -252,7 +267,7 @@ class LectureSchedulerTest {
                 .physical(true).studentId("cparlar").build();
         verify(attendanceRepository, times(1)).saveAndFlush(attendance3);
 
-        verify(attendanceRepository, times(3)).saveAndFlush(any());
+        verifyNoMoreInteractions(attendanceRepository);
     }
 
     /**

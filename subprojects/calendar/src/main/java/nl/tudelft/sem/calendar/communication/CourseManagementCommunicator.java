@@ -1,7 +1,7 @@
 package nl.tudelft.sem.calendar.communication;
 
 import java.util.List;
-import nl.tudelft.sem.calendar.scheduling.RequestedLecture;
+import nl.tudelft.sem.calendar.entities.Lecture;
 
 public class CourseManagementCommunicator {
 
@@ -10,7 +10,7 @@ public class CourseManagementCommunicator {
      *
      * @return the lectures pushed by the course service that need to be scheduled
      */
-    public static List<RequestedLecture> getToBeScheduledLectures() {
+    public static List<Lecture> getToBeScheduledLectures() {
         return null;
     }
 }
