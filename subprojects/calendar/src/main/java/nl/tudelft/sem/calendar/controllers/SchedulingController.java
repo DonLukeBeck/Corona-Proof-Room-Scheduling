@@ -159,8 +159,8 @@ public class SchedulingController {
     // we need to suppress this warning for every method
     public String indicateAbsence(String userId, String courseId, LocalDate date) {
         int lectureId = 0;
-        for (Lecture l : lectureRepository.findAll()) {
-            if (l.getCourseId().equals(courseId) && l.getDate() == date) {
+        for (Lecture l : lectureRepository.findByDate(date)) {
+            if (l.getCourseId().equals(courseId)) {
                 lectureId = l.getLectureId();
             }
         }
