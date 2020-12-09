@@ -159,13 +159,17 @@ class LectureSchedulerTest {
         scheduler.setFields(roomList, lecturesToSchedule, startTime, endTime, timeGapLengthInMinutes);
     }
 
-    /*@Test
+    @Test
     void testScheduleAllLectures() {
-        scheduler.scheduleAllLectures();
         Lecture lecture1 = lectures[0];
-        doReturn(lecture1).when(lectureRepository).saveAndFlush(lecture1);
-                verify(lectureRepository,times(1)).saveAndFlush(any());
-    }*/
+        when(lectureRepository.saveAndFlush(lectures[0])).thenReturn(lectures[0]);
+        when(lectureRepository.saveAndFlush(lectures[1])).thenReturn(lectures[1]);
+        when(lectureRepository.saveAndFlush(lectures[2])).thenReturn(lectures[2]);
+        when(lectureRepository.saveAndFlush(lectures[3])).thenReturn(lectures[3]);
+        when(lectureRepository.saveAndFlush(lectures[4])).thenReturn(lectures[4]);
+        scheduler.scheduleAllLectures();
+        verify(lectureRepository, times(5)).saveAndFlush(any());
+    }
 
     @Test
     public void testLectureMock() {
