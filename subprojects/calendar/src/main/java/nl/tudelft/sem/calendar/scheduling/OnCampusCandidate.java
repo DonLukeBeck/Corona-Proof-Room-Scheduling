@@ -41,6 +41,15 @@ public class OnCampusCandidate {
     }
 
     /**
+     * hash function for the onCampusCandidate
+     * @return the hash code
+     */
+    @Override
+    public int hashCode() {
+        return Objects.hash(netId, deadline);
+    }
+
+    /**
      * Returns the associated netId of this student.
      *
      * @return a string indicating the netid
