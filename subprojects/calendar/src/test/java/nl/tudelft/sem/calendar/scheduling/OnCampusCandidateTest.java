@@ -24,6 +24,25 @@ class OnCampusCandidateTest {
     }
 
     /**
+     * Tests the equals method in case a different type of object is
+     * given.
+     */
+    @Test
+    void testNotEqualsDifferentType() {
+        Object object = new Object();
+        assertNotEquals(object, candidate);
+    }
+
+    /**
+     * Tests the equals method in case the same candidate is
+     * given.
+     */
+    @Test
+    void testSameObject() {
+        assertEquals(candidate, candidate);
+    }
+
+    /**
      * Tests the equals method in case a campus candidate with the same netId and deadline is
      * given.
      */

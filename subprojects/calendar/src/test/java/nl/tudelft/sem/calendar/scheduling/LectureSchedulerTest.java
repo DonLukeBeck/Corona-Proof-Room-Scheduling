@@ -2,6 +2,7 @@ package nl.tudelft.sem.calendar.scheduling;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -324,8 +325,6 @@ class LectureSchedulerTest {
                     LocalDate.of(2020, 12, 26))
         };
 
-        // maybe split this test case up into multiple parts??
-
         @SuppressWarnings("PMD.DataflowAnomalyAnalysis")
         // this is just the priority queue being created and checked afterwards.
         PriorityQueue<OnCampusCandidate> result =
@@ -339,6 +338,7 @@ class LectureSchedulerTest {
         assertThat(allParticipants.get(netIds[1])).isEqualTo(LocalDate.of(2020, 12, 26));
         assertThat(allParticipants.get(netIds[0])).isEqualTo(LocalDate.of(2020, 12, 18));
     }
+    
 
     /**
      * Tests whether the first lecture to be scheduled is scheduled in the biggest lecture room.

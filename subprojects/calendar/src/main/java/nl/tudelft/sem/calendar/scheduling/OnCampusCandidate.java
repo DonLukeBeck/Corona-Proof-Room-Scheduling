@@ -41,16 +41,6 @@ public class OnCampusCandidate {
     }
 
     /**
-     * Creates a hash representation of this candidate.
-     *
-     * @return an integer representation of the candidate
-     */
-    @Override
-    public int hashCode() {
-        return Objects.hash(getNetId(), getDeadline());
-    }
-
-    /**
      * Returns the associated netId of this student.
      *
      * @return a string indicating the netid

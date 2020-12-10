@@ -140,7 +140,6 @@ public class LectureScheduler {
         }
 
         // Save the attendances for this lecture in the database.
-        //TODO: refactor this to be a separate method
         for (String participant : scheduledLecture.getCourse().getNetIds()) {
             attendanceRepository.saveAndFlush(Attendance.builder()
                     .lectureId(scheduledLecture.getLectureId())
@@ -199,9 +198,6 @@ public class LectureScheduler {
      */
     public PriorityQueue<OnCampusCandidate> createCandidateSelector(LocalDate lectureDate,
                         List<String> courseParticipants, Map<String, LocalDate> allParticipants) {
-        if (courseParticipants == null) {
-            return new PriorityQueue<>();
-        }
 
         PriorityQueue<OnCampusCandidate> candidates = new PriorityQueue<>(courseParticipants.size(),
                 Comparator.comparing(OnCampusCandidate::getDeadline));
