@@ -39,11 +39,10 @@ public class CourseManagement {
     @PostMapping(path = "/createNewCourse") // Map ONLY POST Requests
     public String createNewCourse(String courseId, String courseName, String teacherId,
                                   List<String> participants) {
-        for (Course r : courseRepository.findAll()) {
-            if (r.getCourseId().equals(courseId)) {
-                if (r.getCourseName() == courseName) {
-                    return "Already Exists";
-                }
+        Course r = courseRepository.findByCourseId(courseId);
+        if (r.getCourseId().equals(courseId)) {
+            if (r.getCourseName() == courseName) {
+                return "Already Exists";
             }
         }
 
@@ -66,11 +65,10 @@ public class CourseManagement {
      */
     @PostMapping(path = "/deleteCourse") // Map ONLY POST Requests
     public String deleteCourse(String courseId) {
-        for (Course r : courseRepository.findAll()) {
-            if (r.getCourseId().equals(courseId)) {
-                courseRepository.delete(r);
-                return "Deleted";
-            }
+        Course r = courseRepository.findByCourseId(courseId);
+        if (r.getCourseId().equals(courseId)) {
+            courseRepository.delete(r);
+            return "Deleted";
         }
         return "Error";
     }
@@ -91,15 +89,25 @@ public class CourseManagement {
     /**
      * Returns a list of participants with provided parameters.
      */
-    @GetMapping(path = "/getCourseParticipants") // Map ONLY POST Requests
+    @GetMapping(path = "/getCourseParticipants") // Map ONLY Get Requests
     public List<String> getCourseParticipants(String courseId) {
         ArrayList<String> result = new ArrayList<>();
-        for (Enrollment r : enrollmentRepository.findAll()) {
-            if (r.getCourseId().equals(courseId)) {
-                result.add(r.getStudentId());
-            }
+        for (Enrollment r : enrollmentRepository.findByCourseId(courseId)) {
+            result.add(r.getStudentId());
         }
         return result;
+    }
+
+    /**
+     * Returns the courseId given the teacher's ID.
+     */
+    @GetMapping(path = "/getCourseIdForTeacher") // Map ONLY Get Requests
+    public String getCourseIdForTeacher(String teacherId) {
+        Course course = courseRepository.findByCourseIdForTeacher(teacherId);
+        if (course == null) {
+            return "ERROR";
+        }
+        return course.getCourseId();
     }
 
     /**
@@ -110,10 +118,7 @@ public class CourseManagement {
     // Found 'DD'-anomaly for variable 'lectureId' (lines '96'-'98').
     // -> correct since we need to count
     public String planNewLecture(String courseId, int durationInMinutes, Date date) {
-        int lectureId = 1;
-        for (Lecture lecture : lectureRepository.findAll()) {
-            lectureId++;
-        }
+        int lectureId = 1 + lectureRepository.findAll().size();
 
         Lecture lecture = new Lecture();
         lecture.setCourseId(courseId);
@@ -129,16 +134,12 @@ public class CourseManagement {
      */
     @PostMapping(path = "/cancelLecture") // Map ONLY POST Requests
     public String cancelLecture(String courseId, Date date) {
-        for (Lecture lecture : lectureRepository.findAll()) {
-            if (lecture.getCourseId().equals(courseId)) {
-                if (lecture.getScheduledDate().equals(date)) {
-                    lectureRepository.delete(lecture);
-                    return "Lecture deleted";
-                }
-            }
+        Lecture lecture = lectureRepository.findByCourseIdAndDate(courseId, date);
+        if (lecture == null) {
+            return "ERROR";
         }
-
-        return "Error";
+        lectureRepository.delete(lecture);
+        return "Lecture deleted";
     }
 
 
