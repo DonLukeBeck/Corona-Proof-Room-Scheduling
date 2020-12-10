@@ -4,6 +4,7 @@ import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -65,7 +66,7 @@ public class CourseManagement {
     /**
      * Deletes a new course with provided parameters.
      */
-    @PostMapping(path = "/deleteCourse") // Map ONLY POST Requests
+    @DeleteMapping(path = "/deleteCourse") // Map ONLY POST Requests
     public String deleteCourse(@RequestParam String courseId) {
         Course r = courseRepository.findByCourseId(courseId);
         if (r.getCourseId().equals(courseId)) {
@@ -135,7 +136,7 @@ public class CourseManagement {
     /**
      * Cancels a lecture with provided arguments.
      */
-    @PostMapping(path = "/cancelLecture") // Map ONLY POST Requests
+    @DeleteMapping(path = "/cancelLecture") // Map ONLY POST Requests
     public String cancelLecture(@RequestParam String courseId, @RequestParam Date date) {
         Lecture lecture = lectureRepository.findByCourseIdAndDate(courseId, date);
         if (lecture == null) {
