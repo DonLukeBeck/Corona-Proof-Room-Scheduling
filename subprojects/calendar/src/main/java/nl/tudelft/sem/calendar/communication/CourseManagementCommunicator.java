@@ -7,9 +7,12 @@ import java.io.IOException;
 import java.net.ConnectException;
 import java.net.HttpURLConnection;
 import java.net.URI;
+import java.net.URLEncoder;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -39,7 +42,7 @@ public class CourseManagementCommunicator {
     public static List<Lecture> getToBeScheduledLectures(Date date)
         throws IOException, InterruptedException, ServerErrorException {
 
-        var response = getResponse("/lectures/date/" + date);
+        var response = getResponse("/lectures/date/" + encode(date.toString()));
         var bareLectures
             = objectMapper.readValue(response.body(), new TypeReference<List<BareLecture>>() {});
         // this isn't a DU-anomaly since we use it to store and retrieve courses inside the for loop
@@ -85,6 +88,14 @@ public class CourseManagementCommunicator {
             throw new ServerErrorException();
         }
         return response;
+    }
+
+    private static String encode(String s) {
+        return URLEncoder.encode(s, StandardCharsets.UTF_8);
+    }
+
+    protected static void setHttpClient(HttpClient httpClient) {
+        client = httpClient;
     }
 }
 
