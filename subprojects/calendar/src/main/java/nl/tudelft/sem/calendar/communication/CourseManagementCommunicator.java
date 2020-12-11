@@ -39,7 +39,7 @@ public class CourseManagementCommunicator {
      *
      * @return the lectures pushed by the course service that need to be scheduled
      */
-    public static List<Lecture> getToBeScheduledLectures(Date date)
+    public static List<Lecture> getToBeScheduledLectures(LocalDate date)
         throws IOException, InterruptedException, ServerErrorException {
 
         var response = getResponse("/lectures/date/" + encode(date.toString()));
@@ -55,8 +55,7 @@ public class CourseManagementCommunicator {
             }
             lectureList.add(Lecture.builder().course(courseMap.get(l.getCourseId()))
                 .courseId(l.getCourseId()).durationInMinutes(l.getDurationInMinutes())
-                .date(Instant.ofEpochMilli(date.getTime()).atZone(ZoneId.systemDefault())
-                    .toLocalDate()).build());
+                .date(l.getDate()).build());
         }
         return lectureList;
     }

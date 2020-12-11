@@ -1,5 +1,6 @@
 package nl.tudelft.sem.courses;
 
+import java.time.LocalDate;
 import java.util.Date;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -9,6 +10,6 @@ import lombok.Data;
 public class BareLecture {
     private static final long serialVersionUID = 1233465464564564564L;
     private String courseId;
-    private Date date;
+    private LocalDate date;
     private int durationInMinutes;
 }

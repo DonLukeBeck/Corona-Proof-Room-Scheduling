@@ -1,5 +1,7 @@
 package nl.tudelft.sem.courses;
 
+import java.time.Instant;
+import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Date;
 import java.util.function.Function;
@@ -44,12 +46,15 @@ public class LectureController {
      */
     @GetMapping("/date/{date}")
     @ResponseBody
-    public ResponseEntity<?> listLecturesAfterDate(@PathVariable("date") Date date) {
+    public ResponseEntity<?> listLecturesAfterDate(@PathVariable("date") LocalDate date) {
         return ResponseEntity.ok(bareFromLecture(lectureRepository.findAll().stream()
-            .filter(l -> l.getScheduledDate().after(date))).collect(Collectors.toList()));
+            .filter(l -> date.isAfter(l.getScheduledDate().toLocalDate())))
+            .collect(Collectors.toList()));
     }
 
     private Stream<BareLecture> bareFromLecture(Stream<Lecture> s) {
-        return s.map(l -> new BareLecture(l.getCourseId(), l.getScheduledDate(), l.getDuration()));
+        return s.map(l -> new BareLecture(l.getCourseId(),
+            Instant.ofEpochMilli(l.getScheduledDate().getTime()).atZone(ZoneId.systemDefault())
+            .toLocalDate(), l.getDuration()));
     }
 }
