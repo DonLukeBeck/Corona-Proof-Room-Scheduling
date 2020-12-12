@@ -1,8 +1,7 @@
-package nl.tudelft.sem.courses;
+package nl.tudelft.sem.courses.entity;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import java.io.Serializable;
+import javax.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,10 +11,13 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "Enrollment")
-public class Enrollment {
+@IdClass(Enrollment.class)
+public class Enrollment implements Serializable {
+    @Id
     @Column(name = "course_id")
     private String courseId;
 
+    @Id
     @Column(name = "student_id")
     private String studentId;
 

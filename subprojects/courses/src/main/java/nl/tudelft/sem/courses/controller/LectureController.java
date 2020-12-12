@@ -1,12 +1,15 @@
-package nl.tudelft.sem.courses;
+package nl.tudelft.sem.courses.controller;
 
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.util.Date;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import nl.tudelft.sem.courses.entity.BareLecture;
+import nl.tudelft.sem.courses.entity.Lecture;
+import nl.tudelft.sem.courses.repository.CourseRepository;
+import nl.tudelft.sem.courses.repository.EnrollmentRepository;
+import nl.tudelft.sem.courses.repository.LectureRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;

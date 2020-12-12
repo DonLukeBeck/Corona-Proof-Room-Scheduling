@@ -1,6 +1,5 @@
-package nl.tudelft.sem.courses;
+package nl.tudelft.sem.courses.entity;
 
-import java.sql.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -13,19 +12,16 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "Lecture")
-public class Lecture {
+@Table(name = "Course")
+public class Course {
     @Id
-    @Column(name = "lecture_id")
-    private int lectureId;
-
     @Column(name = "course_id")
     private String courseId;
 
-    @Column(name = "duration")
-    private int duration;
+    @Column(name = "course_name")
+    private String courseName;
 
-    @Column(name = "scheduled_date")
-    private Date scheduledDate;
+    @Column(name = "teacher_id")
+    private String teacherId;
 
 }
