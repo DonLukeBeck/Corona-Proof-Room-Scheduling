@@ -165,8 +165,9 @@ public class CourseManagementControllerTest {
 
     @Test
     void cancelLectureSuccess() {
-        //this method does not work
-        //assertEquals("Lecture deleted", courseManagementController.cancelLecture(lecture.getCourseId(), lecture.getScheduledDate()));
+        // the method cancelLecture does not work
+        // Uncomment line below if method is fixed
+        // assertEquals("Lecture deleted", courseManagementController.cancelLecture(lecture.getCourseId(), lecture.getScheduledDate()));
     }
 
     @Test
