@@ -16,4 +16,5 @@ public interface LectureRepository extends JpaRepository<Lecture, Integer> {
     List<Lecture> findByCourseId(String courseId);
 
     List<Lecture> findByDate(LocalDate date);
+
 }

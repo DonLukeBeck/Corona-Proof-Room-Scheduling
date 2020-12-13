@@ -5,6 +5,7 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import nl.tudelft.sem.calendar.communication.RestrictionManagementCommunicator;
+import nl.tudelft.sem.calendar.communication.CourseManagementCommunicator;
 import nl.tudelft.sem.calendar.entities.Attendance;
 import nl.tudelft.sem.calendar.entities.Lecture;
 import nl.tudelft.sem.calendar.entities.Room;
@@ -38,11 +39,10 @@ public class SchedulingController {
      * This method will form the main API endpoint for the Scheduling functionality, once the
      * connection face with the other services is determined, it will be implemented to match up.
      *
-     * @param lecturesToSchedule the list of lectures to be scheduled
      * @return a string indicating success or failure
      */
     @PostMapping(path = "/scheduleLectures")
-    public String schedulePlannedLectures(List<Lecture> lecturesToSchedule) {
+    public String schedulePlannedLectures() {
 
         try {
             // Make API call to retrieve the start time
@@ -53,6 +53,9 @@ public class SchedulingController {
             int timeGapLength = RestrictionManagementCommunicator.getTimeGapLength();
             // Make API call to retrieve rooms with restricted capacity
             List<Room> rooms = RestrictionManagementCommunicator.getAllRoomsWithAdjustedCapacity();
+            // Get all the lectures to be scheduled
+            List<Lecture> lecturesToSchedule = CourseManagementCommunicator
+                    .getToBeScheduledLectures(LocalDate.now());
             // Create the scheduler that does the scheduling
             lectureScheduler.setFields(rooms, lecturesToSchedule, startTime,
                     endTime, timeGapLength);
