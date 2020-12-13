@@ -1,5 +1,6 @@
 package nl.tudelft.sem.courses;
 
+import java.sql.Date;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -10,5 +11,7 @@ public interface LectureRepository extends JpaRepository<Lecture, Integer>,
     List<Lecture> findByCourseId(String courseId);
 
     List<Lecture> findByCourseName(String courseName);
+
+    Lecture findByCourseIdAndDate(String courseName, Date date);
 
 }
