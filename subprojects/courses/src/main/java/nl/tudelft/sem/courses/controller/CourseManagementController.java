@@ -30,6 +30,8 @@ public class CourseManagementController {
     @Autowired
     private transient LectureRepository lectureRepository;
 
+    private transient String errorMessage = "Error";
+
     /**
      * Instantiates repository needed.
      */
@@ -78,11 +80,16 @@ public class CourseManagementController {
     @DeleteMapping(path = "/deleteCourse") // Map ONLY POST Requests
     public String deleteCourse(@RequestParam String courseId) {
         Course r = courseRepository.findByCourseId(courseId);
+        if (r == null) {
+            return errorMessage;
+        }
+
         if (r.getCourseId().equals(courseId)) {
             courseRepository.delete(r);
             return "Deleted";
         }
-        return "Error";
+
+        return errorMessage;
     }
 
     /**
@@ -90,12 +97,11 @@ public class CourseManagementController {
      */
     @GetMapping(path = "/getCourse") // Map ONLY POST Requests
     public Course getCourse(@RequestParam String courseId) {
-        for (Course r : courseRepository.findAll()) {
-            if (r.getCourseId().equals(courseId)) {
-                return r;
-            }
+        Course r = courseRepository.findByCourseId(courseId);
+        if (r == null) {
+            return null;
         }
-        return null;
+        return r;
     }
 
     /**
@@ -117,7 +123,7 @@ public class CourseManagementController {
     public String getCourseIdForTeacher(@RequestParam String teacherId) {
         Course course = courseRepository.findByTeacherId(teacherId);
         if (course == null) {
-            return "ERROR";
+            return errorMessage;
         }
         return course.getCourseId();
     }
@@ -131,15 +137,20 @@ public class CourseManagementController {
     // -> correct since we need to count
     public String planNewLecture(@RequestParam String courseId, @RequestParam int durationInMinutes,
                                  @RequestParam  Date date) {
-        int lectureId = 1 + lectureRepository.findAll().size();
-
-        Lecture lecture = new Lecture();
-        lecture.setCourseId(courseId);
-        lecture.setDuration(durationInMinutes);
-        lecture.setLectureId(lectureId);
-        lecture.setScheduledDate(date);
-        lectureRepository.save(lecture);
-        return "Lecture added";
+        if (courseId == null || durationInMinutes < 0) {
+            return errorMessage;
+        }
+        if (courseRepository.findByCourseId(courseId) != null) {
+            int lectureId = 1 + lectureRepository.findAll().size();
+            Lecture lecture = new Lecture();
+            lecture.setCourseId(courseId);
+            lecture.setDuration(durationInMinutes);
+            lecture.setLectureId(lectureId);
+            lecture.setScheduledDate(date);
+            lectureRepository.save(lecture);
+            return "Lecture added";
+        }
+        return errorMessage;
     }
 
     /**
@@ -149,7 +160,7 @@ public class CourseManagementController {
     public String cancelLecture(@RequestParam String courseId, @RequestParam Date date) {
         Lecture lecture = lectureRepository.findByCourseIdAndDate(courseId, date);
         if (lecture == null) {
-            return "ERROR";
+            return errorMessage;
         }
         lectureRepository.delete(lecture);
         return "Lecture deleted";
