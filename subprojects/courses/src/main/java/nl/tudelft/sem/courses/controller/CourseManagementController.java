@@ -50,7 +50,6 @@ public class CourseManagementController {
      */
     @PostMapping(path = "/createNewCourse") // Map ONLY POST Requests
     public String createNewCourse(@RequestBody AddCourse addCourse) {
-        System.out.println(addCourse.getParticipants());
         Course r = courseRepository.findByCourseId(addCourse.getCourseId());
         try {
             if (r.getCourseId().equals(addCourse.getCourseId())) {
@@ -132,15 +131,16 @@ public class CourseManagementController {
     // Found 'DD'-anomaly for variable 'lectureId' (lines '96'-'98').
     // -> correct since we need to count
     public String planNewLecture(@RequestBody AddLecture addLecture) {
-        int lectureId = 1 + lectureRepository.findAll().size();
-
-        Lecture lecture = new Lecture();
-        lecture.setLectureId(lectureId);
-        lecture.setCourseId(addLecture.getCourseId());
-        lecture.setDuration(addLecture.getDurationInMinutes());
-        lecture.setScheduledDate(addLecture.getDate());
-        lectureRepository.save(lecture);
-        return "Lecture added";
+        if (courseRepository.findByCourseId(addLecture.getCourseId()) != null) {
+            Lecture lecture = new Lecture();
+            lecture.setCourseId(addLecture.getCourseId());
+            lecture.setDuration(addLecture.getDurationInMinutes());
+            lecture.setScheduledDate(addLecture.getDate());
+            lectureRepository.save(lecture);
+            return "Lecture added";
+        }else{
+            return "The course with id " + addLecture.getCourseId() + " does not exist.";
+        }
     }
 
     /**
