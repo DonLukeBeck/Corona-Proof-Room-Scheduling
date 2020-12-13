@@ -9,11 +9,11 @@ import lombok.Data;
 @Data
 public class AttendanceId implements Serializable {
     private static long serialVersionUID = 1234324213L;
-    private String studentid;
-    private int lectureid;
+    private String studentId;
+    private int lectureId;
 
-    public AttendanceId(int lectureid, String studentid) {
-        this.lectureid = lectureid;
-        this.studentid = studentid;
+    public AttendanceId(int lectureId, String studentId) {
+        this.lectureId = lectureId;
+        this.studentId = studentId;
     }
 }
