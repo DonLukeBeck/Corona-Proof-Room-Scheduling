@@ -4,6 +4,7 @@ import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 import nl.tudelft.sem.courses.entity.AddCourse;
+import nl.tudelft.sem.courses.entity.AddLecture;
 import nl.tudelft.sem.courses.entity.Course;
 import nl.tudelft.sem.courses.entity.Enrollment;
 import nl.tudelft.sem.courses.entity.Lecture;
@@ -130,15 +131,14 @@ public class CourseManagementController {
     @SuppressWarnings("PMD.DataflowAnomalyAnalysis")
     // Found 'DD'-anomaly for variable 'lectureId' (lines '96'-'98').
     // -> correct since we need to count
-    public String planNewLecture(@RequestParam String courseId, @RequestParam int durationInMinutes,
-                                 @RequestParam  Date date) {
+    public String planNewLecture(@RequestBody AddLecture addLecture) {
         int lectureId = 1 + lectureRepository.findAll().size();
 
         Lecture lecture = new Lecture();
-        lecture.setCourseId(courseId);
-        lecture.setDuration(durationInMinutes);
         lecture.setLectureId(lectureId);
-        lecture.setScheduledDate(date);
+        lecture.setCourseId(addLecture.getCourseId());
+        lecture.setDuration(addLecture.getDurationInMinutes());
+        lecture.setScheduledDate(addLecture.getDate());
         lectureRepository.save(lecture);
         return "Lecture added";
     }
@@ -155,6 +155,5 @@ public class CourseManagementController {
         lectureRepository.delete(lecture);
         return "Lecture deleted";
     }
-
 
 }
