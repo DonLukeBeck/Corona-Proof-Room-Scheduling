@@ -9,14 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
-@DataJpaTest
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class RestrictionTest {
 
-    private transient Restriction rest;
-
-    @Autowired
-    private transient RestrictionRepository restrictionRepository;
+    private static Restriction rest;
 
     /**
      * The initial setup before each test.
@@ -26,7 +21,6 @@ class RestrictionTest {
         rest = new Restriction();
         rest.setValue(1.0f);
         rest.setName("test");
-        restrictionRepository.save(rest);
     }
 
     @Test
