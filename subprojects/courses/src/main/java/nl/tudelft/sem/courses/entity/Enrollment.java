@@ -17,6 +17,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "Enrollment")
 @IdClass(Enrollment.class)
 public class Enrollment implements Serializable {
+    private static final long serialVersionUID = 1233454322341123464L;
     @Id
     @Column(name = "course_id")
     private String courseId;

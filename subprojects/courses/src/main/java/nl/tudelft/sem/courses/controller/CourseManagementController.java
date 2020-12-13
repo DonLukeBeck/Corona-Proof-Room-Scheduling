@@ -54,7 +54,7 @@ public class CourseManagementController {
                 return "Already Exists";
             }
             return null;
-        } catch (NullPointerException e) {
+        } catch (Exception e) {
 
             for (String id : participants) {
                 Enrollment enrollment = new Enrollment();
