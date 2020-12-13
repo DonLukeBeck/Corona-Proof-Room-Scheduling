@@ -4,9 +4,11 @@ import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController // This means that this class is a RestController
@@ -37,13 +39,13 @@ public class CourseManagement {
      * Adds a new course with provided parameters.
      */
     @PostMapping(path = "/createNewCourse") // Map ONLY POST Requests
-    public String createNewCourse(String courseId, String courseName, String teacherId,
-                                  List<String> participants) {
-        for (Course r : courseRepository.findAll()) {
-            if (r.getCourseId().equals(courseId)) {
-                if (r.getCourseName() == courseName) {
-                    return "Already Exists";
-                }
+    public String createNewCourse(@RequestParam String courseId, @RequestParam String courseName,
+                                  @RequestParam String teacherId,
+                                  @RequestParam List<String> participants) {
+        Course r = courseRepository.findByCourseId(courseId);
+        if (r.getCourseId().equals(courseId)) {
+            if (r.getCourseName() == courseName) {
+                return "Already Exists";
             }
         }
 
@@ -64,13 +66,12 @@ public class CourseManagement {
     /**
      * Deletes a new course with provided parameters.
      */
-    @PostMapping(path = "/deleteCourse") // Map ONLY POST Requests
-    public String deleteCourse(String courseId) {
-        for (Course r : courseRepository.findAll()) {
-            if (r.getCourseId().equals(courseId)) {
-                courseRepository.delete(r);
-                return "Deleted";
-            }
+    @DeleteMapping(path = "/deleteCourse") // Map ONLY POST Requests
+    public String deleteCourse(@RequestParam String courseId) {
+        Course r = courseRepository.findByCourseId(courseId);
+        if (r.getCourseId().equals(courseId)) {
+            courseRepository.delete(r);
+            return "Deleted";
         }
         return "Error";
     }
@@ -79,7 +80,7 @@ public class CourseManagement {
      * Returns a course with provided parameters.
      */
     @GetMapping(path = "/getCourse") // Map ONLY POST Requests
-    public Course getCourse(String courseId) {
+    public Course getCourse(@RequestParam String courseId) {
         for (Course r : courseRepository.findAll()) {
             if (r.getCourseId().equals(courseId)) {
                 return r;
@@ -91,15 +92,25 @@ public class CourseManagement {
     /**
      * Returns a list of participants with provided parameters.
      */
-    @GetMapping(path = "/getCourseParticipants") // Map ONLY POST Requests
-    public List<String> getCourseParticipants(String courseId) {
+    @GetMapping(path = "/getCourseParticipants") // Map ONLY Get Requests
+    public List<String> getCourseParticipants(@RequestParam String courseId) {
         ArrayList<String> result = new ArrayList<>();
-        for (Enrollment r : enrollmentRepository.findAll()) {
-            if (r.getCourseId().equals(courseId)) {
-                result.add(r.getStudentId());
-            }
+        for (Enrollment r : enrollmentRepository.findByCourseId(courseId)) {
+            result.add(r.getStudentId());
         }
         return result;
+    }
+
+    /**
+     * Returns the courseId given the teacher's ID.
+     */
+    @GetMapping(path = "/getCourseIdForTeacher") // Map ONLY Get Requests
+    public String getCourseIdForTeacher(@RequestParam String teacherId) {
+        Course course = courseRepository.findByCourseIdForTeacher(teacherId);
+        if (course == null) {
+            return "ERROR";
+        }
+        return course.getCourseId();
     }
 
     /**
@@ -109,11 +120,9 @@ public class CourseManagement {
     @SuppressWarnings("PMD.DataflowAnomalyAnalysis")
     // Found 'DD'-anomaly for variable 'lectureId' (lines '96'-'98').
     // -> correct since we need to count
-    public String planNewLecture(String courseId, int durationInMinutes, Date date) {
-        int lectureId = 1;
-        for (Lecture lecture : lectureRepository.findAll()) {
-            lectureId++;
-        }
+    public String planNewLecture(@RequestParam String courseId, @RequestParam int durationInMinutes,
+                                 @RequestParam  Date date) {
+        int lectureId = 1 + lectureRepository.findAll().size();
 
         Lecture lecture = new Lecture();
         lecture.setCourseId(courseId);
@@ -127,18 +136,14 @@ public class CourseManagement {
     /**
      * Cancels a lecture with provided arguments.
      */
-    @PostMapping(path = "/cancelLecture") // Map ONLY POST Requests
-    public String cancelLecture(String courseId, Date date) {
-        for (Lecture lecture : lectureRepository.findAll()) {
-            if (lecture.getCourseId().equals(courseId)) {
-                if (lecture.getScheduledDate().equals(date)) {
-                    lectureRepository.delete(lecture);
-                    return "Lecture deleted";
-                }
-            }
+    @DeleteMapping(path = "/cancelLecture") // Map ONLY POST Requests
+    public String cancelLecture(@RequestParam String courseId, @RequestParam Date date) {
+        Lecture lecture = lectureRepository.findByCourseIdAndDate(courseId, date);
+        if (lecture == null) {
+            return "ERROR";
         }
-
-        return "Error";
+        lectureRepository.delete(lecture);
+        return "Lecture deleted";
     }
 
 
