@@ -1,7 +1,6 @@
 package nl.tudelft.sem.calendar.scheduling;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.time.LocalDate;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,6 +23,28 @@ class OnCampusCandidateTest {
     }
 
     /**
+     * Tests the equals method in case a different type of object is
+     * given.
+     */
+    @Test
+    void testNotEqualsDifferentType() {
+        Object object = new Object();
+        assertNotEquals(object, candidate);
+        assertNotEquals(object.hashCode(), candidate.hashCode());
+    }
+
+    /**
+     * Tests the equals method in case the same candidate is
+     * given.
+     */
+    @Test
+    void testSameObject() {
+        assertEquals(candidate, candidate);
+        assertEquals(candidate.hashCode(), candidate.hashCode());
+    }
+
+
+    /**
      * Tests the equals method in case a campus candidate with the same netId and deadline is
      * given.
      */
@@ -31,6 +52,7 @@ class OnCampusCandidateTest {
     void testEquals() {
         OnCampusCandidate candidate2 = new OnCampusCandidate(netId, deadline);
         assertEquals(candidate2, candidate);
+        assertEquals(candidate.hashCode(), candidate2.hashCode());
     }
 
     /**
@@ -40,6 +62,7 @@ class OnCampusCandidateTest {
     void testNotAnEqualNetId() {
         OnCampusCandidate candidate2 = new OnCampusCandidate("mbjdegoede", deadline);
         assertNotEquals(candidate2, candidate);
+        assertNotEquals(candidate2.hashCode(), candidate.hashCode());
     }
 
     /**
@@ -49,6 +72,7 @@ class OnCampusCandidateTest {
     void testNotAnEqualDeadline() {
         OnCampusCandidate candidate2 = new OnCampusCandidate(netId, LocalDate.now().plusDays(1));
         assertNotEquals(candidate2, candidate);
+        assertNotEquals(candidate2.hashCode(), candidate.hashCode());
     }
 
     /**

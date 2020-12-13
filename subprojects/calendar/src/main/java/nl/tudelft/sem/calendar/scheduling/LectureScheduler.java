@@ -14,21 +14,36 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
+import nl.tudelft.sem.calendar.entities.Attendance;
+import nl.tudelft.sem.calendar.entities.Lecture;
 import nl.tudelft.sem.calendar.entities.Room;
+import nl.tudelft.sem.calendar.repositories.AttendanceRepository;
+import nl.tudelft.sem.calendar.repositories.LectureRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.stereotype.Service;
 
 
+@Service
+@ComponentScan(basePackages = {"nl.tudelft.sem.identity.*"})
 public class LectureScheduler {
+
     private transient List<Room> roomList;
     private transient LocalTime[] roomAvailability;
-    private transient List<RequestedLecture> lecturesToSchedule;
+    private transient List<Lecture> lecturesToSchedule;
     private transient LocalTime startTime;
     private transient LocalTime endTime;
     private transient int timeGapLengthInMinutes;
     private transient Map<String, LocalDate> allParticipants;
     private transient int roomSearchIndex;
 
+    @Autowired
+    private transient LectureRepository lectureRepository;
+    @Autowired
+    private transient AttendanceRepository attendanceRepository;
+
     /**
-     * Creates a new instance of the LectureScheduler with a given list of rooms, lectures to be
+     * Initializes the LectureScheduler with a given list of rooms, lectures to be
      * scheduled, scheduling start and ending times and the time gap that should be used wil
      * scheduling.
      *
@@ -39,7 +54,7 @@ public class LectureScheduler {
      * @param timeGapLengthInMinutes the time gap in minutes that should be placed between any two
      *                               lectures
      */
-    public LectureScheduler(List<Room> roomList, List<RequestedLecture> lecturesToSchedule,
+    public void setFields(List<Room> roomList, List<Lecture> lecturesToSchedule,
                             LocalTime startTime, LocalTime endTime, int timeGapLengthInMinutes) {
 
         this.roomList = roomList;
@@ -57,15 +72,10 @@ public class LectureScheduler {
      * This method forms the core of the scheduler. It transforms all the requested lectures into
      * scheduled lectures.
      *
-     * @return a list of scheduled lectures
      */
-    public List<ScheduledLecture> scheduleAllLectures() {
-        List<ScheduledLecture> scheduledLectures = new ArrayList<>();
-        if (lecturesToSchedule == null || lecturesToSchedule.size() == 0) {
-            return scheduledLectures;
-        }
+    public void scheduleAllLectures() {
 
-        Map<LocalDate, List<RequestedLecture>> lecturesByDay = groupLecturesByDay();
+        Map<LocalDate, List<Lecture>> lecturesByDay = groupLecturesByDay();
         List<LocalDate> dates = new ArrayList<>(lecturesByDay.keySet());
 
         // We process the requests in sorted order by date
@@ -80,39 +90,62 @@ public class LectureScheduler {
             roomSearchIndex = 0;
 
             // Schedule all lectures for this day
-            List<RequestedLecture> toScheduleThisDay = getSortedLecturesForDay(date, lecturesByDay);
-            for (RequestedLecture toBeScheduled : toScheduleThisDay) {
-                ScheduledLecture scheduledLecture =
-                        new ScheduledLecture(toBeScheduled.getCourse(), toBeScheduled.getDate());
-                assignRoom(scheduledLecture, toBeScheduled.getDurationInMinutes());
-                assignStudents(scheduledLecture, allParticipants);
-                scheduledLectures.add(scheduledLecture);
+            List<Lecture> toScheduleThisDay = getSortedLecturesForDay(date, lecturesByDay);
+            for (Lecture toBeScheduled : toScheduleThisDay) {
+                int capacity = assignRoom(toBeScheduled, toBeScheduled.getDurationInMinutes());
+                // save lecture in database and update it with a version including an id
+                toBeScheduled = lectureRepository.saveAndFlush(toBeScheduled);
+
+                // then assign students to this lecture with id
+                assignStudents(capacity, toBeScheduled, allParticipants);
             }
         }
-        return scheduledLectures;
     }
 
     /**
      * Assigns students to a scheduled lecture based on the capacity of the associated room and a
-     * map storing the deadlines of all students.
+     * map storing the deadlines of all students. All students elected for the on-campus lecture
+     * will get an attendance entry in the database with the physical bit set to true. The other
+     * students will have it set to false.
      *
+     * @param capacity the capacity of the room in which the lecture is scheduled
      * @param scheduledLecture the lecture being scheduled
      * @param allParticipants  a map with the netIds and deadlines of all students
      */
-    public void assignStudents(ScheduledLecture scheduledLecture, Map<String,
+    // This isn't a DU-anomaly since `selectedStudents` is being read when the participants are
+    // being stored in the database
+    @SuppressWarnings("PMD.DataflowAnomalyAnalysis")
+    public void assignStudents(int capacity, Lecture scheduledLecture, Map<String,
             LocalDate> allParticipants) {
+
+        // Use a priority queue to select students based on the closest deadline.
         PriorityQueue<OnCampusCandidate> candidateSelector =
                 createCandidateSelector(scheduledLecture.getDate(),
-                        scheduledLecture.getCourse().getParticipants(), allParticipants);
+                        scheduledLecture.getCourse().getNetIds(), allParticipants);
+
+        List<String> selectedStudents = new ArrayList<>();
 
         int studentCounter = 0;
         while (!candidateSelector.isEmpty()
-                && scheduledLecture.getRoom() != null
-                && studentCounter < scheduledLecture.getRoom().getCapacity()) {
+                && scheduledLecture.getRoomId() != null
+                && studentCounter < capacity) {
+
+            // Select students from the priority queue.
             String selected = candidateSelector.remove().getNetId();
-            scheduledLecture.addStudentOnCampus(selected);
+            selectedStudents.add(selected);
+            // When selected to attend a lecture on-campus, a student's
+            // deadline is advanced with 14 days.
             allParticipants.put(selected, scheduledLecture.getDate().plusDays(14));
             studentCounter++;
+        }
+
+        // Save the attendances for this lecture in the database.
+        for (String participant : scheduledLecture.getCourse().getNetIds()) {
+            attendanceRepository.saveAndFlush(Attendance.builder()
+                    .lectureId(scheduledLecture.getLectureId())
+                    // Physical bit is true if students are selected, false if not.
+                    .physical(selectedStudents.contains(participant))
+                    .studentId(participant).build());
         }
     }
 
@@ -130,8 +163,8 @@ public class LectureScheduler {
      *
      * @return a map grouping lecture requests by date
      */
-    public Map<LocalDate, List<RequestedLecture>> groupLecturesByDay() {
-        return lecturesToSchedule.stream().collect(groupingBy(RequestedLecture::getDate));
+    public Map<LocalDate, List<Lecture>> groupLecturesByDay() {
+        return lecturesToSchedule.stream().collect(groupingBy(Lecture::getDate));
     }
 
     /**
@@ -142,10 +175,10 @@ public class LectureScheduler {
      * @param lecturesByDay the map storing all lectures grouped by day
      * @return a list of requested lectures, sorted by the corresponding course size
      */
-    public List<RequestedLecture> getSortedLecturesForDay(LocalDate date, Map<LocalDate,
-            List<RequestedLecture>> lecturesByDay) {
+    public List<Lecture> getSortedLecturesForDay(LocalDate date, Map<LocalDate,
+            List<Lecture>> lecturesByDay) {
         lecturesByDay.get(date).sort(Comparator.comparing(
-                l -> l.getCourse().getParticipants().size(), reverseOrder()));
+                l -> l.getCourse().getNetIds().size(), reverseOrder()));
         return lecturesByDay.get(date);
     }
 
@@ -165,9 +198,7 @@ public class LectureScheduler {
      */
     public PriorityQueue<OnCampusCandidate> createCandidateSelector(LocalDate lectureDate,
                         List<String> courseParticipants, Map<String, LocalDate> allParticipants) {
-        if (courseParticipants == null) {
-            return new PriorityQueue<>();
-        }
+
         PriorityQueue<OnCampusCandidate> candidates = new PriorityQueue<>(courseParticipants.size(),
                 Comparator.comparing(OnCampusCandidate::getDeadline));
 
@@ -194,23 +225,33 @@ public class LectureScheduler {
      *
      * @param scheduledLecture  the lecture to schedule
      * @param durationInMinutes the duration of the lecture to schedule
+     * @return the capacity of the room in which the lecture is now scheduled,
+     *      used to assign students to it.
      */
-    public void assignRoom(ScheduledLecture scheduledLecture,
-                          int durationInMinutes) {
+    public int assignRoom(Lecture scheduledLecture, int durationInMinutes) {
         while (roomSearchIndex < roomList.size()) {
+            // Check if it fits in the current room at the current day
             if (durationInMinutes <= (int) Duration.between(
                     roomAvailability[roomSearchIndex], endTime).toMinutes()) {
-                scheduledLecture.setRoom(roomList.get(roomSearchIndex));
+
+                // Schedule the lecture in the currently selected room
+                // update its start and ending time, and the availability of the room.
+                scheduledLecture.setRoomId(roomList.get(roomSearchIndex).getRoomId());
                 scheduledLecture.setStartTime(roomAvailability[roomSearchIndex]);
                 scheduledLecture.setEndTime(
                         roomAvailability[roomSearchIndex].plusMinutes(durationInMinutes));
+
                 roomAvailability[roomSearchIndex] = roomAvailability[roomSearchIndex]
                         .plusMinutes(durationInMinutes + timeGapLengthInMinutes);
-                break;
+
+                return roomList.get(roomSearchIndex).getCapacity();
             } else {
+                // Move to the next room
                 roomSearchIndex++;
             }
         }
+        // No suitable room could be found
+        return 0;
     }
 
     /**
@@ -239,5 +280,59 @@ public class LectureScheduler {
      */
     public int getRoomSearchIndex() {
         return this.roomSearchIndex;
+    }
+
+    /**
+     * Returns the list of lectures to be scheduled, used for testing purposes.
+     *
+     * @return the list of lectures to be schedule
+     */
+    public List<Lecture> getLecturesList() {
+        return this.lecturesToSchedule;
+    }
+
+    /**
+     * Returns the time to start the scheduling at, used for testing purposes.
+     *
+     * @return the time to start the scheduling at
+     */
+    public LocalTime getStartTime() {
+        return this.startTime;
+    }
+
+    /**
+     * Returns the time to end the scheduling at, used for testing purposes.
+     *
+     * @return the time to end the scheduling at
+     */
+    public LocalTime getEndTime() {
+        return this.endTime;
+    }
+
+    /**
+     * Returns the time gap in minutes between any two lectures, used for testing purposes.
+     *
+     * @return time gap in minutes between any two lectures
+     */
+    public int getTimeGapLengthInMinutes() {
+        return this.timeGapLengthInMinutes;
+    }
+
+    /**
+     * Returns the array with availability times for each room, used for testing purposes.
+     *
+     * @return the array with availability times for each room
+     */
+    public LocalTime[] getRoomAvailability() {
+        return this.roomAvailability;
+    }
+
+    /**
+     * Returns the map with course participants and their deadlines, used for testing purposes.
+     *
+     * @return the map with course participants and their deadlines
+     */
+    public Map<String, LocalDate> getAllParticipants() {
+        return allParticipants;
     }
 }

@@ -9,8 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Data
 @Builder
-public class Room {
-    private Integer roomId;
-    private String name;
-    private Integer capacity;
+public class Enrollment {
+    private String studentId;
+    private String courseId;
 }
