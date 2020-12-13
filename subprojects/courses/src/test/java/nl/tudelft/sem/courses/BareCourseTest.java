@@ -1,25 +1,22 @@
 package nl.tudelft.sem.courses;
 
-import nl.tudelft.sem.courses.entity.Course;
+import nl.tudelft.sem.courses.entity.BareCourse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-public class CourseTest {
+public class BareCourseTest {
 
-    private static Course course;
+    private static BareCourse course;
 
     /**
      * The initial setup before each test.
      */
     @BeforeEach
     void createCourse() {
-        course = new Course();
-        course.setCourseId("CSE1230");
-        course.setCourseName("SEM");
-        course.setTeacherId("TE22");
+        course = new BareCourse("CSE1230", "SEM", "TE22");
     }
 
     @Test
@@ -59,4 +56,5 @@ public class CourseTest {
         course.setTeacherId("Teacher");
         assertEquals("Teacher", course.getTeacherId());
     }
+
 }
