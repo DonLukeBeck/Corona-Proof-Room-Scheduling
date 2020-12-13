@@ -3,6 +3,7 @@ package nl.tudelft.sem.courses.controller;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
+import nl.tudelft.sem.courses.entity.AddCourse;
 import nl.tudelft.sem.courses.entity.Course;
 import nl.tudelft.sem.courses.entity.Enrollment;
 import nl.tudelft.sem.courses.entity.Lecture;
@@ -13,9 +14,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
 
 @RestController // This means that this class is a RestController
 @RequestMapping(path = "/course") // URL's start with /course (after Application path)
@@ -45,31 +48,29 @@ public class CourseManagementController {
      * Adds a new course with provided parameters.
      */
     @PostMapping(path = "/createNewCourse") // Map ONLY POST Requests
-    public String createNewCourse(@RequestParam String courseId, @RequestParam String courseName,
-                                  @RequestParam String teacherId,
-                                  @RequestParam List<String> participants) {
-        Course r = courseRepository.findByCourseId(courseId);
+    public String createNewCourse(@RequestBody AddCourse addCourse) {
+        System.out.println(addCourse.getParticipants());
+        Course r = courseRepository.findByCourseId(addCourse.getCourseId());
         try {
-            if (r.getCourseId().equals(courseId)) {
+            if (r.getCourseId().equals(addCourse.getCourseId())) {
                 return "Already Exists";
             }
             return null;
         } catch (Exception e) {
 
-            for (String id : participants) {
+            for (String id : addCourse.getParticipants()) {
                 Enrollment enrollment = new Enrollment();
-                enrollment.setCourseId(courseId);
+                enrollment.setCourseId(addCourse.getCourseId());
                 enrollment.setStudentId(id);
                 enrollmentRepository.save(enrollment);
             }
             Course course = new Course();
-            course.setCourseName(courseName);
-            course.setCourseId(courseId);
-            course.setTeacherId(teacherId);
+            course.setCourseName(addCourse.getCourseName());
+            course.setCourseId(addCourse.getCourseId());
+            course.setTeacherId(addCourse.getTeacherId());
             courseRepository.save(course);
             return "Saved";
         }
-
     }
 
     /**
