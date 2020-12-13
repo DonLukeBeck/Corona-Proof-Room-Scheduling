@@ -21,7 +21,7 @@ public class JwtValidate {
     private JwtParser parser = Jwts.parser().setSigningKey(secret);
 
     /**
-     * Check if the string is a valid jwt
+     * Check if the string is a valid jwt.
      *
      * @param jwt the compacted version of the jwt
      * @return true if the jwt is valid, otherwise false
@@ -29,15 +29,14 @@ public class JwtValidate {
     public boolean isValid(String jwt) {
         try {
             parser.parseClaimsJws(jwt).getBody();
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             return false;
         }
         return true;
     }
 
     /**
-     * Get the claims from the compact jws, a cryptographically signed jwt
+     * Get the claims from the compact jws, a cryptographically signed jwt.
      *
      * @param jwt the compacted version of the jwt
      * @return the set of claims or {@code null} if not valid
@@ -47,7 +46,7 @@ public class JwtValidate {
     }
 
     /**
-     * Get the username from the jwt
+     * Get the username from the jwt.
      *
      * @param jwt the compacted version of the jwt
      * @return the username
@@ -58,7 +57,7 @@ public class JwtValidate {
     }
 
     /**
-     * Check if the jwt belongs to a student
+     * Check if the jwt belongs to a student.
      *
      * @param jwt the compacted version of the jwt
      * @return true if the jwt belongs to a student, false otherwise
@@ -68,7 +67,7 @@ public class JwtValidate {
     }
 
     /**
-     * Check if the claims belong to a student
+     * Check if the claims belong to a student.
      *
      * @param claims the set of claims from the jwt
      * @return true if the jwt belongs to a student, false otherwise
@@ -78,7 +77,7 @@ public class JwtValidate {
     }
 
     /**
-     * Check if the jwt belongs to a teacher
+     * Check if the jwt belongs to a teacher.
      *
      * @param jwt the compacted version of the jwt
      * @return true if the jwt belongs to a teacher, false otherwise
@@ -88,7 +87,7 @@ public class JwtValidate {
     }
 
     /**
-     * Check if the claims belong to a teacher
+     * Check if the claims belong to a teacher.
      *
      * @param claims the set of claims from a jwt
      * @return true if the jwt belongs to a teacher, false otherwise

@@ -13,6 +13,16 @@ public class RoleValidation {
     private static HttpClient client = HttpClient.newBuilder().build();
     private static String uri = "/validate";
 
+    /**
+     * Primary method to verify the role inside a jwt token from a request authorization Header.
+     *
+     * @param request the request to extract the jwt from
+     * @return the role extracted from the jwt token
+     */
+
+    @SuppressWarnings("PMD.DataflowAnomalyAnalysis")
+    // Found 'DD'-anomaly for variable 'token'
+    // This is not a redefinition of the same variable since we cannot initialise the token in an if statement
     public static String getRole(HttpServletRequest request)
             throws IOException, InterruptedException {
 
@@ -33,11 +43,13 @@ public class RoleValidation {
         response = client.send(identityRequest, HttpResponse.BodyHandlers.ofString());
 
         //check whether the response is from the identity service and not some man in the middle
-        if(!response.uri().toString().equals("http://localhost:8083/validate"))
+        if (!response.uri().toString().equals("http://localhost:8083/validate")) {
             return null;
+        }
 
-        if (response.statusCode() == HttpURLConnection.HTTP_OK)
+        if (response.statusCode() == HttpURLConnection.HTTP_OK) {
             return response.body();
+        }
 
         return null;
     }

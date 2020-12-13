@@ -52,12 +52,14 @@ public class CourseManagementController {
      * Adds a new course with provided parameters.
      */
     @PostMapping(path = "/createNewCourse") // Map ONLY POST Requests
-    public String createNewCourse(HttpServletRequest request, @RequestBody AddCourse addCourse) throws IOException, InterruptedException {
+    public String createNewCourse(HttpServletRequest request, @RequestBody AddCourse addCourse)
+            throws IOException, InterruptedException {
 
         String role = RoleValidation.getRole(request);
         try {
-            if (!role.equals("teacher"))
+            if (!role.equals("teacher")) {
                 return "You are not allowed to create a course. Please contact administrator.";
+            }
         } catch (Exception e) {
             return "You are not allowed to create a course. Please contact administrator.";
         }
@@ -150,7 +152,7 @@ public class CourseManagementController {
             lecture.setScheduledDate(addLecture.getDate());
             lectureRepository.save(lecture);
             return "Lecture added";
-        }else{
+        } else {
             return "The course with id " + addLecture.getCourseId() + " does not exist.";
         }
     }
