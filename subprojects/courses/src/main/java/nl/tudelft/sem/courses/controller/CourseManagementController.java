@@ -1,8 +1,10 @@
 package nl.tudelft.sem.courses.controller;
 
+import java.io.IOException;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
+import javax.servlet.http.HttpServletRequest;
 import nl.tudelft.sem.courses.entity.AddCourse;
 import nl.tudelft.sem.courses.entity.AddLecture;
 import nl.tudelft.sem.courses.entity.Course;
@@ -11,6 +13,7 @@ import nl.tudelft.sem.courses.entity.Lecture;
 import nl.tudelft.sem.courses.repository.CourseRepository;
 import nl.tudelft.sem.courses.repository.EnrollmentRepository;
 import nl.tudelft.sem.courses.repository.LectureRepository;
+import nl.tudelft.sem.courses.util.RoleValidation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -49,7 +52,16 @@ public class CourseManagementController {
      * Adds a new course with provided parameters.
      */
     @PostMapping(path = "/createNewCourse") // Map ONLY POST Requests
-    public String createNewCourse(@RequestBody AddCourse addCourse) {
+    public String createNewCourse(HttpServletRequest request, @RequestBody AddCourse addCourse) throws IOException, InterruptedException {
+
+        String role = RoleValidation.getRole(request);
+        try {
+            if (!role.equals("teacher"))
+                return "You are not allowed to create a course. Please contact administrator.";
+        } catch (Exception e) {
+            return "You are not allowed to create a course. Please contact administrator.";
+        }
+
         Course r = courseRepository.findByCourseId(addCourse.getCourseId());
         try {
             if (r.getCourseId().equals(addCourse.getCourseId())) {
