@@ -41,13 +41,12 @@ public class OnCampusCandidate {
     }
 
     /**
-     * Creates a hash representation of this candidate.
-     *
-     * @return an integer representation of the candidate
+     * hash function for the onCampusCandidate
+     * @return the hash code
      */
     @Override
     public int hashCode() {
-        return Objects.hash(getNetId(), getDeadline());
+        return Objects.hash(netId, deadline);
     }
 
     /**

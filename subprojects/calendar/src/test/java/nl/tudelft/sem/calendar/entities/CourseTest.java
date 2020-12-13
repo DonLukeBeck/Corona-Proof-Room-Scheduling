@@ -7,8 +7,6 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-
-
 class CourseTest {
     private static Course course;
     private static String courseId;

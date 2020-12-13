@@ -14,7 +14,7 @@ class EnrollmentTest {
      * Creates an enrollment and its attributes used in all test cases.
      */
     @BeforeEach
-    void setup(){
+    void setup() {
         studentId = "abobe";
         courseId = "CSE1200";
         enrollment = new Enrollment(studentId, courseId);
