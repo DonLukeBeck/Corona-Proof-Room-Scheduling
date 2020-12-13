@@ -31,7 +31,8 @@ import nl.tudelft.sem.calendar.entities.Lecture;
 import nl.tudelft.sem.calendar.exceptions.ServerErrorException;
 
 public class CourseManagementCommunicator {
-    public static ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
+    public static ObjectMapper objectMapper = new ObjectMapper()
+            .registerModule(new JavaTimeModule());
     private static HttpClient client = HttpClient.newBuilder().build();
 
     /**
@@ -64,11 +65,13 @@ public class CourseManagementCommunicator {
         throws IOException, InterruptedException, ServerErrorException {
         var resp = objectMapper.readValue(getResponse(
             "/course/id/" + courseId).body(), new TypeReference<BareCourse>(){});
-        var enrollments = objectMapper.readValue(getResponse(
-            "/enrollment/course/" + encode(courseId)).body(), new TypeReference<List<BareEnrollment>>(){});
+        var enrollments = objectMapper
+                .readValue(getResponse(
+            "/enrollment/course/" + encode(courseId)).body(),
+                        new TypeReference<List<BareEnrollment>>(){});
 
         return new Course(resp.getCourseId(), resp.getCourseName(), resp.getTeacherId(),
-            enrollments.stream().map(e -> new Enrollment(e.getStudentId(),e.getCourseId()))
+            enrollments.stream().map(e -> new Enrollment(e.getStudentId(), e.getCourseId()))
                 .collect(Collectors.toList()));
     }
 
