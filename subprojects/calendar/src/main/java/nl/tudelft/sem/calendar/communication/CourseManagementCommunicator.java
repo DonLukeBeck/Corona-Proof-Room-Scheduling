@@ -8,15 +8,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 import com.fasterxml.jackson.core.type.TypeReference;
 import nl.tudelft.sem.calendar.Constants;
-import nl.tudelft.sem.calendar.entities.BareCourse;
-import nl.tudelft.sem.calendar.entities.BareEnrollment;
-import nl.tudelft.sem.calendar.entities.BareLecture;
-import nl.tudelft.sem.calendar.entities.Course;
-import nl.tudelft.sem.calendar.entities.Enrollment;
-import nl.tudelft.sem.calendar.entities.Lecture;
+import nl.tudelft.sem.calendar.entities.*;
 import nl.tudelft.sem.calendar.exceptions.ServerErrorException;
 
+
 public class CourseManagementCommunicator extends  Communicator {
+
+
 
     /**
      * Retrieves the lectures that need to be scheduled from the Course Management Service.
@@ -59,14 +57,16 @@ public class CourseManagementCommunicator extends  Communicator {
     private static Course courseFromId(String courseId)
         throws IOException, InterruptedException, ServerErrorException {
         var resp = objectMapper.readValue(getResponse(
+
             "/course/id/" + courseId, Constants.COURSE_SERVER_URL).body(),
                 new TypeReference<BareCourse>(){});
         var enrollments = objectMapper.readValue(getResponse(
             "/enrollment/course/" + encode(courseId), Constants.COURSE_SERVER_URL).body(),
                 new TypeReference<List<BareEnrollment>>(){});
 
+
         return new Course(resp.getCourseId(), resp.getCourseName(), resp.getTeacherId(),
-            enrollments.stream().map(e -> new Enrollment(e.getStudentId(),e.getCourseId()))
+            enrollments.stream().map(e -> new Enrollment(e.getStudentId(), e.getCourseId()))
                 .collect(Collectors.toList()));
     }
 }

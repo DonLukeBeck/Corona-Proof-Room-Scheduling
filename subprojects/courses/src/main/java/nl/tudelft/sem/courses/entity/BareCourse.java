@@ -1,4 +1,4 @@
-package nl.tudelft.sem.courses;
+package nl.tudelft.sem.courses.entity;
 
 import java.util.Date;
 import lombok.AllArgsConstructor;

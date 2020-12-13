@@ -1,12 +1,8 @@
-package nl.tudelft.sem.courses;
+package nl.tudelft.sem.courses.controller;
 
-import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.stream.Collector;
-import java.util.stream.Collectors;
-import javax.ws.rs.core.Response;
+import nl.tudelft.sem.courses.entity.BareCourse;
+import nl.tudelft.sem.courses.repository.CourseRepository;
+import nl.tudelft.sem.courses.repository.LectureRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -25,7 +21,7 @@ public class CourseController {
     private transient LectureRepository lectureRepository;
 
     /**
-     * Get endpoint to retrieve all courses
+     * Get endpoint to retrieve all courses.
      *
      * @return A list of {@link BareCourse}s
      */
@@ -36,7 +32,7 @@ public class CourseController {
     }
 
     /**
-     * Get endpoint to a course using an id
+     * Get endpoint to a course using an id.
      *
      * @return the {@link BareCourse} with courseId as id
      */

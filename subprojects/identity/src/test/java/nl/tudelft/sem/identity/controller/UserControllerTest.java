@@ -83,7 +83,7 @@ public class UserControllerTest {
         Claims claims = Jwts.parser().setSigningKey(jwtUtil.getSecret()).parseClaimsJws(jwt)
                 .getBody();
         assertThat(claims.getSubject()).isEqualTo("CorrectNetid");
-        var scope = (ArrayList<LinkedHashMap>) claims.get("scope");
+        ArrayList<LinkedHashMap<String, Object>> scope =  claims.get("scope", ArrayList.class);
         assertTrue(scope.get(0).containsValue("ROLE_STUDENT"));
         var cond = new Condition<LinkedHashMap>
                 (m -> m.containsValue("ROLE_STUDENT"), "Contains student");

@@ -61,8 +61,8 @@ public class CalendarController {
             // Make API call to retrieve rooms with restricted capacity
             List<Room> rooms = RestrictionManagementCommunicator.getAllRoomsWithAdjustedCapacity();
             // Get all the lectures to be scheduled
-            List<Lecture> lecturesToSchedule =
-                    CourseManagementCommunicator.getToBeScheduledLectures(LocalDate.now());
+            List<Lecture> lecturesToSchedule = CourseManagementCommunicator
+                    .getToBeScheduledLectures(LocalDate.now());
             // Create the scheduler that does the scheduling
             lectureScheduler.setFields(rooms, lecturesToSchedule, startTime,
                     endTime, timeGapLength);

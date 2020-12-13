@@ -40,9 +40,9 @@ public class UserService implements UserDetailsService {
     private Collection<GrantedAuthority> getGrantedAuthorities(User user) {
 
         Collection<GrantedAuthority> grantedAuthority = new ArrayList<>();
-        if (user.getRole().equals("teacher")) {
+        if (user.getRole().equalsIgnoreCase("teacher")) {
             grantedAuthority.add(new SimpleGrantedAuthority("ROLE_TEACHER"));
-        } else if (user.getRole().equals("student")) {
+        } else if (user.getRole().equalsIgnoreCase("student")) {
             grantedAuthority.add(new SimpleGrantedAuthority("ROLE_STUDENT"));
         }
         return grantedAuthority;
