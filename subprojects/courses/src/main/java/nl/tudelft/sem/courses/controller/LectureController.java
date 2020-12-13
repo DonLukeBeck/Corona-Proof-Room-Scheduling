@@ -31,7 +31,7 @@ public class LectureController {
     private transient LectureRepository lectureRepository;
 
     /**
-     * Get endpoint to retrieve all lectures
+     * Get endpoint to retrieve all lectures.
      *
      * @return A list of {@link BareLecture}s
      */
@@ -43,7 +43,7 @@ public class LectureController {
     }
 
     /**
-     * Get endpoint to retrieve all lectures after a certain date
+     * Get endpoint to retrieve all lectures after a certain date.
      *
      * @return A list of {@link BareLecture}s
      */

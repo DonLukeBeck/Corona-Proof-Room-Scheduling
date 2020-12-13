@@ -14,7 +14,8 @@ public interface LectureRepository extends JpaRepository<Lecture, Integer>,
 
     List<Lecture> findByCourseId(String courseId);
 
-    @Query(value = "SELECT * FROM Lecture WHERE course_id = ?1 AND scheduled_date = ?2 LIMIT 1", nativeQuery = true)
+    @Query(value = "SELECT * FROM Lecture WHERE course_id = ?1 AND scheduled_date = ?2 LIMIT 1",
+            nativeQuery = true)
     Lecture findByCourseIdAndDate(String courseId, Date date);
 
 }

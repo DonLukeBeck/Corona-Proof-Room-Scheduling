@@ -24,7 +24,7 @@ public class EnrollmentController {
     private transient EnrollmentRepository enrollmentRepository;
 
     /**
-     * Get endpoint to retrieve all enrollments
+     * Get endpoint to retrieve all enrollments.
      *
      * @return A list of {@link BareEnrollment}s
      */
@@ -36,7 +36,7 @@ public class EnrollmentController {
     }
 
     /**
-     * Get endpoint to retrieve all enrollments from a specific course
+     * Get endpoint to retrieve all enrollments from a specific course.
      *
      * @return A list of {@link BareEnrollment}s
      */

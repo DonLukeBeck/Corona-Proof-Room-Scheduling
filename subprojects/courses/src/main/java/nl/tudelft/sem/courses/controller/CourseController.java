@@ -21,7 +21,7 @@ public class CourseController {
     private transient LectureRepository lectureRepository;
 
     /**
-     * Get endpoint to retrieve all courses
+     * Get endpoint to retrieve all courses.
      *
      * @return A list of {@link BareCourse}s
      */
@@ -32,7 +32,7 @@ public class CourseController {
     }
 
     /**
-     * Get endpoint to a course using an id
+     * Get endpoint to a course using an id.
      *
      * @return the {@link BareCourse} with courseId as id
      */

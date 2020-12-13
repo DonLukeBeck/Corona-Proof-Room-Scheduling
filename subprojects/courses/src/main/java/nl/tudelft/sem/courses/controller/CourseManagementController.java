@@ -3,9 +3,9 @@ package nl.tudelft.sem.courses.controller;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
+import nl.tudelft.sem.courses.entity.Course;
 import nl.tudelft.sem.courses.entity.Enrollment;
 import nl.tudelft.sem.courses.entity.Lecture;
-import nl.tudelft.sem.courses.entity.Course;
 import nl.tudelft.sem.courses.repository.CourseRepository;
 import nl.tudelft.sem.courses.repository.EnrollmentRepository;
 import nl.tudelft.sem.courses.repository.LectureRepository;
@@ -49,12 +49,12 @@ public class CourseManagementController {
                                   @RequestParam String teacherId,
                                   @RequestParam List<String> participants) {
         Course r = courseRepository.findByCourseId(courseId);
-        try{
+        try {
             if (r.getCourseId().equals(courseId)) {
                 return "Already Exists";
             }
             return null;
-        }catch(NullPointerException e){
+        } catch (NullPointerException e) {
 
             for (String id : participants) {
                 Enrollment enrollment = new Enrollment();
@@ -69,7 +69,6 @@ public class CourseManagementController {
             courseRepository.save(course);
             return "Saved";
         }
-
 
     }
 

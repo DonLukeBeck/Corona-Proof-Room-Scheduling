@@ -10,7 +10,10 @@ import org.springframework.stereotype.Repository;
 public interface AttendanceRepository extends JpaRepository<Attendance, Integer> {
 
     List<Attendance> findAll();
+
     List<Attendance> findByLectureId(int lectureId);
+
     List<Attendance> findByStudentId(String studentId);
-    List<Attendance> findByLecureIdAndStudentId(int lectureId, String studentId);
+
+    List<Attendance> findByLectureIdAndStudentId(int lectureId, String studentId);
 }

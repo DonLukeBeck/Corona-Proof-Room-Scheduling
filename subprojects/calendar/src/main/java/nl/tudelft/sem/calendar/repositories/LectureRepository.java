@@ -10,7 +10,10 @@ import org.springframework.stereotype.Repository;
 public interface LectureRepository extends JpaRepository<Lecture, Integer> {
 
     List<Lecture> findAll();
+
     List<Lecture> findByLectureId(int lectureId);
+
     List<Lecture> findByCourseId(String courseId);
+
     List<Lecture> findByDate(LocalDate date);
 }
