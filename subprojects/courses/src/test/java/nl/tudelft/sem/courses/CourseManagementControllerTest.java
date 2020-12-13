@@ -129,7 +129,12 @@ public class CourseManagementControllerTest {
 
     @Test
     void getCourseParticipantsSuccess() {
-        // see if the list that we get equals the list of participants
+        for (String i : courseManagementController.getCourseParticipants(enrollment.getCourseId())) {
+            Enrollment e = new Enrollment();
+            e.setCourseId(enrollment.getCourseId());
+            e.setStudentId(i);
+            assert (enrollments.contains(e));
+        }
     }
 
     @Test
