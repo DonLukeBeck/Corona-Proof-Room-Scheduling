@@ -1,4 +1,4 @@
-package nl.tudelft.sem.courses;
+package nl.tudelft.sem.courses.entity;
 
 import java.time.LocalDate;
 import java.util.Date;

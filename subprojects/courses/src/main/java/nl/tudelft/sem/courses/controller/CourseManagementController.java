@@ -1,8 +1,14 @@
-package nl.tudelft.sem.courses;
+package nl.tudelft.sem.courses.controller;
 
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
+import nl.tudelft.sem.courses.entity.Course;
+import nl.tudelft.sem.courses.entity.Enrollment;
+import nl.tudelft.sem.courses.entity.Lecture;
+import nl.tudelft.sem.courses.repository.CourseRepository;
+import nl.tudelft.sem.courses.repository.EnrollmentRepository;
+import nl.tudelft.sem.courses.repository.LectureRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController // This means that this class is a RestController
 @RequestMapping(path = "/course") // URL's start with /course (after Application path)
-public class CourseManagement {
+public class CourseManagementController {
 
     @Autowired
     private transient CourseRepository courseRepository;
@@ -27,9 +33,9 @@ public class CourseManagement {
     /**
      * Instantiates repository needed.
      */
-    public CourseManagement(CourseRepository courseRepository,
-                            EnrollmentRepository enrollmentRepository,
-                            LectureRepository lectureRepository) {
+    public CourseManagementController(CourseRepository courseRepository,
+                                      EnrollmentRepository enrollmentRepository,
+                                      LectureRepository lectureRepository) {
         this.courseRepository = courseRepository;
         this.enrollmentRepository = enrollmentRepository;
         this.lectureRepository = lectureRepository;
@@ -43,24 +49,27 @@ public class CourseManagement {
                                   @RequestParam String teacherId,
                                   @RequestParam List<String> participants) {
         Course r = courseRepository.findByCourseId(courseId);
-        if (r.getCourseId().equals(courseId)) {
-            if (r.getCourseName() == courseName) {
+        try {
+            if (r.getCourseId().equals(courseId)) {
                 return "Already Exists";
             }
+            return null;
+        } catch (Exception e) {
+
+            for (String id : participants) {
+                Enrollment enrollment = new Enrollment();
+                enrollment.setCourseId(courseId);
+                enrollment.setStudentId(id);
+                enrollmentRepository.save(enrollment);
+            }
+            Course course = new Course();
+            course.setCourseName(courseName);
+            course.setCourseId(courseId);
+            course.setTeacherId(teacherId);
+            courseRepository.save(course);
+            return "Saved";
         }
 
-        for (String id : participants) {
-            Enrollment enrollment = new Enrollment();
-            enrollment.setCourseId(courseId);
-            enrollment.setStudentId(id);
-            enrollmentRepository.save(enrollment);
-        }
-        Course course = new Course();
-        course.setCourseName(courseName);
-        course.setCourseId(courseId);
-        course.setTeacherId(teacherId);
-        courseRepository.save(course);
-        return "Saved";
     }
 
     /**

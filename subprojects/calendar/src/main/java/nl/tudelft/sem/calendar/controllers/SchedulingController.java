@@ -60,8 +60,7 @@ public class SchedulingController {
             lectureScheduler.scheduleAllLectures();
 
             return "Success!";
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             return "Failure!";
         }
     }
@@ -165,7 +164,7 @@ public class SchedulingController {
             }
         }
 
-        for (Attendance a : attendanceRepository.findByLecureIdAndStudentId(lectureId, userId)) {
+        for (Attendance a : attendanceRepository.findByLectureIdAndStudentId(lectureId, userId)) {
             attendanceRepository.delete(a);
             a.setPhysical(false);
             attendanceRepository.save(a);
