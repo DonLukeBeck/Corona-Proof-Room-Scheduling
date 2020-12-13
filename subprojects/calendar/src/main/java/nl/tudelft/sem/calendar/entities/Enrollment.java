@@ -21,11 +21,10 @@ public class Enrollment implements Serializable {
     private static final long serialVersionUID = 1233454322341123464L;
 
     @Id
-    @Column(name = "course_id")
-    private String courseId;
-
-    @Id
     @Column(name = "student_id")
     private String studentId;
 
+    @Id
+    @Column(name = "course_id")
+    private String courseId;
 }

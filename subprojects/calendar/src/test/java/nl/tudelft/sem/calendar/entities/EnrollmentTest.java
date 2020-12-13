@@ -17,7 +17,7 @@ class EnrollmentTest {
     void setup() {
         studentId = "abobe";
         courseId = "CSE1200";
-        enrollment = new Enrollment(courseId, studentId);
+        enrollment = new Enrollment(studentId, courseId);
     }
 
     /**

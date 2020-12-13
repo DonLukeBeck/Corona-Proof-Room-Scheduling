@@ -1,6 +1,8 @@
 package nl.tudelft.sem.calendar.entities;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -63,7 +65,7 @@ class LectureTest {
                 .courseName(courseName)
                 .teacherId(teacherId).build();
         lecture = new Lecture(lectureId, courseId, roomId, startTime, 
-                endTime, date, durationInMinutes, course);
+                endTime, date, durationInMinutes, course, false);
 
     }
 
@@ -206,5 +208,17 @@ class LectureTest {
                 .teacherId(teacherId).build();
         lecture.setCourse(course1);
         assertEquals(course1, lecture.getCourse());
+    }
+
+    /**
+     * Tests the getter and setter of the attribute indicating whether a student
+     *      is selected to attend the lecture on-campus or not,
+     *      used when retrieving the lecture for the schedule.
+     */
+    @Test
+    void testGetSetSelectedForOnCampus() {
+        assertFalse(lecture.isSelectedForOnCampus());
+        lecture.setSelectedForOnCampus(true);
+        assertTrue(lecture.isSelectedForOnCampus());
     }
 }

@@ -1,5 +1,6 @@
 package nl.tudelft.sem.calendar.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -27,7 +28,7 @@ public class Lecture implements Serializable  {
     private static final long serialVersionUID = 1233464399341123464L;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "lecture_id")
     @Generated
     private Integer lectureId;
@@ -49,7 +50,13 @@ public class Lecture implements Serializable  {
 
     // Attributes of the lecture, before it gets scheduled
     @Transient
+    @JsonIgnore
     private int durationInMinutes;
+
     @Transient
+    @JsonIgnore
     private Course course;
+
+    @Transient
+    boolean selectedForOnCampus;
 }
