@@ -115,7 +115,7 @@ public class CourseManagementController {
      */
     @GetMapping(path = "/getCourseIdForTeacher") // Map ONLY Get Requests
     public String getCourseIdForTeacher(@RequestParam String teacherId) {
-        Course course = courseRepository.findByCourseIdForTeacher(teacherId);
+        Course course = courseRepository.findByTeacherId(teacherId);
         if (course == null) {
             return "ERROR";
         }
