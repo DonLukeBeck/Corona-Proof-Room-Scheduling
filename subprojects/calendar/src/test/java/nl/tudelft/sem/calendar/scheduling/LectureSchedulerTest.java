@@ -5,11 +5,17 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.*;
-
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.PriorityQueue;
 import nl.tudelft.sem.calendar.entities.Attendance;
 import nl.tudelft.sem.calendar.entities.Course;
 import nl.tudelft.sem.calendar.entities.Lecture;
@@ -21,6 +27,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.ApplicationContext;
 
 @SpringBootTest
 class LectureSchedulerTest {
@@ -31,13 +38,15 @@ class LectureSchedulerTest {
     private transient int timeGapLengthInMinutes;
 
     @Autowired
-    transient LectureScheduler scheduler;
+    private transient ApplicationContext context;
+    @Autowired
+    private transient LectureScheduler scheduler;
 
     // We mock the repositories
     @MockBean
-    transient LectureRepository lectureRepository;
+    private transient LectureRepository lectureRepository;
     @MockBean
-    transient AttendanceRepository attendanceRepository;
+    private transient AttendanceRepository attendanceRepository;
 
     // Objects used in the test cases, stored in arrays.
     private transient Room[] testRooms;
@@ -112,7 +121,7 @@ class LectureSchedulerTest {
         return new HashMap<>() {
             {
                 put(testDates[0], Arrays.asList(lectures[0],
-                        lectures[1],lectures[2]));
+                        lectures[1], lectures[2]));
                 put(testDates[1], Collections.singletonList(lectures[3]));
                 put(testDates[2], Collections.singletonList(lectures[4]));
             }
@@ -148,19 +157,48 @@ class LectureSchedulerTest {
         timeGapLengthInMinutes = 45;
         startTime = LocalTime.of(8, 45);
         endTime = LocalTime.of(17, 45);
-        scheduler.setFields(roomList, lecturesToSchedule, startTime, endTime, timeGapLengthInMinutes);
+        scheduler.setFields(roomList, lecturesToSchedule, startTime,
+                endTime, timeGapLengthInMinutes);
     }
 
+    /**
+     * Tests whether stubbing the mock gives the expected outcome.
+     */
+    @Test
+    public void testLectureMock() {
+        when(lectureRepository.saveAndFlush(any())).thenReturn(lectures[0]);
+
+        LectureRepository lectureRepository = context.getBean(LectureRepository.class);
+        Lecture lecture = lectureRepository.saveAndFlush(lectures[0]);
+
+        assertEquals(lectures[0], lecture);
+        verify(lectureRepository).saveAndFlush(any());
+    }
+
+    /**
+     * Tests whether all to be scheduled lectures make an interaction with the lectureRepository
+     * to be stored in the database after scheduling.
+     */
     @Test
     void testScheduleAllLectures() {
+        when(lectureRepository.saveAndFlush(lectures[0])).thenReturn(lectures[0]);
+        when(lectureRepository.saveAndFlush(lectures[1])).thenReturn(lectures[1]);
+        when(lectureRepository.saveAndFlush(lectures[2])).thenReturn(lectures[2]);
+        when(lectureRepository.saveAndFlush(lectures[3])).thenReturn(lectures[3]);
+        when(lectureRepository.saveAndFlush(lectures[4])).thenReturn(lectures[4]);
+        scheduler.scheduleAllLectures();
 
-        // to be implemented. should do integration like test, we can again pass list with
-        // a lot of lectures to be scheduled and then verify that the repositories are called
-        // with certain attributes
-
-        //scheduler.scheduleAllLectures();
+        verify(lectureRepository, times(1)).saveAndFlush(lectures[0]);
+        verify(lectureRepository, times(1)).saveAndFlush(lectures[1]);
+        verify(lectureRepository, times(1)).saveAndFlush(lectures[2]);
+        verify(lectureRepository, times(1)).saveAndFlush(lectures[3]);
+        verify(lectureRepository, times(1)).saveAndFlush(lectures[4]);
+        verifyNoMoreInteractions(lectureRepository);
     }
 
+    /**
+     * Tests whether all properties of the scheduler are correctly set upon initialization.
+     */
     @Test
     void testSetFields() {
         assertEquals(roomList, scheduler.getRoomList());
@@ -168,8 +206,13 @@ class LectureSchedulerTest {
         assertEquals(startTime, scheduler.getStartTime());
         assertEquals(endTime, scheduler.getEndTime());
         assertEquals(timeGapLengthInMinutes, scheduler.getTimeGapLengthInMinutes());
-    }
+        assertEquals(new HashMap<String, LocalDate>(), scheduler.getAllParticipants());
+        assertEquals(0, scheduler.getRoomSearchIndex());
 
+        for (LocalTime lt : scheduler.getRoomAvailability()) {
+            assertEquals(startTime, lt);
+        }
+    }
 
     /**
      * Tests whether all course participants are selected to attend the lecture on campus when the
@@ -178,16 +221,26 @@ class LectureSchedulerTest {
      */
     @Test
     void testAssignStudentsEnoughCapacity() {
+
+        lectures[1].setRoomId(testRooms[1].getRoomId());
         Map<String, LocalDate> allParticipants = createParticipants();
         scheduler.assignStudents(testRooms[1].getCapacity(), lectures[1], allParticipants);
-        verify(attendanceRepository, times(3)).saveAndFlush(Attendance.builder()
-                .lectureId(lectures[1].getLectureId()).physical(true)
-                .studentId(any()).build());
 
-        //Attendance attendance = Attendance.builder().lectureId(lectures[2].getLectureId()).physical(true).studentId("abobe").build();
-        //verify(attendanceRepository, times(1)).saveAndFlush();
+        Attendance attendance1 = Attendance.builder().lectureId(lectures[1].getLectureId())
+                .physical(true).studentId(netIds[1]).build();
 
-        // make test more specific, verify not any student, but their exact details.
+        verify(attendanceRepository, times(1)).saveAndFlush(attendance1);
+
+        Attendance attendance2 = Attendance.builder().lectureId(lectures[1]
+                .getLectureId()).physical(true).studentId(netIds[0]).build();
+
+        verify(attendanceRepository, times(1)).saveAndFlush(attendance2);
+
+        Attendance attendance3 = Attendance.builder().lectureId(lectures[1].getLectureId())
+                .physical(true).studentId(netIds[2]).build();
+
+        verify(attendanceRepository, times(1)).saveAndFlush(attendance3);
+        verifyNoMoreInteractions(attendanceRepository);
     }
 
     /**
@@ -198,21 +251,24 @@ class LectureSchedulerTest {
      */
     @Test
     void testAssignStudentsButNotEnoughCapacity() {
-        //        Map<String, LocalDate> allParticipants = createParticipants();
-        //        testSchedLectures[1].setRoom(testRooms[0]);
-        //        assertThat(testSchedLectures[1].getStudentsOnCampus()).isEmpty();
-        //        scheduler.assignStudents(testSchedLectures[1], allParticipants);
-        //
-        //        assertThat(testSchedLectures[1].getStudentsOnCampus())
-        //                .containsExactly(netIds[0], netIds[2]);
-        //
-        //        assertThat(allParticipants.get(netIds[0])).isEqualTo(
-        //                testSchedLectures[1].getDate().plusDays(14));
-        //        assertThat(allParticipants.get(netIds[2])).isEqualTo(
-        //                testSchedLectures[1].getDate().plusDays(14));
-        //        assertThat(allParticipants.get(netIds[1])).isEqualTo(LocalDate.of(2020, 12, 26));
+        lectures[1].setRoomId(testRooms[0].getRoomId());
+        Map<String, LocalDate> allParticipants = createParticipants();
+        scheduler.assignStudents(testRooms[0].getCapacity(), lectures[1], allParticipants);
 
-        // use mock and assume that called in particular way.
+
+        Attendance attendance1 = Attendance.builder().lectureId(lectures[1].getLectureId())
+                .physical(false).studentId(netIds[1]).build();
+        verify(attendanceRepository, times(1)).saveAndFlush(attendance1);
+
+        Attendance attendance2 = Attendance.builder().lectureId(lectures[1].getLectureId())
+                .physical(true).studentId(netIds[0]).build();
+        verify(attendanceRepository, times(1)).saveAndFlush(attendance2);
+
+        Attendance attendance3 = Attendance.builder().lectureId(lectures[1].getLectureId())
+                .physical(true).studentId(netIds[2]).build();
+        verify(attendanceRepository, times(1)).saveAndFlush(attendance3);
+
+        verifyNoMoreInteractions(attendanceRepository);
     }
 
     /**
@@ -268,12 +324,10 @@ class LectureSchedulerTest {
                     LocalDate.of(2020, 12, 26))
         };
 
-        // maybe split this test case up into multiple parts??
-
         @SuppressWarnings("PMD.DataflowAnomalyAnalysis")
         // this is just the priority queue being created and checked afterwards.
         PriorityQueue<OnCampusCandidate> result =
-                scheduler.createCandidateSelector(lectureDate, courseParticipants, allParticipants);
+            scheduler.createCandidateSelector(lectureDate, courseParticipants, allParticipants);
 
         for (OnCampusCandidate onCampusCandidate : verification) {
             OnCampusCandidate candidate = result.remove();
@@ -283,6 +337,7 @@ class LectureSchedulerTest {
         assertThat(allParticipants.get(netIds[1])).isEqualTo(LocalDate.of(2020, 12, 26));
         assertThat(allParticipants.get(netIds[0])).isEqualTo(LocalDate.of(2020, 12, 18));
     }
+
 
     /**
      * Tests whether the first lecture to be scheduled is scheduled in the biggest lecture room.

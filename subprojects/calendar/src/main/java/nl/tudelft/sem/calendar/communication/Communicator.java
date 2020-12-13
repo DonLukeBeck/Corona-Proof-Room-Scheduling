@@ -1,5 +1,7 @@
 package nl.tudelft.sem.calendar.communication;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URI;
@@ -8,13 +10,12 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import nl.tudelft.sem.calendar.exceptions.ServerErrorException;
 
 public abstract class Communicator {
     private static HttpClient client = HttpClient.newBuilder().build();
-    public static ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
+    public static ObjectMapper objectMapper =
+            new ObjectMapper().registerModule(new JavaTimeModule());
 
     protected static HttpResponse<String> getResponse(String uri, String service)
             throws IOException, InterruptedException, ServerErrorException {
@@ -27,7 +28,7 @@ public abstract class Communicator {
 
         response = client.send(request, HttpResponse.BodyHandlers.ofString());
         if (response.statusCode() != HttpURLConnection.HTTP_OK) {
-            // TODO: log the errors
+            System.out.println(uri + "," + service);
             throw new ServerErrorException();
         }
         return response;

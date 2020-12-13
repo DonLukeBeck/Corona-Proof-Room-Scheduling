@@ -1,34 +1,39 @@
 package nl.tudelft.sem.calendar.communication;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
-import com.fasterxml.jackson.core.type.TypeReference;
 import nl.tudelft.sem.calendar.Constants;
-import nl.tudelft.sem.calendar.entities.*;
+import nl.tudelft.sem.calendar.entities.BareCourse;
+import nl.tudelft.sem.calendar.entities.BareEnrollment;
+import nl.tudelft.sem.calendar.entities.BareLecture;
+import nl.tudelft.sem.calendar.entities.Course;
+import nl.tudelft.sem.calendar.entities.Enrollment;
+import nl.tudelft.sem.calendar.entities.Lecture;
 import nl.tudelft.sem.calendar.exceptions.ServerErrorException;
-
 
 public class CourseManagementCommunicator extends  Communicator {
 
-
-
     /**
      * Retrieves the lectures that need to be scheduled from the Course Management Service.
+     *
      * @param date the (current) date after which the lectures should be considered for scheduling.
-     * @return a list of {@link Lecture} objects, used in the scheduling process.
-     * @throws IOException
-     * @throws InterruptedException
-     * @throws ServerErrorException
+     *
+     * @return a list of {@link Lecture} objects, used in the scheduling process
+     *
+     * @throws IOException an input/output exception
+     * @throws InterruptedException an interrupted exception
+     * @throws ServerErrorException a server error exception
      */
     public static List<Lecture> getToBeScheduledLectures(LocalDate date)
         throws IOException, InterruptedException, ServerErrorException {
 
-        var response = getResponse("/lectures/date/" +
-                encode(date.toString()), Constants.COURSE_SERVER_URL);
+        var response = getResponse("/lecture/lectures/date/"
+                + encode(date.toString()), Constants.COURSE_SERVER_URL);
         var bareLectures
             = objectMapper.readValue(response.body(), new TypeReference<List<BareLecture>>() {});
         // this isn't a DU-anomaly since we use it to store and retrieve courses inside the for loop
@@ -47,12 +52,45 @@ public class CourseManagementCommunicator extends  Communicator {
     }
 
     /**
+     * Retrieves all lectures for scheduling from the Course Management Service.
+     *
+     * @return a list of {@link Lecture} objects, used in the scheduling process.
+     *
+     * @throws IOException an input/output exception
+     * @throws InterruptedException an interrupted exception
+     * @throws ServerErrorException a server error exception
+     */
+    public static List<Lecture> getToBeScheduledLecturesTest()
+        throws InterruptedException, ServerErrorException, IOException {
+
+        var response = getResponse("/lecture/lectures", Constants.COURSE_SERVER_URL);
+        var bareLectures = objectMapper.readValue(response.body(),
+                new TypeReference<List<BareLecture>>() {});
+        // this isn't a DU-anomaly since we use it to store and retrieve courses inside the for loop
+        @SuppressWarnings("PMD.DataflowAnomalyAnalysis")
+        var courseMap = new HashMap<String, Course>();
+        var lectureList = new ArrayList<Lecture>();
+        for (var l : bareLectures) {
+            if (!courseMap.containsKey(l.getCourseId())) {
+                courseMap.put(l.getCourseId(), courseFromId(l.getCourseId()));
+            }
+            lectureList.add(Lecture.builder().course(courseMap.get(l.getCourseId()))
+                    .courseId(l.getCourseId()).durationInMinutes(l.getDurationInMinutes())
+                    .date(l.getDate()).build());
+        }
+        return lectureList;
+    }
+
+    /**
      * Retrieves the associated course and participants for a lecture.
+     *
      * @param courseId the id of the course that needs to be retrieved
-     * @return a {@link Course} object, containing information about the course.
-     * @throws IOException
-     * @throws InterruptedException
-     * @throws ServerErrorException
+     *
+     * @return a {@link Course} object, containing information about the course
+     *
+     * @throws IOException an input/output exception
+     * @throws InterruptedException an interrupted exception
+     * @throws ServerErrorException a server error exception
      */
     private static Course courseFromId(String courseId)
         throws IOException, InterruptedException, ServerErrorException {

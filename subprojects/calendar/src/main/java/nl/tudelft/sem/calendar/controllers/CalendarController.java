@@ -3,7 +3,9 @@ package nl.tudelft.sem.calendar.controllers;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import nl.tudelft.sem.calendar.communication.CourseManagementCommunicator;
 import nl.tudelft.sem.calendar.communication.RestrictionManagementCommunicator;
 import nl.tudelft.sem.calendar.entities.Attendance;
@@ -62,7 +64,7 @@ public class CalendarController {
             List<Room> rooms = RestrictionManagementCommunicator.getAllRoomsWithAdjustedCapacity();
             // Get all the lectures to be scheduled
             List<Lecture> lecturesToSchedule = CourseManagementCommunicator
-                    .getToBeScheduledLectures(LocalDate.now());
+                    .getToBeScheduledLecturesTest();
             // Create the scheduler that does the scheduling
             lectureScheduler.setFields(rooms, lecturesToSchedule, startTime,
                     endTime, timeGapLength);
@@ -90,12 +92,12 @@ public class CalendarController {
     // we need to suppress this warning for every method
     public ResponseEntity<?> getMyPersonalSchedule(String userId) {
         List<Lecture> lectures = new ArrayList<>();
-        ArrayList<Integer> lectureIds = new ArrayList<>();
-        for (Attendance a : attendanceRepository.findByStudentId(userId)) {
-            lectureIds.add(a.getLectureId());
-        }
-        for (Integer i : lectureIds) {
-            lectures.addAll(lectureRepository.findByLectureId(i));
+        Map<Integer, Boolean> lectureIdPhysical = createLectureIdPhysicalMap(userId);
+
+        for (Map.Entry<Integer, Boolean> idPhysical : lectureIdPhysical.entrySet()) {
+            Lecture l = lectureRepository.findByLectureId(idPhysical.getKey());
+            l.setSelectedForOnCampus(idPhysical.getValue());
+            lectures.add(l);
         }
         return ResponseEntity.ok(lectures);
     }
@@ -115,13 +117,11 @@ public class CalendarController {
     // we need to suppress this warning for every method
     public ResponseEntity<?> getMyPersonalScheduleForDay(String userId, LocalDate date) {
         ArrayList<Lecture> lectures = new ArrayList<>();
-        ArrayList<Integer> lectureIds = new ArrayList<>();
-        for (Attendance a : attendanceRepository.findByStudentId(userId)) {
-            lectureIds.add(a.getLectureId());
-        }
+        Map<Integer, Boolean> lectureIdPhysical = createLectureIdPhysicalMap(userId);
 
         for (Lecture l : lectureRepository.findByDate(date)) {
-            if (lectureIds.contains(l.getLectureId())) {
+            if (lectureIdPhysical.containsKey(l.getLectureId())) {
+                l.setSelectedForOnCampus(lectureIdPhysical.get(l.getLectureId()));
                 lectures.add(l);
             }
         }
@@ -143,17 +143,31 @@ public class CalendarController {
     // we need to suppress this warning for every method
     public ResponseEntity<?> getMyPersonalScheduleForCourse(String userId, String courseId) {
         ArrayList<Lecture> lectures = new ArrayList<>();
-        ArrayList<Integer> lectureIds = new ArrayList<>();
-        for (Attendance a : attendanceRepository.findByStudentId(userId)) {
-            lectureIds.add(a.getLectureId());
-        }
+        Map<Integer, Boolean> lectureIdPhysical = createLectureIdPhysicalMap(userId);
 
         for (Lecture l : lectureRepository.findByCourseId(courseId)) {
-            if (lectureIds.contains(l.getLectureId())) {
+            if (lectureIdPhysical.containsKey(l.getLectureId())) {
+                l.setSelectedForOnCampus(lectureIdPhysical.get(l.getLectureId()));
                 lectures.add(l);
             }
         }
         return ResponseEntity.ok(lectures);
+    }
+
+    /**
+     * Helper method to create a map in which the lectureId and a boolean
+     * indicating physical presence are stored.
+     *
+     * @param userId - the userId of the user to look for
+     *
+     * @return a map containing a lectureId and a boolean indicating physical presence
+     */
+    public Map<Integer, Boolean> createLectureIdPhysicalMap(String userId) {
+        Map<Integer, Boolean> result = new HashMap<>();
+        for (Attendance a : attendanceRepository.findByStudentId(userId)) {
+            result.put(a.getLectureId(), a.getPhysical());
+        }
+        return result;
     }
 
     /**
@@ -180,13 +194,14 @@ public class CalendarController {
                 }
             }
 
-            for (Attendance a : attendanceRepository.findByLectureIdAndStudentId(lectureId, userId)) {
+            for (Attendance a :
+                    attendanceRepository.findByLectureIdAndStudentId(lectureId, userId)) {
                 attendanceRepository.delete(a);
                 a.setPhysical(false);
                 attendanceRepository.save(a);
             }
             return ResponseEntity.ok(HttpStatus.ACCEPTED);
-        } catch (Exception e){
+        } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Internal server error.");
         }
