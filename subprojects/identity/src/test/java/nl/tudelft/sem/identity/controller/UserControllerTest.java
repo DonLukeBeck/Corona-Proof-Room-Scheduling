@@ -62,7 +62,9 @@ public class UserControllerTest {
     @BeforeEach
     public void setup() {
         this.mockMvc = webAppContextSetup(webApplicationContext).build();
-        this.correctUser = new User("CorrectNetid", encoder.encode("SecurePassword123"), "student", false);
+        this.correctUser = new User("CorrectNetid",
+                encoder.encode("SecurePassword123"),
+                "student", false);
         this.authenticationRequest = new AuthenticationRequest(correctUser.getNetid(),
             "SecurePassword123");
     }
@@ -73,16 +75,19 @@ public class UserControllerTest {
         when(userRepository.findByNetid(correctUser.getNetid())).thenReturn(correctUser);
 
         String uri = "/login";
-        String jwt = mockMvc.perform(post(uri).contentType(MediaType.APPLICATION_JSON_VALUE)
-            .content(objectMapper.writeValueAsString(authenticationRequest))).andExpect(status().isOk())
+        String jwt = mockMvc.perform(post(uri)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .content(objectMapper.writeValueAsString(authenticationRequest)))
+                .andExpect(status().isOk())
             .andReturn().getResponse().getContentAsString();
 
         Claims claims = Jwts.parser().setSigningKey(jwtUtil.getSecret()).parseClaimsJws(jwt)
-            .getBody();
+                .getBody();
         assertThat(claims.getSubject()).isEqualTo("CorrectNetid");
-        var scope = (ArrayList<LinkedHashMap>) claims.get("scope");
+        ArrayList<LinkedHashMap<String, Object>> scope =  claims.get("scope", ArrayList.class);
         assertTrue(scope.get(0).containsValue("ROLE_STUDENT"));
-        var cond = new Condition<LinkedHashMap>(m -> m.containsValue("ROLE_STUDENT"), "Contains student");
+        var cond = new Condition<LinkedHashMap>
+                (m -> m.containsValue("ROLE_STUDENT"), "Contains student");
         assertThat(scope).haveExactly(1, cond);
         assertThat(claims.getIssuedAt()).isBefore(claims.getExpiration());
     }

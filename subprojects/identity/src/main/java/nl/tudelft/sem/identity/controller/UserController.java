@@ -3,13 +3,13 @@ package nl.tudelft.sem.identity.controller;
 import lombok.extern.slf4j.Slf4j;
 import nl.tudelft.sem.identity.entity.AuthenticationRequest;
 import nl.tudelft.sem.identity.util.JwtUtil;
+import nl.tudelft.sem.identity.util.JwtValidate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -26,19 +26,22 @@ public class UserController {
     @Autowired
     private AuthenticationManager authenticationManager;
 
-    @GetMapping("/")
-    public String welcome() {
-        return "Welcome";
-    }
-
-    @GetMapping("/create-courses")
-    public String createCourses() {
-        return "Create courses page";
-    }
-
-    @GetMapping("/see-schedule")
-    public String seeSchedule() {
-        return "See schedule page";
+    /**
+     * Validates jwt tokens from incoming authorization requests.
+     *
+     * @param token String containing jwt token
+     * @return Extracted role from token
+     */
+    @PostMapping(path = "/validate")
+    public String validate(@RequestBody String token) {
+        JwtValidate jwtValid = new JwtValidate();
+        if (jwtValid.isTeacher(token)) {
+            return "teacher";
+        } else if (jwtValid.isStudent(token)) {
+            return "student";
+        } else {
+            return null;
+        }
     }
 
     /**
