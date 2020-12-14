@@ -10,14 +10,13 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import nl.tudelft.sem.calendar.communication.CourseManagementCommunicator;
 import nl.tudelft.sem.calendar.communication.RestrictionManagementCommunicator;
-import nl.tudelft.sem.calendar.entities.Attendance;
-import nl.tudelft.sem.calendar.entities.Lecture;
-import nl.tudelft.sem.calendar.entities.Room;
+import nl.tudelft.sem.calendar.entities.*;
 import nl.tudelft.sem.calendar.exceptions.ServerErrorException;
 import nl.tudelft.sem.calendar.repositories.AttendanceRepository;
 import nl.tudelft.sem.calendar.repositories.LectureRepository;
 import nl.tudelft.sem.calendar.scheduling.LectureScheduler;
-import nl.tudelft.sem.calendar.util.RoleValidation;
+import nl.tudelft.sem.calendar.util.JwtValidate;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -95,7 +94,7 @@ public class CalendarController {
     // we need to add specific values to lectureIds
     // we need to suppress this warning for every method
     public Object getMyPersonalScheduleStudent(HttpServletRequest request, String studentId) throws IOException, InterruptedException {
-
+/*
         String role = RoleValidation.getRole(request);
         try {
             if (!role.equals("student")) {
@@ -104,7 +103,7 @@ public class CalendarController {
         } catch (Exception e) {
             return "You are not allowed to view this page. Please contact administrator.";
         }
-
+*/
         List<Lecture> lectures = new ArrayList<>();
         Map<Integer, Boolean> lectureIdPhysical = createLectureIdPhysicalMap(studentId);
 
@@ -119,8 +118,6 @@ public class CalendarController {
     /**
      * This method will return the personal schedule of a teacher.
      *
-     * @param teacherId the userId of the teacher.
-     *
      * @return returns a list with the lectures for a teacher
      */
     @GetMapping(path = "/getMyPersonalScheduleTeacher") // Map ONLY GET Requests
@@ -128,30 +125,24 @@ public class CalendarController {
     @SuppressWarnings({"PMD.DataflowAnomalyAnalysis", "PMD.AvoidDuplicateLiterals"})
     // we need to add specific values to lectureIds
     // we need to suppress this warning for every method
-    public Object getMyPersonalScheduleTeacher(HttpServletRequest request, String teacherId) throws IOException, InterruptedException, ServerErrorException {
+    public ResponseEntity<?> getMyPersonalScheduleTeacher(HttpServletRequest request) throws IOException, InterruptedException, ServerErrorException {
 
-        String role = RoleValidation.getRole(request);
-
+        JSONObject jwtInfo = JwtValidate.jwtValidate(request);
         try {
-            if (!role.equals("teacher")) {
-                return "You are not allowed to view this page. Please contact administrator.";
+            if (!jwtInfo.getString("role").equals("teacher")) {
+                ResponseEntity.ok("You are not allowed to view this page. Please contact administrator.");
             }
         } catch (Exception e) {
-            return "You are not allowed to view this page. Please contact administrator.";
+            ResponseEntity.ok("You are not allowed to view this page. Please contact administrator.");
         }
 
-        //List<Lecture> lectures = lectureRepository.findAll();
-        //List<Lecture> result = new ArrayList<Lecture>();
-
-        String courseId = CourseManagementCommunicator.courseFromTeacher(teacherId);
-        List<Lecture> result = lectureRepository.findByCourseId(courseId);
-
-        //for (Lecture l : lectures) {
-        //    if(CourseManagementCommunicator.courseFromId(l.getCourseId()).getTeacherId().equals(teacherId)) {
-        //        result.add(l);
-        //    }
-        // }
-        return ResponseEntity.ok(result);
+        List<BareCourse> courseList = CourseManagementCommunicator.coursesFromTeacher(jwtInfo.getString("netid"));
+        List<Lecture> lectureList = new ArrayList<Lecture>();
+        for(BareCourse bareCourse : courseList) {
+            List<Lecture> lectures = lectureRepository.findByCourseId(bareCourse.getCourseId());
+            lectureList.addAll(lectures);
+        }
+        return ResponseEntity.ok(lectureList);
     }
 
     /**
@@ -168,6 +159,7 @@ public class CalendarController {
     // we need to add specific values to lectureIds
     // we need to suppress this warning for every method
     public Object getMyPersonalScheduleForDayStudent(HttpServletRequest request, String studentId, LocalDate date) throws IOException, InterruptedException {
+        /*
         String role = RoleValidation.getRole(request);
         try {
             if (!role.equals("student")) {
@@ -176,7 +168,7 @@ public class CalendarController {
         } catch (Exception e) {
             return "You are not allowed to view this page. Please contact administrator.";
         }
-
+*/
         ArrayList<Lecture> lectures = new ArrayList<>();
         Map<Integer, Boolean> lectureIdPhysical = createLectureIdPhysicalMap(studentId);
 
@@ -203,7 +195,7 @@ public class CalendarController {
     // we need to add specific values to lectureIds
     // we need to suppress this warning for every method
     public Object getMyPersonalScheduleForDayTeacher(HttpServletRequest request, String teacherId, LocalDate date) throws IOException, InterruptedException, ServerErrorException {
-        String role = RoleValidation.getRole(request);
+      /*  String role = RoleValidation.getRole(request);
         try {
             if (!role.equals("teacher")) {
                 return "You are not allowed to view this page. Please contact administrator.";
@@ -211,15 +203,15 @@ public class CalendarController {
         } catch (Exception e) {
             return "You are not allowed to view this page. Please contact administrator.";
         }
-
-        String courseId = CourseManagementCommunicator.courseFromTeacher(teacherId);
-        List<Lecture> result = lectureRepository.findByCourseId(courseId);
-        for (Lecture i : result) {
-            if (i.getDate() != date) {
-                result.remove(i);
-            }
-        }
-        return ResponseEntity.ok(result);
+*/
+       // String courseId = CourseManagementCommunicator.coursesFromTeacher(teacherId);
+        //List<Lecture> result = lectureRepository.findByCourseId(courseId);
+      //  for (Lecture i : result) {
+      //      if (i.getDate() != date) {
+     //           result.remove(i);
+     //       }
+     //   }
+        return ResponseEntity.ok(request);
     }
 
     /**
@@ -236,7 +228,7 @@ public class CalendarController {
     // we need to add specific values to lectureIds
     // we need to suppress this warning for every method
     public Object getMyPersonalScheduleForCourseStudent(HttpServletRequest request,String userId, String courseId) throws IOException, InterruptedException {
-        String role = RoleValidation.getRole(request);
+       /* String role = RoleValidation.getRole(request);
         try {
             if (!role.equals("student")) {
                 return "You are not allowed to view this page. Please contact administrator.";
@@ -244,7 +236,7 @@ public class CalendarController {
         } catch (Exception e) {
             return "You are not allowed to view this page. Please contact administrator.";
         }
-
+*/
         ArrayList<Lecture> lectures = new ArrayList<>();
         Map<Integer, Boolean> lectureIdPhysical = createLectureIdPhysicalMap(userId);
 
@@ -271,14 +263,14 @@ public class CalendarController {
     // we need to add specific values to lectureIds
     // we need to suppress this warning for every method
     public Object getMyPersonalScheduleForCourseTeacher(HttpServletRequest request, String teacherId, String courseId) throws IOException, InterruptedException, ServerErrorException {
-        String role = RoleValidation.getRole(request);
+       /* String role = RoleValidation.getRole(request);
         try {
             if (!role.equals("teacher")) {
                 return "You are not allowed to view this page. Please contact administrator.";
             }
         } catch (Exception e) {
             return "You are not allowed to view this page. Please contact administrator.";
-        }
+        }*/
         List<Lecture> result = lectureRepository.findByCourseId(courseId);
         for (Lecture i : result) {
             if (i.getCourseId() != courseId) {

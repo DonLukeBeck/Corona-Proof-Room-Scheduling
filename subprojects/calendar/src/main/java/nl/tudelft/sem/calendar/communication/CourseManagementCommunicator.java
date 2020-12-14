@@ -108,15 +108,12 @@ public class CourseManagementCommunicator extends  Communicator {
                 .collect(Collectors.toList()));
     }
 
-    public static String courseFromTeacher(String teacherId)
+    public static List<BareCourse> coursesFromTeacher(String teacherId)
             throws IOException, InterruptedException, ServerErrorException {
         var resp = objectMapper.readValue(getResponse(
-
                 "/course/teacher/" + teacherId, Constants.COURSE_SERVER_URL).body(),
-                new TypeReference<BareCourse>(){});
-
-
-        return resp.getCourseId();
+                new TypeReference<List<BareCourse>>(){});
+        return resp;
     }
 }
 

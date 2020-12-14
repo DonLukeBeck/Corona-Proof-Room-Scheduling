@@ -1,5 +1,7 @@
 package nl.tudelft.sem.courses.controller;
 
+import java.util.List;
+import javax.servlet.http.HttpServletRequest;
 import nl.tudelft.sem.courses.entity.BareCourse;
 import nl.tudelft.sem.courses.entity.Course;
 import nl.tudelft.sem.courses.repository.CourseRepository;
@@ -48,17 +50,19 @@ public class CourseController {
     }
 
     /**
-     * Get endpoint to a course using an id.
+     * Retrieves a course list based on teacher id
      *
-     * @return the {@link BareCourse} with courseId as id
+     * @param request
+     * @param id
+     * @return
      */
     @GetMapping("/teacher/{id}")
     @ResponseBody
-    public ResponseEntity<?> getCourseTeacher(@PathVariable("id") String id) {
-        Course res = courseRepository.findByTeacherId(id);
-        if (res == null) {
+    public ResponseEntity<?> getCoursesTeacher(HttpServletRequest request, @PathVariable("id") String id) {
+        List<Course> courseList = courseRepository.findAllByTeacherId(id);
+        if (courseList == null) {
             return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok(res);
+        return ResponseEntity.ok(courseList);
     }
 }
