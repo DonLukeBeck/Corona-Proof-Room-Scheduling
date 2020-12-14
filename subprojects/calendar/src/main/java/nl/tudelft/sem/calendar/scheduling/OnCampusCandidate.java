@@ -41,7 +41,8 @@ public class OnCampusCandidate {
     }
 
     /**
-     * hash function for the onCampusCandidate
+     * Hash function for the onCampusCandidate, used in the equals method.
+     *
      * @return the hash code
      */
     @Override

@@ -2,7 +2,6 @@ package nl.tudelft.sem.calendar.scheduling;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -228,17 +227,17 @@ class LectureSchedulerTest {
         scheduler.assignStudents(testRooms[1].getCapacity(), lectures[1], allParticipants);
 
         Attendance attendance1 = Attendance.builder().lectureId(lectures[1].getLectureId())
-            .physical(true).studentId(netIds[1]).build();
+                .physical(true).studentId(netIds[1]).build();
 
         verify(attendanceRepository, times(1)).saveAndFlush(attendance1);
 
         Attendance attendance2 = Attendance.builder().lectureId(lectures[1]
-            .getLectureId()).physical(true).studentId(netIds[0]).build();
+                .getLectureId()).physical(true).studentId(netIds[0]).build();
 
         verify(attendanceRepository, times(1)).saveAndFlush(attendance2);
 
         Attendance attendance3 = Attendance.builder().lectureId(lectures[1].getLectureId())
-            .physical(true).studentId(netIds[2]).build();
+                .physical(true).studentId(netIds[2]).build();
 
         verify(attendanceRepository, times(1)).saveAndFlush(attendance3);
         verifyNoMoreInteractions(attendanceRepository);
@@ -328,7 +327,7 @@ class LectureSchedulerTest {
         @SuppressWarnings("PMD.DataflowAnomalyAnalysis")
         // this is just the priority queue being created and checked afterwards.
         PriorityQueue<OnCampusCandidate> result =
-                scheduler.createCandidateSelector(lectureDate, courseParticipants, allParticipants);
+            scheduler.createCandidateSelector(lectureDate, courseParticipants, allParticipants);
 
         for (OnCampusCandidate onCampusCandidate : verification) {
             OnCampusCandidate candidate = result.remove();
@@ -338,7 +337,7 @@ class LectureSchedulerTest {
         assertThat(allParticipants.get(netIds[1])).isEqualTo(LocalDate.of(2020, 12, 26));
         assertThat(allParticipants.get(netIds[0])).isEqualTo(LocalDate.of(2020, 12, 18));
     }
-    
+
 
     /**
      * Tests whether the first lecture to be scheduled is scheduled in the biggest lecture room.
