@@ -92,7 +92,7 @@ public class CourseManagementCommunicator extends  Communicator {
      * @throws InterruptedException an interrupted exception
      * @throws ServerErrorException a server error exception
      */
-    private static Course courseFromId(String courseId)
+    public static Course courseFromId(String courseId)
         throws IOException, InterruptedException, ServerErrorException {
         var resp = objectMapper.readValue(getResponse(
 
