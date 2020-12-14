@@ -22,7 +22,7 @@ public class RoleValidation {
 
     @SuppressWarnings("PMD.DataflowAnomalyAnalysis")
     // Found 'DD'-anomaly for variable 'token'
-    // This is not a redefinition of the same variable since we cannot initialise the token in an if statement
+    // This isn't a redefinition since we cannot initialise the token in an if statement
     public static String getRole(HttpServletRequest request)
             throws IOException, InterruptedException {
 

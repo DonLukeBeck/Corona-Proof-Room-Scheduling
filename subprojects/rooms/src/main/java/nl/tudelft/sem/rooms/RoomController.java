@@ -1,5 +1,6 @@
 package nl.tudelft.sem.rooms;
 
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,10 +31,9 @@ public class RoomController {
      * @return success or error message
      */
     public String addNewRoom(String name, int capacity) {
-        for (Room ro : roomRepository.findAll()) {
-            if (ro.getName().equals(name)) {
-                return "Already Exists";
-            }
+        Optional<Room> r1 = roomRepository.findByName(name);
+        if (r1.isPresent()) {
+            return "Already Exists";
         }
         final int invCap = 1;
         if (capacity < invCap) {
@@ -53,13 +53,12 @@ public class RoomController {
      * @return success or error message
      */
     public String deleteRoom(String name) {
-        for (Room ro : roomRepository.findAll()) {
-            if (ro.getName().equals(name)) {
-                roomRepository.deleteById(ro.getRoomId());
-                return "Deleted";
-            }
+        Optional<Room> ro = roomRepository.findByName(name);
+        if (ro.isPresent()) {
+            roomRepository.deleteById(ro.get().getRoomId());
+            return "Deleted";
         }
-        return "DNE";
+        return null;
     }
 
     /**
@@ -73,14 +72,18 @@ public class RoomController {
     }
 
     /**
-     * Returns the room by its id.
+     * Returns the room name by its id.
      *
      * @param roomId of the room
-     * @return room entity
+     * @return room name
      */
-    @PostMapping(path = "/getRoom") // Map ONLY POST Requests
-    public Room getRoom(@RequestParam int roomId) {
-        return roomRepository.findById(roomId).orElse(null);
+    @PostMapping(path = "/getRoomName") // Map ONLY POST Requests
+    public String getRoomName(@RequestParam int roomId) {
+        Room r = roomRepository.findById(roomId).orElse(null);
+        if (r != null) {
+            return r.getName();
+        }
+        return null;
     }
 
 }
