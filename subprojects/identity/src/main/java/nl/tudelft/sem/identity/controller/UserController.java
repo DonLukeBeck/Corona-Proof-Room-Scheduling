@@ -2,6 +2,7 @@ package nl.tudelft.sem.identity.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import nl.tudelft.sem.identity.entity.AuthenticationRequest;
+import nl.tudelft.sem.identity.entity.TokenInfo;
 import nl.tudelft.sem.identity.util.JwtUtil;
 import nl.tudelft.sem.identity.util.JwtValidate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,15 +34,16 @@ public class UserController {
      * @return Extracted role from token
      */
     @PostMapping(path = "/validate")
-    public String validate(@RequestBody String token) {
+    public TokenInfo validate(@RequestBody String token) {
         JwtValidate jwtValid = new JwtValidate();
+        JwtUtil jwtUtil = new JwtUtil();
+        String role = null;
         if (jwtValid.isTeacher(token)) {
-            return "teacher";
+            role = "teacher";
         } else if (jwtValid.isStudent(token)) {
-            return "student";
-        } else {
-            return null;
+            role = "student";
         }
+        return new TokenInfo(role ,jwtUtil.extractNetid(token));
     }
 
     /**
