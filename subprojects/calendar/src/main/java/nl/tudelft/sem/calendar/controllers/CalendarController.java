@@ -140,7 +140,10 @@ public class CalendarController {
         List<Lecture> lectureList = new ArrayList<Lecture>();
         for(BareCourse bareCourse : courseList) {
             List<Lecture> lectures = lectureRepository.findByCourseId(bareCourse.getCourseId());
-            lectureList.addAll(lectures);
+            for(Lecture l : lectures){
+                l.setSelectedForOnCampus(true);
+                lectureList.add(l);
+            }
         }
         return ResponseEntity.ok(lectureList);
     }
