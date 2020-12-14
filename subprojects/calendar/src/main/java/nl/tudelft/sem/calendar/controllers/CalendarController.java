@@ -157,19 +157,28 @@ public class CalendarController {
     /**
      * This method will return the personal schedule of a user for a given day.
      *
-     * @param userId the userId of the user.
+     * @param studentId the userId of the user.
      * @param date the date for which the schedule must be given.
      *
      * @return returns a list with the lectures for a the user for a given day
      */
-    @GetMapping(path = "/getMyPersonalScheduleForDay") // Map ONLY GET Requests
+    @GetMapping(path = "/getMyPersonalScheduleForDayStudent") // Map ONLY GET Requests
     @ResponseBody
     @SuppressWarnings({"PMD.DataflowAnomalyAnalysis", "PMD.AvoidDuplicateLiterals"})
     // we need to add specific values to lectureIds
     // we need to suppress this warning for every method
-    public ResponseEntity<?> getMyPersonalScheduleForDay(String userId, LocalDate date) {
+    public Object getMyPersonalScheduleForDayStudent(HttpServletRequest request, String studentId, LocalDate date) throws IOException, InterruptedException {
+        String role = RoleValidation.getRole(request);
+        try {
+            if (!role.equals("student")) {
+                return "You are not allowed to view this page. Please contact administrator.";
+            }
+        } catch (Exception e) {
+            return "You are not allowed to view this page. Please contact administrator.";
+        }
+
         ArrayList<Lecture> lectures = new ArrayList<>();
-        Map<Integer, Boolean> lectureIdPhysical = createLectureIdPhysicalMap(userId);
+        Map<Integer, Boolean> lectureIdPhysical = createLectureIdPhysicalMap(studentId);
 
         for (Lecture l : lectureRepository.findByDate(date)) {
             if (lectureIdPhysical.containsKey(l.getLectureId())) {
@@ -181,6 +190,39 @@ public class CalendarController {
     }
 
     /**
+     * This method will return the personal schedule of a user for a given day.
+     *
+     * @param teacherId the userId of the user.
+     * @param date the date for which the schedule must be given.
+     *
+     * @return returns a list with the lectures for a the user for a given day
+     */
+    @GetMapping(path = "/getMyPersonalScheduleForDayTeacher") // Map ONLY GET Requests
+    @ResponseBody
+    @SuppressWarnings({"PMD.DataflowAnomalyAnalysis", "PMD.AvoidDuplicateLiterals"})
+    // we need to add specific values to lectureIds
+    // we need to suppress this warning for every method
+    public Object getMyPersonalScheduleForDayTeacher(HttpServletRequest request, String teacherId, LocalDate date) throws IOException, InterruptedException, ServerErrorException {
+        String role = RoleValidation.getRole(request);
+        try {
+            if (!role.equals("teacher")) {
+                return "You are not allowed to view this page. Please contact administrator.";
+            }
+        } catch (Exception e) {
+            return "You are not allowed to view this page. Please contact administrator.";
+        }
+
+        String courseId = CourseManagementCommunicator.courseFromTeacher(teacherId);
+        List<Lecture> result = lectureRepository.findByCourseId(courseId);
+        for (Lecture i : result) {
+            if (i.getDate() != date) {
+                result.remove(i);
+            }
+        }
+        return ResponseEntity.ok(result);
+    }
+
+    /**
      * This method will return the personal schedule of a user for a given course.
      *
      * @param userId the userId of the user.
@@ -188,12 +230,21 @@ public class CalendarController {
      *
      * @return returns a list with the lectures for a the user for a given course
      */
-    @GetMapping(path = "/getMyPersonalScheduleForCourse") // Map ONLY GET Requests
+    @GetMapping(path = "/getMyPersonalScheduleForCourseStudent") // Map ONLY GET Requests
     @ResponseBody
     @SuppressWarnings({"PMD.DataflowAnomalyAnalysis", "PMD.AvoidDuplicateLiterals"})
     // we need to add specific values to lectureIds
     // we need to suppress this warning for every method
-    public ResponseEntity<?> getMyPersonalScheduleForCourse(String userId, String courseId) {
+    public Object getMyPersonalScheduleForCourseStudent(HttpServletRequest request,String userId, String courseId) throws IOException, InterruptedException {
+        String role = RoleValidation.getRole(request);
+        try {
+            if (!role.equals("student")) {
+                return "You are not allowed to view this page. Please contact administrator.";
+            }
+        } catch (Exception e) {
+            return "You are not allowed to view this page. Please contact administrator.";
+        }
+
         ArrayList<Lecture> lectures = new ArrayList<>();
         Map<Integer, Boolean> lectureIdPhysical = createLectureIdPhysicalMap(userId);
 
@@ -204,6 +255,37 @@ public class CalendarController {
             }
         }
         return ResponseEntity.ok(lectures);
+    }
+
+    /**
+     * This method will return the personal schedule of a user for a given course.
+     *
+     * @param teacherId the userId of the user.
+     * @param courseId the course for which the schedule must be given.
+     *
+     * @return returns a list with the lectures for a the user for a given course
+     */
+    @GetMapping(path = "/getMyPersonalScheduleForCourseTeacher") // Map ONLY GET Requests
+    @ResponseBody
+    @SuppressWarnings({"PMD.DataflowAnomalyAnalysis", "PMD.AvoidDuplicateLiterals"})
+    // we need to add specific values to lectureIds
+    // we need to suppress this warning for every method
+    public Object getMyPersonalScheduleForCourseTeacher(HttpServletRequest request, String teacherId, String courseId) throws IOException, InterruptedException, ServerErrorException {
+        String role = RoleValidation.getRole(request);
+        try {
+            if (!role.equals("teacher")) {
+                return "You are not allowed to view this page. Please contact administrator.";
+            }
+        } catch (Exception e) {
+            return "You are not allowed to view this page. Please contact administrator.";
+        }
+        List<Lecture> result = lectureRepository.findByCourseId(courseId);
+        for (Lecture i : result) {
+            if (i.getCourseId() != courseId) {
+                result.remove(i);
+            }
+        }
+        return ResponseEntity.ok(result);
     }
 
     /**
