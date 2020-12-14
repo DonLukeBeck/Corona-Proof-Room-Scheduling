@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
-import nl.tudelft.sem.calendar.Constants;
+import nl.tudelft.sem.calendar.util.Constants;
 import nl.tudelft.sem.calendar.entities.BareCourse;
 import nl.tudelft.sem.calendar.entities.BareEnrollment;
 import nl.tudelft.sem.calendar.entities.BareLecture;
