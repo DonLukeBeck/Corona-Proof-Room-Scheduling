@@ -107,5 +107,16 @@ public class CourseManagementCommunicator extends  Communicator {
             enrollments.stream().map(e -> new Enrollment(e.getStudentId(), e.getCourseId()))
                 .collect(Collectors.toList()));
     }
+
+    public static String courseFromTeacher(String teacherId)
+            throws IOException, InterruptedException, ServerErrorException {
+        var resp = objectMapper.readValue(getResponse(
+
+                "/course/teacher/" + teacherId, Constants.COURSE_SERVER_URL).body(),
+                new TypeReference<BareCourse>(){});
+
+
+        return resp.getCourseId();
+    }
 }
 

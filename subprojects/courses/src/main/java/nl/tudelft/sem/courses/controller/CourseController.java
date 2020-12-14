@@ -1,6 +1,7 @@
 package nl.tudelft.sem.courses.controller;
 
 import nl.tudelft.sem.courses.entity.BareCourse;
+import nl.tudelft.sem.courses.entity.Course;
 import nl.tudelft.sem.courses.repository.CourseRepository;
 import nl.tudelft.sem.courses.repository.LectureRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,5 +45,20 @@ public class CourseController {
             return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok(res.get());
+    }
+
+    /**
+     * Get endpoint to a course using an id.
+     *
+     * @return the {@link BareCourse} with courseId as id
+     */
+    @GetMapping("/teacher/{id}")
+    @ResponseBody
+    public ResponseEntity<?> getCourseTeacher(@PathVariable("id") String id) {
+        Course res = courseRepository.findByTeacherId(id);
+        if (res == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(res);
     }
 }

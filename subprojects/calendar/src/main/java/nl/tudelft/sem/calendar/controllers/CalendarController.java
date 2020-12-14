@@ -140,14 +140,17 @@ public class CalendarController {
             return "You are not allowed to view this page. Please contact administrator.";
         }
 
-        List<Lecture> lectures = lectureRepository.findAll();
-        List<Lecture> result = new ArrayList<Lecture>();
+        //List<Lecture> lectures = lectureRepository.findAll();
+        //List<Lecture> result = new ArrayList<Lecture>();
 
-        for (Lecture l : lectures) {
-            if(CourseManagementCommunicator.courseFromId(l.getCourseId()).getTeacherId().equals(teacherId)) {
-                result.add(l);
-            }
-        }
+        String courseId = CourseManagementCommunicator.courseFromTeacher(teacherId);
+        List<Lecture> result = lectureRepository.findByCourseId(courseId);
+
+        //for (Lecture l : lectures) {
+        //    if(CourseManagementCommunicator.courseFromId(l.getCourseId()).getTeacherId().equals(teacherId)) {
+        //        result.add(l);
+        //    }
+        // }
         return ResponseEntity.ok(result);
     }
 
