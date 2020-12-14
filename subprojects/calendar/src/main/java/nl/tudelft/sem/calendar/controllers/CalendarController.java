@@ -3,9 +3,11 @@ package nl.tudelft.sem.calendar.controllers;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import nl.tudelft.sem.calendar.communication.RestrictionManagementCommunicator;
+import java.util.Map;
 import nl.tudelft.sem.calendar.communication.CourseManagementCommunicator;
+import nl.tudelft.sem.calendar.communication.RestrictionManagementCommunicator;
 import nl.tudelft.sem.calendar.entities.Attendance;
 import nl.tudelft.sem.calendar.entities.Lecture;
 import nl.tudelft.sem.calendar.entities.Room;
@@ -13,12 +15,18 @@ import nl.tudelft.sem.calendar.repositories.AttendanceRepository;
 import nl.tudelft.sem.calendar.repositories.LectureRepository;
 import nl.tudelft.sem.calendar.scheduling.LectureScheduler;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-public class SchedulingController {
+@RequestMapping(path = "/calendar")
+
+public class CalendarController {
 
     @Autowired
     transient LectureScheduler lectureScheduler;
@@ -29,8 +37,8 @@ public class SchedulingController {
     @Autowired
     private transient LectureRepository lectureRepository;
 
-    public SchedulingController(AttendanceRepository attendanceRepository,
-                                LectureRepository lectureRepository) {
+    public CalendarController(AttendanceRepository attendanceRepository,
+                              LectureRepository lectureRepository) {
         this.attendanceRepository = attendanceRepository;
         this.lectureRepository = lectureRepository;
     }
@@ -42,7 +50,8 @@ public class SchedulingController {
      * @return a string indicating success or failure
      */
     @PostMapping(path = "/scheduleLectures")
-    public String schedulePlannedLectures() {
+    @ResponseBody
+    public ResponseEntity<?> schedulePlannedLectures() {
 
         try {
             // Make API call to retrieve the start time
@@ -55,16 +64,17 @@ public class SchedulingController {
             List<Room> rooms = RestrictionManagementCommunicator.getAllRoomsWithAdjustedCapacity();
             // Get all the lectures to be scheduled
             List<Lecture> lecturesToSchedule = CourseManagementCommunicator
-                    .getToBeScheduledLectures(LocalDate.now());
+                    .getToBeScheduledLecturesTest();
             // Create the scheduler that does the scheduling
             lectureScheduler.setFields(rooms, lecturesToSchedule, startTime,
                     endTime, timeGapLength);
             // Schedule the lecture
             lectureScheduler.scheduleAllLectures();
 
-            return "Success!";
+            return ResponseEntity.ok(HttpStatus.CREATED);
         } catch (Exception e) {
-            return "Failure!";
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Internal server error.");
         }
     }
 
@@ -76,19 +86,20 @@ public class SchedulingController {
      * @return returns a list with the lectures for a the user
      */
     @GetMapping(path = "/getMyPersonalSchedule") // Map ONLY GET Requests
+    @ResponseBody
     @SuppressWarnings({"PMD.DataflowAnomalyAnalysis", "PMD.AvoidDuplicateLiterals"})
     // we need to add specific values to lectureIds
     // we need to suppress this warning for every method
-    public List getMyPersonalSchedule(String userId) {
+    public ResponseEntity<?> getMyPersonalSchedule(String userId) {
         List<Lecture> lectures = new ArrayList<>();
-        ArrayList<Integer> lectureIds = new ArrayList<>();
-        for (Attendance a : attendanceRepository.findByStudentId(userId)) {
-            lectureIds.add(a.getLectureId());
+        Map<Integer, Boolean> lectureIdPhysical = createLectureIdPhysicalMap(userId);
+
+        for (Map.Entry<Integer, Boolean> idPhysical : lectureIdPhysical.entrySet()) {
+            Lecture l = lectureRepository.findByLectureId(idPhysical.getKey());
+            l.setSelectedForOnCampus(idPhysical.getValue());
+            lectures.add(l);
         }
-        for (Integer i : lectureIds) {
-            lectures.addAll(lectureRepository.findByLectureId(i));
-        }
-        return lectures;
+        return ResponseEntity.ok(lectures);
     }
 
     /**
@@ -100,22 +111,21 @@ public class SchedulingController {
      * @return returns a list with the lectures for a the user for a given day
      */
     @GetMapping(path = "/getMyPersonalScheduleForDay") // Map ONLY GET Requests
+    @ResponseBody
     @SuppressWarnings({"PMD.DataflowAnomalyAnalysis", "PMD.AvoidDuplicateLiterals"})
     // we need to add specific values to lectureIds
     // we need to suppress this warning for every method
-    public List getMyPersonalScheduleForDay(String userId, LocalDate date) {
+    public ResponseEntity<?> getMyPersonalScheduleForDay(String userId, LocalDate date) {
         ArrayList<Lecture> lectures = new ArrayList<>();
-        ArrayList<Integer> lectureIds = new ArrayList<>();
-        for (Attendance a : attendanceRepository.findByStudentId(userId)) {
-            lectureIds.add(a.getLectureId());
-        }
+        Map<Integer, Boolean> lectureIdPhysical = createLectureIdPhysicalMap(userId);
 
         for (Lecture l : lectureRepository.findByDate(date)) {
-            if (lectureIds.contains(l.getLectureId())) {
+            if (lectureIdPhysical.containsKey(l.getLectureId())) {
+                l.setSelectedForOnCampus(lectureIdPhysical.get(l.getLectureId()));
                 lectures.add(l);
             }
         }
-        return lectures;
+        return ResponseEntity.ok(lectures);
     }
 
     /**
@@ -127,22 +137,37 @@ public class SchedulingController {
      * @return returns a list with the lectures for a the user for a given course
      */
     @GetMapping(path = "/getMyPersonalScheduleForCourse") // Map ONLY GET Requests
+    @ResponseBody
     @SuppressWarnings({"PMD.DataflowAnomalyAnalysis", "PMD.AvoidDuplicateLiterals"})
     // we need to add specific values to lectureIds
     // we need to suppress this warning for every method
-    public List getMyPersonalScheduleForCourse(String userId, String courseId) {
+    public ResponseEntity<?> getMyPersonalScheduleForCourse(String userId, String courseId) {
         ArrayList<Lecture> lectures = new ArrayList<>();
-        ArrayList<Integer> lectureIds = new ArrayList<>();
-        for (Attendance a : attendanceRepository.findByStudentId(userId)) {
-            lectureIds.add(a.getLectureId());
-        }
+        Map<Integer, Boolean> lectureIdPhysical = createLectureIdPhysicalMap(userId);
 
         for (Lecture l : lectureRepository.findByCourseId(courseId)) {
-            if (lectureIds.contains(l.getLectureId())) {
+            if (lectureIdPhysical.containsKey(l.getLectureId())) {
+                l.setSelectedForOnCampus(lectureIdPhysical.get(l.getLectureId()));
                 lectures.add(l);
             }
         }
-        return lectures;
+        return ResponseEntity.ok(lectures);
+    }
+
+    /**
+     * Helper method to create a map in which the lectureId and a boolean
+     * indicating physical presence are stored.
+     *
+     * @param userId - the userId of the user to look for
+     *
+     * @return a map containing a lectureId and a boolean indicating physical presence
+     */
+    public Map<Integer, Boolean> createLectureIdPhysicalMap(String userId) {
+        Map<Integer, Boolean> result = new HashMap<>();
+        for (Attendance a : attendanceRepository.findByStudentId(userId)) {
+            result.put(a.getLectureId(), a.getPhysical());
+        }
+        return result;
     }
 
     /**
@@ -156,24 +181,29 @@ public class SchedulingController {
      * @return a string with 'success' if done
      */
     @PostMapping(path = "/indicateAbsence")
+    @ResponseBody
     @SuppressWarnings({"PMD.DataflowAnomalyAnalysis", "PMD.AvoidDuplicateLiterals"})
     // we need to add specific values to lectureIds
     // we need to suppress this warning for every method
-    public String indicateAbsence(String userId, String courseId, LocalDate date) {
-        int lectureId = 0;
-        for (Lecture l : lectureRepository.findByDate(date)) {
-            if (l.getCourseId().equals(courseId)) {
-                lectureId = l.getLectureId();
+    public ResponseEntity<?> indicateAbsence(String userId, String courseId, LocalDate date) {
+        try {
+            int lectureId = 0;
+            for (Lecture l : lectureRepository.findByDate(date)) {
+                if (l.getCourseId().equals(courseId)) {
+                    lectureId = l.getLectureId();
+                }
             }
-        }
 
-        for (Attendance a : attendanceRepository.findByLectureIdAndStudentId(lectureId, userId)) {
-            attendanceRepository.delete(a);
-            a.setPhysical(false);
-            attendanceRepository.save(a);
+            for (Attendance a :
+                    attendanceRepository.findByLectureIdAndStudentId(lectureId, userId)) {
+                attendanceRepository.delete(a);
+                a.setPhysical(false);
+                attendanceRepository.save(a);
+            }
+            return ResponseEntity.ok(HttpStatus.ACCEPTED);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Internal server error.");
         }
-
-        return "Succes";
     }
-
 }

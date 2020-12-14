@@ -5,7 +5,40 @@ import java.util.Arrays;
 import java.util.List;
 import nl.tudelft.sem.calendar.entities.Room;
 
-public class RestrictionManagementCommunicator {
+public class RestrictionManagementCommunicator extends Communicator {
+
+    //    public static List<Room> getAllRoomsWithAdjustedCapacity() throws
+    //            InterruptedException, ServerErrorException, IOException {
+    //
+    //            var response = getResponse("/getAllRoomsWithAdjustedCapacity",
+    //                    Constants.RESTRICTION_SERVER_URL);
+    //            return objectMapper.readValue(response.body(), new TypeReference<>() {});
+    //    }
+    //
+    //    // int, long or float??
+    //    public static int getTimeGapLength() throws
+    //            InterruptedException, ServerErrorException, IOException {
+    //
+    //        var response = getResponse("/getTimeGapLength",
+    //                Constants.RESTRICTION_SERVER_URL);
+    //        return objectMapper.readValue(response.body(), new TypeReference<>() {});
+    //    }
+    //
+    //    public static LocalTime getStartTime() throws
+    //            InterruptedException, ServerErrorException, IOException {
+    //
+    //        var response = getResponse("/getStartTime",
+    //                Constants.RESTRICTION_SERVER_URL);
+    //        return objectMapper.readValue(response.body(), new TypeReference<>() {});
+    //    }
+    //
+    //    public static LocalTime getEndTime() throws
+    //            InterruptedException, ServerErrorException, IOException {
+    //
+    //        var response = getResponse("/getEndTime",
+    //                Constants.RESTRICTION_SERVER_URL);
+    //        return objectMapper.readValue(response.body(), new TypeReference<>() {});
+    //    }
 
     /**
      * This method mocks the getAllRoomsWithAdjustedCapacity endpoint from the restriction

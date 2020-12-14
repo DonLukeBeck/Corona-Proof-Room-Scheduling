@@ -11,7 +11,7 @@ public interface LectureRepository extends JpaRepository<Lecture, Integer> {
 
     List<Lecture> findAll();
 
-    List<Lecture> findByLectureId(int lectureId);
+    Lecture findByLectureId(int lectureId);
 
     List<Lecture> findByCourseId(String courseId);
 

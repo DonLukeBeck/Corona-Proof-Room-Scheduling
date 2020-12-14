@@ -1,6 +1,8 @@
 package nl.tudelft.sem.calendar.entities;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -63,7 +65,7 @@ class LectureTest {
                 .courseName(courseName)
                 .teacherId(teacherId).build();
         lecture = new Lecture(lectureId, courseId, roomId, startTime, 
-                endTime, date, attendances, durationInMinutes, course);
+                endTime, date, durationInMinutes, course, false);
 
     }
 
@@ -113,14 +115,6 @@ class LectureTest {
     @Test
     void testGetDate() {
         assertEquals(LocalDate.now(), lecture.getDate());
-    }
-
-    /**
-     * Tests the getter of the associated list of attendances.
-     */
-    @Test
-    void testGetAttendances() {
-        assertEquals(attendances, lecture.getAttendances());
     }
 
     /**
@@ -194,21 +188,6 @@ class LectureTest {
     }
 
     /**
-     * Tests the setter of the associated list of student attendances.
-     */
-    @Test
-    void testSetAttendances() {
-        Attendance attendance1 = Attendance.builder()
-                .lectureId(15)
-                .physical(true)
-                .studentId("abobe").build();
-        List<Attendance> att = new ArrayList<Attendance>();
-        att.add(attendance1);
-        lecture.setAttendances(att);
-        assertEquals(att, lecture.getAttendances());
-    }
-
-    /**
      * Tests the setter of the declared duration in minutes of the requested lecture.
      */
     @Test
@@ -229,5 +208,17 @@ class LectureTest {
                 .teacherId(teacherId).build();
         lecture.setCourse(course1);
         assertEquals(course1, lecture.getCourse());
+    }
+
+    /**
+     * Tests the getter and setter of the attribute indicating whether a student
+     *      is selected to attend the lecture on-campus or not,
+     *      used when retrieving the lecture for the schedule.
+     */
+    @Test
+    void testGetSetSelectedForOnCampus() {
+        assertFalse(lecture.isSelectedForOnCampus());
+        lecture.setSelectedForOnCampus(true);
+        assertTrue(lecture.isSelectedForOnCampus());
     }
 }
