@@ -2,6 +2,8 @@ package nl.tudelft.sem.courses.controller;
 
 import java.io.IOException;
 import java.sql.Date;
+import java.time.LocalDate;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
@@ -17,6 +19,7 @@ import nl.tudelft.sem.courses.util.JwtValidate;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -163,8 +166,9 @@ public class CourseManagementController {
      * Cancels a lecture with provided arguments.
      */
     @DeleteMapping(path = "/cancelLecture") // Map ONLY POST Requests
-    public String cancelLecture(@RequestParam String courseId, @RequestParam Date date) {
-        Lecture lecture = lectureRepository.findByCourseIdAndDate(courseId, date);
+    public String cancelLecture(@RequestParam String courseId, @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+        Date sqlDate = Date.valueOf(date);
+        Lecture lecture = lectureRepository.findByCourseIdAndDate(courseId, sqlDate);
         if (lecture == null) {
             return "ERROR";
         }
