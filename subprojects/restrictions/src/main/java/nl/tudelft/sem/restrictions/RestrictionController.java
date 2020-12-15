@@ -2,6 +2,7 @@ package nl.tudelft.sem.restrictions;
 
 import java.io.IOException;
 import java.time.LocalTime;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import nl.tudelft.sem.restrictions.communication.RoomsCommunicator;
@@ -199,7 +200,7 @@ public class RestrictionController {
     @ResponseBody
     public ResponseEntity<?> getAllRoomsWithAdjustedCapacity()
             throws InterruptedException, ServerErrorException, IOException {
-        Iterable<Room> it = RoomsCommunicator.getAllRooms();
+        List<Room> it = RoomsCommunicator.getAllRooms();
         for (Room r : it) {
             int cap = r.getCapacity();
             if (cap >= getMinSeatsBig()) {

@@ -21,7 +21,7 @@ public class RoomManagementCommunicator extends Communicator {
     public String getRoomName(int roomId) throws
             InterruptedException, ServerErrorException, IOException {
 
-        var response = getResponse("/getRoomName" + roomId,
+        var response = getResponse("/rooms/getRoomName" + roomId,
                 Constants.ROOMS_SERVER_URL);
         return objectMapper.readValue(response.body(), new TypeReference<String>() {
         });

@@ -27,7 +27,7 @@ public class RestrictionManagementCommunicator extends Communicator {
 
             InterruptedException, ServerErrorException, IOException {
 
-        var response = getResponse("/getAllRoomsWithAdjustedCapacity",
+        var response = getResponse("/restrictions/getAllRoomsWithAdjustedCapacity",
                 Constants.RESTRICTION_SERVER_URL);
         Optional<Iterator<Room>> it = objectMapper.readValue(response.body(),
                 new TypeReference<>() {});
@@ -50,7 +50,7 @@ public class RestrictionManagementCommunicator extends Communicator {
     public int getTimeGapLength() throws
             InterruptedException, ServerErrorException, IOException {
 
-        var response = getResponse("/getTimeGapLength",
+        var response = getResponse("/restrictions/getTimeGapLength",
                 Constants.RESTRICTION_SERVER_URL);
         return objectMapper.readValue(response.body(), new TypeReference<>() {
         });
@@ -68,7 +68,7 @@ public class RestrictionManagementCommunicator extends Communicator {
 
             InterruptedException, ServerErrorException, IOException {
 
-        var response = getResponse("/getStartTime",
+        var response = getResponse("/restrictions/getStartTime",
                 Constants.RESTRICTION_SERVER_URL);
         return objectMapper.readValue(response.body(), new TypeReference<>() {
         });
@@ -87,29 +87,13 @@ public class RestrictionManagementCommunicator extends Communicator {
 
             InterruptedException, ServerErrorException, IOException {
 
-        var response = getResponse("/getEndTime",
+        var response = getResponse("/restrictions/getEndTime",
                 Constants.RESTRICTION_SERVER_URL);
         return objectMapper.readValue(response.body(), new TypeReference<>() {
         });
     }
     
-    /**
-     * Returns the name of the room with given id.
-     *
-     * @param roomId of the room
-     * @return name of the room
-     * @throws IOException an input/output exception
-     * @throws InterruptedException an interrupted exception
-     * @throws ServerErrorException a server error exception
-     */
-    public String getRoomName(int roomId) throws
-            InterruptedException, ServerErrorException, IOException {
 
-        var response = getResponse("/getRoomName" + roomId,
-                Constants.ROOMS_SERVER_URL);
-        return objectMapper.readValue(response.body(), new TypeReference<String>() {
-        });
-    }
 }//
 //    /**
 //     * This method mocks the getAllRoomsWithAdjustedCapacity endpoint from the restriction
