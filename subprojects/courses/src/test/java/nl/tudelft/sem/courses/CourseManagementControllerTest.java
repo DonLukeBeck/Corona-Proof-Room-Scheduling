@@ -22,6 +22,9 @@ import org.springframework.test.context.ContextConfiguration;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
@@ -51,7 +54,9 @@ public class CourseManagementControllerTest {
 
     private CourseManagementController courseManagementController;
 
+    private static HttpClient client;
     private HttpServletRequest request;
+    private HttpServletRequest response;
 
     @MockBean
     CourseRepository courseRepository;
@@ -67,6 +72,8 @@ public class CourseManagementControllerTest {
     void setUp() throws IOException, InterruptedException {
 
         this.request = Mockito.mock(HttpServletRequest.class);
+        this.response = Mockito.mock(HttpServletRequest.class);
+        this.client = Mockito.mock(HttpClient.class);
 
         this.enrollment = new Enrollment();
         enrollment.setCourseId("CSE1200");
@@ -104,9 +111,11 @@ public class CourseManagementControllerTest {
 
         when(request.getHeader("Authorization")).thenReturn("Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJsdWthIiwic2NvcGUiOlt7ImF1dGhvcml0eSI6IlJPTEVfVEVBQ0hFUiJ9XSwiZXhwIjoxNjA4MDQ2MTM2LCJpYXQiOjE2MDgwNDI1MzZ9.1Pn1WnHIsa6YHIGqmnCPogfmvPqwXIjpwuhotzk6SnU"); //????
 
-        final JSONObject obj = new JSONObject();
-        obj.append("role", "teacher");
+        JSONObject obj = new JSONObject();
+        obj.put("role", "teacher");
+        obj.put("netid", "luka");
         when(jwtValidate(request)).thenReturn(obj);
+
 
     }
 
