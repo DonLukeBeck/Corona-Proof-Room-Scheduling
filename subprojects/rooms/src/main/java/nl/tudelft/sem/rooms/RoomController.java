@@ -29,20 +29,22 @@ public class RoomController {
      * @param capacity of the new room
      * @return success or error message
      */
-    public ResponseEntity<?> addNewRoom(String name, int capacity) {
+    @PostMapping(path = "/addNewRoom") // Map ONLY POST Requests
+    @ResponseBody
+    public ResponseEntity<?> addNewRoom(@RequestParam String name, @RequestParam int capacity) {
         Optional<Room> r1 = roomRepository.findByName(name);
         if (r1.isPresent()) {
-            return "Already Exists";
+            return ResponseEntity.ok("Already Exists");
         }
         final int invCap = 1;
         if (capacity < invCap) {
-            return "Invalid Capacity";
+            return ResponseEntity.ok("Invalid capacity.");
         }
         Room r = new Room();
         r.setCapacity(capacity);
         r.setName(name);
         roomRepository.save(r);
-        return "Saved";
+        return ResponseEntity.ok("Room added.");
     }
 
     /**
@@ -51,15 +53,16 @@ public class RoomController {
      * @param name of the room
      * @return success or error message
      */
-     @DeleteMapping(path = "/getRoomName") // Map ONLY POST Requests
-     @ResponseBody
-    public ResponseEntity<?> deleteRoom(String name) {
+
+    @DeleteMapping(path = "/deleteRoom") // Map ONLY POST Requests
+    @ResponseBody
+    public ResponseEntity<?> deleteRoom(@RequestParam String name) {
         Optional<Room> ro = roomRepository.findByName(name);
         if (ro.isPresent()) {
             roomRepository.deleteById(ro.get().getRoomId());
-            return "Deleted";
+            return ResponseEntity.ok("Deleted");
         }
-        return null;
+        return ResponseEntity.ok("Room could not be found.");
     }
 
     /**
