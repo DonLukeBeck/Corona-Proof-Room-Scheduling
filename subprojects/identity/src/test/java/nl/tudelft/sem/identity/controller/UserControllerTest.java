@@ -1,6 +1,11 @@
 package nl.tudelft.sem.identity.controller;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -24,12 +29,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.context.WebApplicationContext;
-
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
 
 @ContextConfiguration(classes = UserController.class)
@@ -58,6 +57,9 @@ public class UserControllerTest {
     @MockBean
     UserRepository userRepository;
 
+    /**
+     * The initial setup before each test.
+     */
     @BeforeEach
     public void setup() {
         this.mockMvc = webAppContextSetup(webApplicationContext).build();
@@ -85,8 +87,8 @@ public class UserControllerTest {
         assertThat(claims.getSubject()).isEqualTo("CorrectNetid");
         ArrayList<LinkedHashMap<String, Object>> scope =  claims.get("scope", ArrayList.class);
         assertTrue(scope.get(0).containsValue("ROLE_STUDENT"));
-        var cond = new Condition<LinkedHashMap>
-                (m -> m.containsValue("ROLE_STUDENT"), "Contains student");
+        var cond = new Condition<LinkedHashMap>(
+                m -> m.containsValue("ROLE_STUDENT"), "Contains student");
         assertThat(scope).haveExactly(1, cond);
         assertThat(claims.getIssuedAt()).isBefore(claims.getExpiration());
     }

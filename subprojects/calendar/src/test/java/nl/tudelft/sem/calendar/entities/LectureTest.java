@@ -238,6 +238,6 @@ class LectureTest {
     void testGetSetRoomName() {
         assertEquals(roomName, lecture.getRoomName());
         lecture.setRoomName("DW-2");
-        assertEquals("DW-2",lecture.getRoomName());
+        assertEquals("DW-2", lecture.getRoomName());
     }
 }
