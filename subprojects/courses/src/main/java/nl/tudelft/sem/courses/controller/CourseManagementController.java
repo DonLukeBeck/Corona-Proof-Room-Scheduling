@@ -13,7 +13,9 @@ import nl.tudelft.sem.courses.entity.Lecture;
 import nl.tudelft.sem.courses.repository.CourseRepository;
 import nl.tudelft.sem.courses.repository.EnrollmentRepository;
 import nl.tudelft.sem.courses.repository.LectureRepository;
-import nl.tudelft.sem.courses.util.RoleValidation;
+import nl.tudelft.sem.courses.util.JwtValidate;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -53,11 +55,11 @@ public class CourseManagementController {
      */
     @PostMapping(path = "/createNewCourse") // Map ONLY POST Requests
     public String createNewCourse(HttpServletRequest request, @RequestBody AddCourse addCourse)
-            throws IOException, InterruptedException {
+            throws IOException, InterruptedException, JSONException {
 
-        String role = RoleValidation.getRole(request);
+        JSONObject jwtInfo = JwtValidate.jwtValidate(request);
         try {
-            if (!role.equals("teacher")) {
+            if (!jwtInfo.getString("role").equals("teacher")) {
                 return "You are not allowed to create a course. Please contact administrator.";
             }
         } catch (Exception e) {
