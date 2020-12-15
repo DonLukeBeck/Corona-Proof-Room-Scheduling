@@ -82,12 +82,12 @@ public class RestrictionController {
      * @return a string containing the success or error message
      */
     @PostMapping(path = "/setCapacityRestriction") // Map ONLY POST Requests
-    public String setCapacityRestriction(@RequestParam boolean bigOrSmallRoom,
+    public ResponseEntity<?> setCapacityRestriction(@RequestParam boolean bigOrSmallRoom,
                                          @RequestParam float maxPercentageAllowed) {
         if (bigOrSmallRoom) {
-            return addNewRestriction("bigRoomMaxPercentage", maxPercentageAllowed);
+            return ResponseEntity.ok(addNewRestriction("bigRoomMaxPercentage", maxPercentageAllowed));
         } else {
-            return addNewRestriction("smallRoomMaxPercentage", maxPercentageAllowed);
+            return ResponseEntity.ok(addNewRestriction("smallRoomMaxPercentage", maxPercentageAllowed));
         }
     }
 
@@ -98,8 +98,8 @@ public class RestrictionController {
      * @return a string containing the success or error message
      */
     @PostMapping(path = "/setMinSeatsBig") // Map ONLY POST Requests
-    public String setMinSeatsBig(@RequestParam float numberOfSeats) {
-        return addNewRestriction("minSeatsBig", numberOfSeats);
+    public ResponseEntity<?> setMinSeatsBig(@RequestParam float numberOfSeats) {
+        return ResponseEntity.ok(addNewRestriction("minSeatsBig", numberOfSeats));
     }
 
     /**
@@ -109,8 +109,8 @@ public class RestrictionController {
      * @return a string containing the success or error message
      */
     @PostMapping(path = "/setTimeGapLength") // Map ONLY POST Requests
-    public String setTimeGapLength(@RequestParam float gapTimeInMinutes) {
-        return addNewRestriction("gapTimeInMinutes", gapTimeInMinutes);
+    public ResponseEntity<?> setTimeGapLength(@RequestParam float gapTimeInMinutes) {
+        return ResponseEntity.ok(addNewRestriction("gapTimeInMinutes", gapTimeInMinutes));
     }
 
     /**
@@ -154,8 +154,8 @@ public class RestrictionController {
      * @return a string containing the success or error message
      */
     @PostMapping(path = "/setStartTime") // Map ONLY POST Requests
-    public String setStartTime(@RequestParam LocalTime startTime) {
-        return addNewRestriction("startTime", (float) startTime.toSecondOfDay());
+    public ResponseEntity<?> setStartTime(@RequestParam LocalTime startTime) {
+        return ResponseEntity.ok(addNewRestriction("startTime", (float) startTime.toSecondOfDay()));
     }
 
     /**
@@ -165,8 +165,8 @@ public class RestrictionController {
      * @return a string containing the success or error message
      */
     @PostMapping(path = "/setEndTime") // Map ONLY POST Requests
-    public String setEndTime(@RequestParam LocalTime endTime) {
-        return addNewRestriction("endTime", (float) endTime.toSecondOfDay());
+    public ResponseEntity<?> setEndTime(@RequestParam LocalTime endTime) {
+        return ResponseEntity.ok(addNewRestriction("endTime", (float) endTime.toSecondOfDay()));
     }
 
     /**
