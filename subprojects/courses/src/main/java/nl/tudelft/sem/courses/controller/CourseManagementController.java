@@ -53,7 +53,8 @@ public class CourseManagementController {
         this.lectureRepository = lectureRepository;
     }
 
-    public JSONObject validate(HttpServletRequest request) throws IOException, InterruptedException {
+    public JSONObject validate(HttpServletRequest request)
+            throws IOException, InterruptedException {
         JSONObject jwtInfo = jwtValidate.jwtValidate(request);
         return jwtInfo;
     }
