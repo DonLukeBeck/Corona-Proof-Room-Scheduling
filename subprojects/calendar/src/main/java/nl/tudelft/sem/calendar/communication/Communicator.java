@@ -13,7 +13,7 @@ import java.nio.charset.StandardCharsets;
 import nl.tudelft.sem.calendar.exceptions.ServerErrorException;
 
 public abstract class Communicator {
-    private HttpClient client = HttpClient.newBuilder().build();
+    private transient HttpClient client = HttpClient.newBuilder().build();
     public ObjectMapper objectMapper =
             new ObjectMapper().registerModule(new JavaTimeModule());
 
