@@ -29,7 +29,7 @@ public class RoomController {
      * @param capacity of the new room
      * @return success or error message
      */
-    public String addNewRoom(String name, int capacity) {
+    public ResponseEntity<?> addNewRoom(String name, int capacity) {
         Optional<Room> r1 = roomRepository.findByName(name);
         if (r1.isPresent()) {
             return "Already Exists";
@@ -51,7 +51,9 @@ public class RoomController {
      * @param name of the room
      * @return success or error message
      */
-    public String deleteRoom(String name) {
+     @DeleteMapping(path = "/getRoomName") // Map ONLY POST Requests
+     @ResponseBody
+    public ResponseEntity<?> deleteRoom(String name) {
         Optional<Room> ro = roomRepository.findByName(name);
         if (ro.isPresent()) {
             roomRepository.deleteById(ro.get().getRoomId());
@@ -77,7 +79,7 @@ public class RoomController {
      * @param roomId of the room
      * @return room name
      */
-    @PostMapping(path = "/getRoomName") // Map ONLY POST Requests
+    @GetMapping(path = "/getRoomName") // Map ONLY POST Requests
     @ResponseBody
     public ResponseEntity<?>  getRoomName(@RequestParam int roomId) {
         Room r = roomRepository.findById(roomId).orElse(null);
