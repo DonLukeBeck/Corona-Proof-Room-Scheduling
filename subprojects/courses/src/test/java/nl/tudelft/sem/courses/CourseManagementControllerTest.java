@@ -79,6 +79,9 @@ public class CourseManagementControllerTest {
      */
     @BeforeEach
     void setUp() throws IOException, InterruptedException {
+        String courseId = "CSE1200";
+        String courseName = "OOPP";
+        String teacherId = "Andy";
 
         this.request = mock(HttpServletRequest.class);
         this.response = mock(HttpServletResponse.class);
@@ -87,25 +90,25 @@ public class CourseManagementControllerTest {
         //this.courseManagementController = mock(CourseManagementController.class);
 
         this.enrollment = new Enrollment();
-        enrollment.setCourseId("CSE1200");
+        enrollment.setCourseId(courseId);
         enrollment.setStudentId("Henry");
         enrollments = new ArrayList<>();
         enrollments.add(enrollment);
         participants = new ArrayList<>();
         participants.add(enrollment.getStudentId());
 
-        this.Addcourse = new AddCourse("CSE1200", "OOPP", "Andy", participants);
+        this.Addcourse = new AddCourse(courseId, courseName, teacherId, participants);
         this.course = new Course();
-        course.setCourseName("OOPP");
-        course.setTeacherId("Andy");
-        course.setCourseId("CSE1200");
+        course.setCourseName(courseName);
+        course.setTeacherId(teacherId);
+        course.setCourseId(courseId);
 
         date = new Date(1220227200L * 1000);
-        this.Addlecture = new AddLecture("CSE1200", date, 30);
+        this.Addlecture = new AddLecture(courseId, date, 30);
         this.lecture = new Lecture();
         lecture.setDuration(30);
         lecture.setScheduledDate(date);
-        lecture.setCourseId("CSE1200");
+        lecture.setCourseId(courseId);
         lectures = new ArrayList<>();
         lectures.add(lecture);
 

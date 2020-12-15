@@ -40,7 +40,7 @@ public class CourseManagementController {
     private transient LectureRepository lectureRepository;
 
     private transient String errorMessage = "Error";
-    private JwtValidate jwtValidate = new JwtValidate();
+    private transient JwtValidate jwtValidate = new JwtValidate();
 
     /**
      * Instantiates repository needed.

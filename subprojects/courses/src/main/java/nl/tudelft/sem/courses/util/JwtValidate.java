@@ -14,8 +14,8 @@ import org.springframework.boot.jackson.JsonObjectSerializer;
 
 public class JwtValidate {
 
-    private HttpClient client = HttpClient.newBuilder().build();
-    private String uri = "/validate";
+    private transient HttpClient client = HttpClient.newBuilder().build();
+    private transient String uri = "/validate";
 
     /**
      * Primary method to verify the role inside a jwt token from a request authorization Header.
