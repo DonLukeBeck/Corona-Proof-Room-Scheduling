@@ -57,6 +57,11 @@ public class Lecture implements Serializable  {
     @JsonIgnore
     private Course course;
 
+    // Used for schedule retrieval
+
     @Transient
-    boolean selectedForOnCampus;
+    private String roomName;
+    @Transient
+    private boolean selectedForOnCampus;
+
 }
