@@ -170,8 +170,6 @@ public class CourseManagementController {
         // We need to add one day since Spring of MariaDB or something matches against one day off
         Date sqlDate = Date.valueOf(date.plusDays(1));
         Lecture lecture = lectureRepository.findByCourseIdAndScheduledDate(courseId, sqlDate);
-        if (lecture != null)
-            System.out.println(lecture.getScheduledDate());
         if (lecture == null) {
             return "ERROR";
         }
