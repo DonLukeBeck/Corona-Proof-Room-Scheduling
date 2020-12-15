@@ -40,6 +40,7 @@ public class CourseManagementController {
     private transient LectureRepository lectureRepository;
 
     private transient String errorMessage = "Error";
+    private JwtValidate jwtValidate = new JwtValidate();
 
     /**
      * Instantiates repository needed.
@@ -52,6 +53,11 @@ public class CourseManagementController {
         this.lectureRepository = lectureRepository;
     }
 
+    public JSONObject validate(HttpServletRequest request) throws IOException, InterruptedException {
+        JSONObject jwtInfo = jwtValidate.jwtValidate(request);
+        return jwtInfo;
+    }
+
     /**
      * Adds a new course with provided parameters.
      */
@@ -59,7 +65,7 @@ public class CourseManagementController {
     public String createNewCourse(HttpServletRequest request, @RequestBody AddCourse addCourse)
             throws IOException, InterruptedException, JSONException {
 
-        JSONObject jwtInfo = JwtValidate.jwtValidate(request);
+        JSONObject jwtInfo = validate(request);
         try {
             if (!jwtInfo.getString("role").equals("teacher")) {
                 return "You are not allowed to create a course. Please contact administrator.";
