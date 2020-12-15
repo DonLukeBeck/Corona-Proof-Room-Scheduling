@@ -1,9 +1,6 @@
 package nl.tudelft.sem.restrictions;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
 import java.util.NoSuchElementException;
@@ -12,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ContextConfiguration;
 
 
@@ -25,7 +23,7 @@ class RestrictionControllerTest {
 
     private Restriction rest1;
     private Restriction rest2;
-    private String ae;
+    private ResponseEntity<?> ae;
 
     private RestrictionController restrictionController;
 
@@ -37,7 +35,7 @@ class RestrictionControllerTest {
      */
     @BeforeEach
     void setUp() {
-        ae = "Already Exists";
+        ae = ResponseEntity.ok("Already Exists");
         this.rest1 = new Restriction();
         this.rest1.setValue(1.0f);
         this.rest1.setName("test");
@@ -76,7 +74,7 @@ class RestrictionControllerTest {
 
     @Test
     public void addNewRestrictionSuccess2() {
-        assertEquals(ae, restrictionController.addNewRestriction("test2", 2.0f));
+        assertEquals("Already Exists", restrictionController.addNewRestriction("test2", 2.0f));
     }
 
     @Test
