@@ -55,9 +55,11 @@ public class CalendarController {
 
         try {
             // Make API call to retrieve the start time
-            LocalTime startTime = RestrictionManagementCommunicator.getStartTime();
+            LocalTime startTime = LocalTime
+                    .ofSecondOfDay(RestrictionManagementCommunicator.getStartTime());
             // Make API call to retrieve the end time
-            LocalTime endTime = RestrictionManagementCommunicator.getEndTime();
+            LocalTime endTime = LocalTime
+                    .ofSecondOfDay(RestrictionManagementCommunicator.getEndTime());
             // Make API call to retrieve time gap length
             int timeGapLength = RestrictionManagementCommunicator.getTimeGapLength();
             // Make API call to retrieve rooms with restricted capacity

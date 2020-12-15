@@ -24,7 +24,7 @@ public class RestrictionManagementCommunicator extends Communicator {
 
         var response = getResponse("/getAllRoomsWithAdjustedCapacity",
                 Constants.RESTRICTION_SERVER_URL);
-        return objectMapper.readValue(response.body(), new TypeReference<List<Room>>() {
+        return objectMapper.readValue(response.body(), new TypeReference<>() {
         });
     }
 
@@ -53,7 +53,7 @@ public class RestrictionManagementCommunicator extends Communicator {
      * @throws InterruptedException an interrupted exception
      * @throws ServerErrorException a server error exception
      */
-    public static LocalTime getStartTime() throws
+    public static int getStartTime() throws
             InterruptedException, ServerErrorException, IOException {
 
         var response = getResponse("/getStartTime",
@@ -70,7 +70,7 @@ public class RestrictionManagementCommunicator extends Communicator {
      * @throws InterruptedException an interrupted exception
      * @throws ServerErrorException a server error exception
      */
-    public static LocalTime getEndTime() throws
+    public static int getEndTime() throws
             InterruptedException, ServerErrorException, IOException {
 
         var response = getResponse("/getEndTime",

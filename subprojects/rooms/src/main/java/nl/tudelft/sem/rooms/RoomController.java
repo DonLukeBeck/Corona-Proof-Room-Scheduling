@@ -2,12 +2,14 @@ package nl.tudelft.sem.rooms;
 
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.ResponseBody;
 
-@RestController // This means that this class is a RestController
+@Controller // This means that this class is a RestController
 @RequestMapping(path = "/rooms") // URL's start with /restrictions (after Application path)
 public class RoomController {
 
@@ -67,8 +69,9 @@ public class RoomController {
      * @return iterable containing all rooms
      */
     @PostMapping(path = "/getAllRooms") // Map ONLY POST Requests
-    public Iterable<Room> getAllRooms() {
-        return roomRepository.findAll();
+    @ResponseBody
+    public ResponseEntity<?> getAllRooms() {
+        return ResponseEntity.ok(roomRepository.findAll());
     }
 
     /**
@@ -78,12 +81,13 @@ public class RoomController {
      * @return room name
      */
     @PostMapping(path = "/getRoomName") // Map ONLY POST Requests
-    public String getRoomName(@RequestParam int roomId) {
+    @ResponseBody
+    public ResponseEntity<?>  getRoomName(@RequestParam int roomId) {
         Room r = roomRepository.findById(roomId).orElse(null);
         if (r != null) {
-            return r.getName();
+            return ResponseEntity.ok(r.getName());
         }
-        return null;
+        return ResponseEntity.notFound().build();
     }
 
 }

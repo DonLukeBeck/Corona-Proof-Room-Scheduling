@@ -4,14 +4,18 @@ import java.io.IOException;
 import java.time.LocalTime;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import nl.tudelft.sem.restrictions.communication.RoomsCommunicator;
+import nl.tudelft.sem.restrictions.communication.ServerErrorException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.ResponseBody;
 
-@RestController // This means that this class is a RestController
+@Controller // This means that this class is a RestController
 @RequestMapping(path = "/restrictions") // URL's start with /restrictions (after Application path)
 public class RestrictionController {
 
@@ -114,7 +118,6 @@ public class RestrictionController {
      * @param bigOrSmallRoom boolean representing if the parameter is for big (1) or small (0) rooms
      * @return a string containing the success or error message
      */
-    @PostMapping(path = "/getCapacityRestriction") // Map ONLY POST Requests
     public int getCapacityRestriction(@RequestParam boolean bigOrSmallRoom) {
         if (bigOrSmallRoom) {
             return (int) getRestrictionVal("bigRoomMaxPercentage");
@@ -128,7 +131,6 @@ public class RestrictionController {
      *
      * @return float representing minimum seat number
      */
-    @GetMapping(path = "/getMinSeatsBig") // Map ONLY POST Requests
     public int getMinSeatsBig() {
         return (int) getRestrictionVal("minSeatsBig");
     }
@@ -139,8 +141,9 @@ public class RestrictionController {
      * @return time gap as  a float
      */
     @GetMapping(path = "/getTimeGapLength") // Map ONLY POST Requests
-    public int getTimeGapLength() {
-        return (int) getRestrictionVal("gapTimeInMinutes");
+    @ResponseBody
+    public ResponseEntity<?> getTimeGapLength() {
+        return ResponseEntity.ok((int) getRestrictionVal("gapTimeInMinutes"));
     }
 
     /**
@@ -171,8 +174,9 @@ public class RestrictionController {
      * @return start time as a localtime
      */
     @GetMapping(path = "/getStartTime") // Map ONLY POST Requests
-    public LocalTime getStartTime() {
-        return LocalTime.ofSecondOfDay((int) getRestrictionVal("startTime"));
+    @ResponseBody
+    public ResponseEntity<?> getStartTime() {
+        return ResponseEntity.ok((int) getRestrictionVal("startTime"));
     }
 
     /**
@@ -181,8 +185,9 @@ public class RestrictionController {
      * @return end time as a localtime
      */
     @GetMapping(path = "/getEndTime") // Map ONLY POST Requests
-    public LocalTime getEndTime() {
-        return LocalTime.ofSecondOfDay((int) getRestrictionVal("endTime"));
+    @ResponseBody
+    public ResponseEntity<?> getEndTime() {
+        return ResponseEntity.ok((int) getRestrictionVal("endTime"));
     }
 
     /**
@@ -191,7 +196,8 @@ public class RestrictionController {
      * @return list of rooms
      */
     @GetMapping(path = "/getAllRoomsWithAdjustedCapacity") // Map ONLY POST Requests
-    public Iterable<Room> getAllRoomsWithAdjustedCapacity()
+    @ResponseBody
+    public ResponseEntity<?> getAllRoomsWithAdjustedCapacity()
             throws InterruptedException, ServerErrorException, IOException {
         Iterable<Room> it = RoomsCommunicator.getAllRooms();
         for (Room r : it) {
@@ -202,7 +208,7 @@ public class RestrictionController {
                 r.setCapacity(cap * (getCapacityRestriction(false) / 100));
             }
         }
-        return it;
+        return ResponseEntity.ok(it);
     }
 }
 
