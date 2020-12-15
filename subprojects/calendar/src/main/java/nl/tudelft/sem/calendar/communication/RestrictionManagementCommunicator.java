@@ -3,8 +3,11 @@ package nl.tudelft.sem.calendar.communication;
 import com.fasterxml.jackson.core.type.TypeReference;
 import java.io.IOException;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 import nl.tudelft.sem.calendar.Constants;
 import nl.tudelft.sem.calendar.entities.Room;
 import nl.tudelft.sem.calendar.exceptions.ServerErrorException;
@@ -24,8 +27,14 @@ public class RestrictionManagementCommunicator extends Communicator {
 
         var response = getResponse("/getAllRoomsWithAdjustedCapacity",
                 Constants.RESTRICTION_SERVER_URL);
-        return objectMapper.readValue(response.body(), new TypeReference<>() {
-        });
+        Optional<Iterator<Room>> it = objectMapper.readValue(response.body(),
+                new TypeReference<>() {});
+        List<Room> ret = new ArrayList<>();
+        if (it.isPresent()) {
+            it.get().forEachRemaining(ret::add);
+        }
+
+        return ret;
     }
 
     /**

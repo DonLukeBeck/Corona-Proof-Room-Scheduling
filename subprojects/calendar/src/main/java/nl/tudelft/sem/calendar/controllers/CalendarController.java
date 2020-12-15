@@ -63,7 +63,8 @@ public class CalendarController {
             // Make API call to retrieve time gap length
             int timeGapLength = RestrictionManagementCommunicator.getTimeGapLength();
             // Make API call to retrieve rooms with restricted capacity
-            List<Room> rooms = RestrictionManagementCommunicator.getAllRoomsWithAdjustedCapacity();
+            List<Room> rooms =
+                    RestrictionManagementCommunicator.getAllRoomsWithAdjustedCapacity();
             // Get all the lectures to be scheduled
             List<Lecture> lecturesToSchedule = CourseManagementCommunicator
                     .getToBeScheduledLecturesTest();
