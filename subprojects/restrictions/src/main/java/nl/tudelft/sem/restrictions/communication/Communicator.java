@@ -1,4 +1,4 @@
-package nl.tudelft.sem.calendar.communication;
+package nl.tudelft.sem.restrictions.communication;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -10,14 +10,13 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
-import nl.tudelft.sem.calendar.exceptions.ServerErrorException;
 
 public abstract class Communicator {
-    private transient HttpClient client = HttpClient.newBuilder().build();
-    public ObjectMapper objectMapper =
+    private static HttpClient client = HttpClient.newBuilder().build();
+    public static ObjectMapper objectMapper =
             new ObjectMapper().registerModule(new JavaTimeModule());
 
-    protected HttpResponse<String> getResponse(String uri, String service)
+    protected static HttpResponse<String> getResponse(String uri, String service)
             throws IOException, InterruptedException, ServerErrorException {
 
         HttpRequest.Builder builder = HttpRequest.newBuilder();
@@ -28,17 +27,18 @@ public abstract class Communicator {
 
         response = client.send(request, HttpResponse.BodyHandlers.ofString());
         if (response.statusCode() != HttpURLConnection.HTTP_OK) {
+            System.out.println(response.statusCode() + " " + HttpURLConnection.HTTP_OK);
             System.out.println(uri + "," + service);
             throw new ServerErrorException();
         }
         return response;
     }
 
-    protected String encode(String s) {
+    protected static String encode(String s) {
         return URLEncoder.encode(s, StandardCharsets.UTF_8);
     }
 
-    protected void setHttpClient(HttpClient httpClient) {
+    protected static void setHttpClient(HttpClient httpClient) {
         client = httpClient;
     }
 }

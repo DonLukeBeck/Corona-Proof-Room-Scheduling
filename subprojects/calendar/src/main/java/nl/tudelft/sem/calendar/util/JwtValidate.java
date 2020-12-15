@@ -29,6 +29,7 @@ public class JwtValidate {
     public static JSONObject jwtValidate(HttpServletRequest request)
             throws IOException, InterruptedException, JSONException {
 
+
         //extract authorization from request
         String authorizationHeader = request.getHeader("Authorization");
         String token = null;
