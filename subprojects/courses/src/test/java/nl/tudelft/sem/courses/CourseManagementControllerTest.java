@@ -9,8 +9,8 @@ import nl.tudelft.sem.courses.entity.Lecture;
 import nl.tudelft.sem.courses.repository.CourseRepository;
 import nl.tudelft.sem.courses.repository.EnrollmentRepository;
 import nl.tudelft.sem.courses.repository.LectureRepository;
-import nl.tudelft.sem.courses.util.RoleValidation;
-import org.bouncycastle.operator.AADProcessor;
+import nl.tudelft.sem.courses.util.JwtValidate;
+import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -26,6 +26,7 @@ import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 
+import static nl.tudelft.sem.courses.util.JwtValidate.jwtValidate;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.when;
@@ -50,7 +51,7 @@ public class CourseManagementControllerTest {
 
     private CourseManagementController courseManagementController;
 
-    private HttpServletRequest req;
+    private HttpServletRequest request;
 
     @MockBean
     CourseRepository courseRepository;
@@ -65,7 +66,7 @@ public class CourseManagementControllerTest {
     @BeforeEach
     void setUp() throws IOException, InterruptedException {
 
-        this.req = Mockito.mock(HttpServletRequest.class);
+        this.request = Mockito.mock(HttpServletRequest.class);
 
         this.enrollment = new Enrollment();
         enrollment.setCourseId("CSE1200");
@@ -101,8 +102,11 @@ public class CourseManagementControllerTest {
         when(lectureRepository.findByCourseId(course.getCourseName())).thenReturn(lectures);
         when(lectureRepository.findByCourseIdAndDate(course.getCourseName(), date)).thenReturn(lecture);
 
-        //when(req.getParameter("role")).thenReturn("teacher");
-        //when(RoleValidation.getRole(req)).thenReturn("teacher");
+        when(request.getHeader("Authorization")).thenReturn("Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJsdWthIiwic2NvcGUiOlt7ImF1dGhvcml0eSI6IlJPTEVfVEVBQ0hFUiJ9XSwiZXhwIjoxNjA4MDQ2MTM2LCJpYXQiOjE2MDgwNDI1MzZ9.1Pn1WnHIsa6YHIGqmnCPogfmvPqwXIjpwuhotzk6SnU"); //????
+
+        final JSONObject obj = new JSONObject();
+        obj.append("role", "teacher");
+        when(jwtValidate(request)).thenReturn(obj);
 
     }
 
@@ -114,17 +118,17 @@ public class CourseManagementControllerTest {
     @Test
     void createNewCourseSuccess() throws IOException, InterruptedException {
         AddCourse newOne = new AddCourse("CSE1299", "OOPP", "Andy", participants);
-
+        System.out.println(request.getHeader("Authorization"));
         assertEquals("Saved",
                 courseManagementController.createNewCourse
-                        (req, newOne));
+                        (request, newOne));
     }
 
     @Test
     void createNewCourseFail() throws IOException, InterruptedException {
         assertEquals("Already Exists",
                 courseManagementController.createNewCourse
-                        (req, Addcourse));
+                        (request, Addcourse));
     }
 
     @Test
