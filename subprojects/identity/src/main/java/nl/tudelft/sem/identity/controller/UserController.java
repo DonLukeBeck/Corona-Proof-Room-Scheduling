@@ -37,13 +37,14 @@ public class UserController {
     public TokenInfo validate(@RequestBody String token) {
         JwtValidate jwtValid = new JwtValidate();
         JwtUtil jwtUtil = new JwtUtil();
-        String role = null;
+
         if (jwtValid.isTeacher(token)) {
-            role = "teacher";
+            return new TokenInfo("teacher", jwtUtil.extractNetid(token));
         } else if (jwtValid.isStudent(token)) {
-            role = "student";
+            return new TokenInfo("student", jwtUtil.extractNetid(token));
+        } else {
+            return new TokenInfo(null, jwtUtil.extractNetid(token));
         }
-        return new TokenInfo(role ,jwtUtil.extractNetid(token));
     }
 
     /**

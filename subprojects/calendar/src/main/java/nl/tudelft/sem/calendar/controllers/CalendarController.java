@@ -36,8 +36,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 public class CalendarController {
 
-    private String noAccessMessage =
+    private transient String noAccessMessage =
             "You are not allowed to view this page. Please contact administrator.";
+    private transient String teacherRole = "teacher";
 
     @Autowired
     transient LectureScheduler lectureScheduler;
@@ -65,8 +66,8 @@ public class CalendarController {
     public ResponseEntity<?> schedulePlannedLectures(HttpServletRequest request)
             throws InterruptedException, IOException, JSONException {
 
-        String validation = validateRole(request, "teacher");
-        if(validation.equals(noAccessMessage)) {
+        String validation = validateRole(request, teacherRole);
+        if (validation.equals(noAccessMessage)) {
             return ResponseEntity.ok(noAccessMessage);
         }
 
@@ -111,7 +112,7 @@ public class CalendarController {
             throws IOException, InterruptedException, JSONException {
 
         String validation = validateRole(request, "student");
-        if(validation.equals(noAccessMessage)) {
+        if (validation.equals(noAccessMessage)) {
             return ResponseEntity.ok(noAccessMessage);
         }
 
@@ -142,8 +143,8 @@ public class CalendarController {
     public ResponseEntity<?> getMyPersonalScheduleTeacher(HttpServletRequest request)
             throws IOException, InterruptedException, ServerErrorException, JSONException {
 
-        String validation = validateRole(request, "teacher");
-        if(validation.equals(noAccessMessage)) {
+        String validation = validateRole(request, teacherRole);
+        if (validation.equals(noAccessMessage)) {
             return ResponseEntity.ok(noAccessMessage);
         }
 
@@ -151,9 +152,9 @@ public class CalendarController {
                 CourseManagementCommunicator.coursesFromTeacher(validation);
 
         List<Lecture> lectureList = new ArrayList<>();
-        for(BareCourse bareCourse : courseList) {
+        for (BareCourse bareCourse : courseList) {
             List<Lecture> lectures = lectureRepository.findByCourseId(bareCourse.getCourseId());
-            for(Lecture l : lectures){
+            for (Lecture l : lectures) {
                 l.setSelectedForOnCampus(true);
                 lectureList.add(l);
             }
@@ -179,7 +180,7 @@ public class CalendarController {
             throws IOException, InterruptedException, JSONException {
 
         String validation = validateRole(request, "student");
-        if(validation.equals(noAccessMessage)) {
+        if (validation.equals(noAccessMessage)) {
             return ResponseEntity.ok(noAccessMessage);
         }
 
@@ -212,8 +213,8 @@ public class CalendarController {
             HttpServletRequest request, LocalDate date)
             throws IOException, InterruptedException, ServerErrorException, JSONException {
 
-        String validation = validateRole(request, "teacher");
-        if(validation.equals(noAccessMessage)) {
+        String validation = validateRole(request, teacherRole);
+        if (validation.equals(noAccessMessage)) {
             return ResponseEntity.ok(noAccessMessage);
         }
 
@@ -221,10 +222,10 @@ public class CalendarController {
                 CourseManagementCommunicator.coursesFromTeacher(validation);
         List<Lecture> lectureList = new ArrayList<>();
 
-        for(BareCourse bareCourse : courseList) {
+        for (BareCourse bareCourse : courseList) {
             List<Lecture> lectures =
                     lectureRepository.findByCourseIdAndDate(bareCourse.getCourseId(), date);
-            for(Lecture l : lectures){
+            for (Lecture l : lectures) {
                 l.setSelectedForOnCampus(true);
                 lectureList.add(l);
             }
@@ -250,7 +251,7 @@ public class CalendarController {
             throws IOException, InterruptedException, JSONException {
 
         String validation = validateRole(request, "student");
-        if(validation.equals(noAccessMessage)) {
+        if (validation.equals(noAccessMessage)) {
             return ResponseEntity.ok(noAccessMessage);
         }
 
@@ -283,9 +284,9 @@ public class CalendarController {
             HttpServletRequest request, String courseId)
             throws IOException, InterruptedException, JSONException {
 
-        String validation = validateRole(request, "teacher");
+        String validation = validateRole(request, teacherRole);
 
-        if(validation.equals(noAccessMessage)) {
+        if (validation.equals(noAccessMessage)) {
             return ResponseEntity.ok(noAccessMessage);
         }
 
@@ -346,9 +347,9 @@ public class CalendarController {
             HttpServletRequest request, String courseId, LocalDate date)
             throws InterruptedException, IOException, JSONException {
 
-        String validation = validateRole(request, "teacher");
+        String validation = validateRole(request, teacherRole);
 
-        if(validation.equals(noAccessMessage)) {
+        if (validation.equals(noAccessMessage)) {
             return ResponseEntity.ok(noAccessMessage);
         }
 

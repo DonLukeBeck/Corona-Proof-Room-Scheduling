@@ -50,15 +50,16 @@ public class CourseController {
     }
 
     /**
-     * Retrieves a course list based on teacher id
+     * Retrieves a course list based on teacher id.
      *
-     * @param request
-     * @param id
-     * @return
+     * @param request request information
+     * @param id id of the teacher
+     * @return a list of courses based on teacher id
      */
     @GetMapping("/teacher/{id}")
     @ResponseBody
-    public ResponseEntity<?> getCoursesTeacher(HttpServletRequest request, @PathVariable("id") String id) {
+    public ResponseEntity<?> getCoursesTeacher(HttpServletRequest request,
+                                               @PathVariable("id") String id) {
         List<Course> courseList = courseRepository.findAllByTeacherId(id);
         if (courseList == null) {
             return ResponseEntity.notFound().build();

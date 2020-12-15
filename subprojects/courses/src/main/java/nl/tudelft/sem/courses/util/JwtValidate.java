@@ -26,7 +26,8 @@ public class JwtValidate {
 
     @SuppressWarnings("PMD.DataflowAnomalyAnalysis")
     // Found 'DD'-anomaly for variable 'token'
-    // This is not a redefinition of the same variable since we cannot initialise the token in an if statement
+    // This is not a redefinition of the same variable
+    // we cannot initialise the token in an if statement
     public static JSONObject jwtValidate(HttpServletRequest request)
             throws IOException, InterruptedException, JSONException {
 

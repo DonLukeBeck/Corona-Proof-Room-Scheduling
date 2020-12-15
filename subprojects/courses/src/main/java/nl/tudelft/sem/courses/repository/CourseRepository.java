@@ -18,7 +18,8 @@ public interface CourseRepository extends JpaRepository<Course, String>,
 
     Course findByTeacherId(String teacherId);
 
-    @Query(value = "SELECT * FROM course WHERE teacher_id = ?1",nativeQuery = true)
+    @Query(value = "SELECT * FROM course WHERE teacher_id = ?1",
+            nativeQuery = true)
     List<Course> findAllByTeacherId(String teacherId);
 
 }
