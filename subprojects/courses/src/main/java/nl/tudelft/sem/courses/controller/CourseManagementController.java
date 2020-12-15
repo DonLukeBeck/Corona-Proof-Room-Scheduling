@@ -160,7 +160,7 @@ public class CourseManagementController {
             Lecture lecture = new Lecture();
             lecture.setCourseId(courseId);
             lecture.setDuration(durationInMinutes);
-            lecture.setLectureId(lectureId);
+            //lecture.setLectureId(lectureId);
             lecture.setScheduledDate(date);
             lectureRepository.save(lecture);
             return "Lecture added";

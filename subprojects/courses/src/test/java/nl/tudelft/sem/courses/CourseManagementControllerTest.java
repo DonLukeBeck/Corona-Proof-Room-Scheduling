@@ -1,19 +1,27 @@
 package nl.tudelft.sem.courses;
 
 import nl.tudelft.sem.courses.controller.CourseManagementController;
+import nl.tudelft.sem.courses.entity.AddCourse;
+import nl.tudelft.sem.courses.entity.AddLecture;
 import nl.tudelft.sem.courses.entity.Course;
 import nl.tudelft.sem.courses.entity.Enrollment;
 import nl.tudelft.sem.courses.entity.Lecture;
 import nl.tudelft.sem.courses.repository.CourseRepository;
 import nl.tudelft.sem.courses.repository.EnrollmentRepository;
 import nl.tudelft.sem.courses.repository.LectureRepository;
+import nl.tudelft.sem.courses.util.RoleValidation;
+import org.bouncycastle.operator.AADProcessor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.test.context.ContextConfiguration;
 
+import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,7 +37,9 @@ import static org.mockito.Mockito.when;
 @SuppressWarnings("PMD.BeanMembersShouldSerialize")
 public class CourseManagementControllerTest {
 
+    private AddCourse Addcourse;
     private Course course;
+    private AddLecture Addlecture;
     private Lecture lecture;
     private Enrollment enrollment;
     private static Date date;
@@ -39,6 +49,8 @@ public class CourseManagementControllerTest {
     private String errorMessage = "Error";
 
     private CourseManagementController courseManagementController;
+
+    private HttpServletRequest req;
 
     @MockBean
     CourseRepository courseRepository;
@@ -51,20 +63,9 @@ public class CourseManagementControllerTest {
      * The initial setup before each test.
      */
     @BeforeEach
-    void setUp() {
-        this.course = new Course();
-        course.setCourseId("CSE1200");
-        course.setTeacherId("Andy");
-        course.setCourseName("OOPP");
+    void setUp() throws IOException, InterruptedException {
 
-        this.lecture = new Lecture();
-        date = new Date(1220227200L * 1000);
-        lecture.setCourseId("CSE1200");
-        lecture.setScheduledDate(date);
-        lecture.setDuration(30);
-        lecture.setLectureId(1);
-        lectures = new ArrayList<>();
-        lectures.add(lecture);
+        this.req = Mockito.mock(HttpServletRequest.class);
 
         this.enrollment = new Enrollment();
         enrollment.setCourseId("CSE1200");
@@ -73,6 +74,21 @@ public class CourseManagementControllerTest {
         enrollments.add(enrollment);
         participants = new ArrayList<>();
         participants.add(enrollment.getStudentId());
+
+        this.Addcourse = new AddCourse("CSE1200", "OOPP", "Andy", participants);
+        this.course = new Course();
+        course.setCourseName("OOPP");
+        course.setTeacherId("Andy");
+        course.setCourseId("CSE1200");
+
+        date = new Date(1220227200L * 1000);
+        this.Addlecture = new AddLecture("CSE1200", date, 30);
+        this.lecture = new Lecture();
+        lecture.setDuration(30);
+        lecture.setScheduledDate(date);
+        lecture.setCourseId("CSE1200");
+        lectures = new ArrayList<>();
+        lectures.add(lecture);
 
         courseManagementController =
                 new CourseManagementController(courseRepository, enrollmentRepository, lectureRepository);
@@ -84,6 +100,10 @@ public class CourseManagementControllerTest {
 
         when(lectureRepository.findByCourseId(course.getCourseName())).thenReturn(lectures);
         when(lectureRepository.findByCourseIdAndDate(course.getCourseName(), date)).thenReturn(lecture);
+
+        //when(req.getParameter("role")).thenReturn("teacher");
+        //when(RoleValidation.getRole(req)).thenReturn("teacher");
+
     }
 
     @Test
@@ -92,17 +112,19 @@ public class CourseManagementControllerTest {
     }
 
     @Test
-    void createNewCourseSuccess() {
+    void createNewCourseSuccess() throws IOException, InterruptedException {
+        AddCourse newOne = new AddCourse("CSE1299", "OOPP", "Andy", participants);
+
         assertEquals("Saved",
                 courseManagementController.createNewCourse
-                        ("CSE2200", "AD", "Teacher", participants));
+                        (req, newOne));
     }
 
     @Test
-    void createNewCourseFail() {
+    void createNewCourseFail() throws IOException, InterruptedException {
         assertEquals("Already Exists",
                 courseManagementController.createNewCourse
-                        (course.getCourseId(), course.getCourseName(), course.getTeacherId(), participants));
+                        (req, Addcourse));
     }
 
     @Test
