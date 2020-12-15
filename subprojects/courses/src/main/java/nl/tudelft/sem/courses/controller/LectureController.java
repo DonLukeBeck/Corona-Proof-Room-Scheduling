@@ -11,6 +11,7 @@ import nl.tudelft.sem.courses.repository.CourseRepository;
 import nl.tudelft.sem.courses.repository.EnrollmentRepository;
 import nl.tudelft.sem.courses.repository.LectureRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -49,9 +50,9 @@ public class LectureController {
      */
     @GetMapping("/date/{date}")
     @ResponseBody
-    public ResponseEntity<?> listLecturesAfterDate(@PathVariable("date") LocalDate date) {
+    public ResponseEntity<?> listLecturesAfterDate(@PathVariable("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
         return ResponseEntity.ok(bareFromLecture(lectureRepository.findAll().stream()
-            .filter(l -> date.isAfter(l.getScheduledDate().toLocalDate())))
+            .filter(l -> date.isBefore(l.getScheduledDate().toLocalDate())))
             .collect(Collectors.toList()));
     }
 

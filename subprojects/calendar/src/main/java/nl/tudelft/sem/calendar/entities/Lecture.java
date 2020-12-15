@@ -18,7 +18,7 @@ import lombok.Generated;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "Lecture", schema = "public")
+@Table(name = "lecture", schema = "public")
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
@@ -57,6 +57,11 @@ public class Lecture implements Serializable  {
     @JsonIgnore
     private Course course;
 
+    // Used for schedule retrieval
+
     @Transient
-    boolean selectedForOnCampus;
+    private String roomName;
+    @Transient
+    private boolean selectedForOnCampus;
+
 }
