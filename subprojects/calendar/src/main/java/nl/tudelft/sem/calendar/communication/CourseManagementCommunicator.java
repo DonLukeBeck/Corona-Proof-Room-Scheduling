@@ -15,7 +15,9 @@ import nl.tudelft.sem.calendar.entities.Enrollment;
 import nl.tudelft.sem.calendar.entities.Lecture;
 import nl.tudelft.sem.calendar.exceptions.ServerErrorException;
 import nl.tudelft.sem.calendar.util.Constants;
+import org.springframework.stereotype.Service;
 
+@Service
 public class CourseManagementCommunicator extends  Communicator {
 
     /**
@@ -29,7 +31,7 @@ public class CourseManagementCommunicator extends  Communicator {
      * @throws InterruptedException an interrupted exception
      * @throws ServerErrorException a server error exception
      */
-    public static List<Lecture> getToBeScheduledLectures(LocalDate date)
+    public List<Lecture> getToBeScheduledLectures(LocalDate date)
         throws IOException, InterruptedException, ServerErrorException {
 
         var response = getResponse("/lecture/lectures/date/"
@@ -60,7 +62,7 @@ public class CourseManagementCommunicator extends  Communicator {
      * @throws InterruptedException an interrupted exception
      * @throws ServerErrorException a server error exception
      */
-    public static List<Lecture> getToBeScheduledLecturesTest()
+    public List<Lecture> getToBeScheduledLecturesTest()
         throws InterruptedException, ServerErrorException, IOException {
 
         var response = getResponse("/lecture/lectures", Constants.COURSE_SERVER_URL);
@@ -92,7 +94,7 @@ public class CourseManagementCommunicator extends  Communicator {
      * @throws InterruptedException an interrupted exception
      * @throws ServerErrorException a server error exception
      */
-    public static Course courseFromId(String courseId)
+    public Course courseFromId(String courseId)
         throws IOException, InterruptedException, ServerErrorException {
         var resp = objectMapper.readValue(getResponse(
 
@@ -117,7 +119,7 @@ public class CourseManagementCommunicator extends  Communicator {
      * @throws InterruptedException - an interrupted exception
      * @throws ServerErrorException - a server error exception
      */
-    public static List<BareCourse> coursesFromTeacher(String teacherId)
+    public List<BareCourse> coursesFromTeacher(String teacherId)
             throws IOException, InterruptedException, ServerErrorException {
         var resp = objectMapper.readValue(getResponse(
                 "/course/teacher/" + teacherId, Constants.COURSE_SERVER_URL).body(),

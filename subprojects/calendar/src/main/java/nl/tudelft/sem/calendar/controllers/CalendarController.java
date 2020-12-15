@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import nl.tudelft.sem.calendar.communication.CourseManagementCommunicator;
 import nl.tudelft.sem.calendar.communication.RestrictionManagementCommunicator;
+import nl.tudelft.sem.calendar.communication.RoomManagementCommunicator;
 import nl.tudelft.sem.calendar.entities.Attendance;
 import nl.tudelft.sem.calendar.entities.BareCourse;
 import nl.tudelft.sem.calendar.entities.Lecture;
@@ -25,23 +26,20 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping(path = "/calendar")
 
 public class CalendarController {
 
+    private transient String teacherRole = "teacher";
+    private transient String studentRole = "student";
     private transient String noAccessMessage =
             "You are not allowed to view this page. Please contact administrator.";
-    private transient String teacherRole = "teacher";
 
     @Autowired
-    transient LectureScheduler lectureScheduler;
+    private transient LectureScheduler lectureScheduler;
 
     @Autowired
     private transient AttendanceRepository attendanceRepository;
@@ -49,11 +47,14 @@ public class CalendarController {
     @Autowired
     private transient LectureRepository lectureRepository;
 
-    public CalendarController(AttendanceRepository attendanceRepository,
-                              LectureRepository lectureRepository) {
-        this.attendanceRepository = attendanceRepository;
-        this.lectureRepository = lectureRepository;
-    }
+    @Autowired
+    private transient RestrictionManagementCommunicator restrictionManagementCommunicator;
+
+    @Autowired
+    private transient CourseManagementCommunicator courseManagementCommunicator;
+
+    @Autowired
+    private transient RoomManagementCommunicator roomManagementCommunicator;
 
     /**
      * This method will form the main API endpoint for the Scheduling functionality, once the
@@ -73,15 +74,17 @@ public class CalendarController {
 
         try {
             // Make API call to retrieve the start time
-            LocalTime startTime = RestrictionManagementCommunicator.getStartTime();
+            LocalTime startTime =
+            LocalTime.ofSecondOfDay(restrictionManagementCommunicator.getStartTime());
             // Make API call to retrieve the end time
-            LocalTime endTime = RestrictionManagementCommunicator.getEndTime();
+            LocalTime endTime =
+            LocalTime.ofSecondOfDay(restrictionManagementCommunicator.getEndTime());
             // Make API call to retrieve time gap length
-            int timeGapLength = RestrictionManagementCommunicator.getTimeGapLength();
+            int timeGapLength = restrictionManagementCommunicator.getTimeGapLength();
             // Make API call to retrieve rooms with restricted capacity
-            List<Room> rooms = RestrictionManagementCommunicator.getAllRoomsWithAdjustedCapacity();
+            List<Room> rooms = restrictionManagementCommunicator.getAllRoomsWithAdjustedCapacity();
             // Get all the lectures to be scheduled
-            List<Lecture> lecturesToSchedule = CourseManagementCommunicator
+            List<Lecture> lecturesToSchedule = courseManagementCommunicator
                     .getToBeScheduledLecturesTest();
             // Create the scheduler that does the scheduling
             lectureScheduler.setFields(rooms, lecturesToSchedule, startTime,
@@ -109,9 +112,9 @@ public class CalendarController {
     // we need to add specific values to lectureIds
     // we need to suppress this warning for every method
     public ResponseEntity<?> getMyPersonalScheduleStudent(HttpServletRequest request)
-            throws IOException, InterruptedException, JSONException {
+            throws IOException, InterruptedException, JSONException, ServerErrorException {
 
-        String validation = validateRole(request, "student");
+        String validation = validateRole(request, studentRole);
         if (validation.equals(noAccessMessage)) {
             return ResponseEntity.ok(noAccessMessage);
         }
@@ -123,6 +126,7 @@ public class CalendarController {
         for (Map.Entry<Integer, Boolean> idPhysical : lectureIdPhysical.entrySet()) {
             Lecture l = lectureRepository.findByLectureId(idPhysical.getKey());
             l.setSelectedForOnCampus(idPhysical.getValue());
+            l.setRoomName(roomManagementCommunicator.getRoomName(l.getRoomId()));
             lectures.add(l);
         }
         return ResponseEntity.ok(lectures);
@@ -149,13 +153,14 @@ public class CalendarController {
         }
 
         List<BareCourse> courseList =
-                CourseManagementCommunicator.coursesFromTeacher(validation);
+                courseManagementCommunicator.coursesFromTeacher(validation);
 
         List<Lecture> lectureList = new ArrayList<>();
         for (BareCourse bareCourse : courseList) {
             List<Lecture> lectures = lectureRepository.findByCourseId(bareCourse.getCourseId());
             for (Lecture l : lectures) {
                 l.setSelectedForOnCampus(true);
+                l.setRoomName(roomManagementCommunicator.getRoomName(l.getRoomId()));
                 lectureList.add(l);
             }
         }
@@ -177,9 +182,9 @@ public class CalendarController {
     // we need to suppress this warning for every method
     public ResponseEntity<?> getMyPersonalScheduleForDayStudent(
             HttpServletRequest request, LocalDate date)
-            throws IOException, InterruptedException, JSONException {
+            throws IOException, InterruptedException, JSONException, ServerErrorException {
 
-        String validation = validateRole(request, "student");
+        String validation = validateRole(request, studentRole);
         if (validation.equals(noAccessMessage)) {
             return ResponseEntity.ok(noAccessMessage);
         }
@@ -190,6 +195,7 @@ public class CalendarController {
         for (Lecture l : lectureRepository.findByDate(date)) {
             if (lectureIdPhysical.containsKey(l.getLectureId())) {
                 l.setSelectedForOnCampus(lectureIdPhysical.get(l.getLectureId()));
+                l.setRoomName(roomManagementCommunicator.getRoomName(l.getRoomId()));
                 lectures.add(l);
             }
         }
@@ -219,7 +225,7 @@ public class CalendarController {
         }
 
         List<BareCourse> courseList =
-                CourseManagementCommunicator.coursesFromTeacher(validation);
+               courseManagementCommunicator.coursesFromTeacher(validation);
         List<Lecture> lectureList = new ArrayList<>();
 
         for (BareCourse bareCourse : courseList) {
@@ -227,6 +233,7 @@ public class CalendarController {
                     lectureRepository.findByCourseIdAndDate(bareCourse.getCourseId(), date);
             for (Lecture l : lectures) {
                 l.setSelectedForOnCampus(true);
+                l.setRoomName(roomManagementCommunicator.getRoomName(l.getRoomId()));
                 lectureList.add(l);
             }
         }
@@ -248,9 +255,9 @@ public class CalendarController {
     // we need to suppress this warning for every method
     public ResponseEntity<?> getMyPersonalScheduleForCourseStudent(
             HttpServletRequest request, String courseId)
-            throws IOException, InterruptedException, JSONException {
+            throws IOException, InterruptedException, JSONException, ServerErrorException {
 
-        String validation = validateRole(request, "student");
+        String validation = validateRole(request, studentRole);
         if (validation.equals(noAccessMessage)) {
             return ResponseEntity.ok(noAccessMessage);
         }
@@ -261,6 +268,7 @@ public class CalendarController {
         for (Lecture l : lectureRepository.findByCourseId(courseId)) {
             if (lectureIdPhysical.containsKey(l.getLectureId())) {
                 l.setSelectedForOnCampus(lectureIdPhysical.get(l.getLectureId()));
+                l.setRoomName(roomManagementCommunicator.getRoomName(l.getRoomId()));
                 lectures.add(l);
             }
         }

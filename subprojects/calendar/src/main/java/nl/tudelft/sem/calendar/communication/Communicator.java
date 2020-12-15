@@ -13,11 +13,11 @@ import java.nio.charset.StandardCharsets;
 import nl.tudelft.sem.calendar.exceptions.ServerErrorException;
 
 public abstract class Communicator {
-    private static HttpClient client = HttpClient.newBuilder().build();
-    public static ObjectMapper objectMapper =
+    private HttpClient client = HttpClient.newBuilder().build();
+    public ObjectMapper objectMapper =
             new ObjectMapper().registerModule(new JavaTimeModule());
 
-    protected static HttpResponse<String> getResponse(String uri, String service)
+    protected HttpResponse<String> getResponse(String uri, String service)
             throws IOException, InterruptedException, ServerErrorException {
 
         HttpRequest.Builder builder = HttpRequest.newBuilder();
@@ -34,11 +34,11 @@ public abstract class Communicator {
         return response;
     }
 
-    protected static String encode(String s) {
+    protected String encode(String s) {
         return URLEncoder.encode(s, StandardCharsets.UTF_8);
     }
 
-    protected static void setHttpClient(HttpClient httpClient) {
+    protected void setHttpClient(HttpClient httpClient) {
         client = httpClient;
     }
 }
