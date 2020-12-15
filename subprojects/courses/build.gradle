@@ -68,6 +68,7 @@ dependencies {
 	compile files('libs/OJDBC8-Full')
 	compile 'mysql:mysql-connector-java:5.1.+'
 	compile group: 'mysql', name: 'mysql-connector-java', version: '5.1.6'
+	compile group: 'com.jwebmp', name: 'json', version: '0.63.0.54'
 }
 
 dependencyManagement {

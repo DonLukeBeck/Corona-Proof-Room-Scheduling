@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
-import nl.tudelft.sem.calendar.Constants;
 import nl.tudelft.sem.calendar.entities.BareCourse;
 import nl.tudelft.sem.calendar.entities.BareEnrollment;
 import nl.tudelft.sem.calendar.entities.BareLecture;
@@ -15,6 +14,7 @@ import nl.tudelft.sem.calendar.entities.Course;
 import nl.tudelft.sem.calendar.entities.Enrollment;
 import nl.tudelft.sem.calendar.entities.Lecture;
 import nl.tudelft.sem.calendar.exceptions.ServerErrorException;
+import nl.tudelft.sem.calendar.util.Constants;
 
 public class CourseManagementCommunicator extends  Communicator {
 
@@ -92,7 +92,7 @@ public class CourseManagementCommunicator extends  Communicator {
      * @throws InterruptedException an interrupted exception
      * @throws ServerErrorException a server error exception
      */
-    private static Course courseFromId(String courseId)
+    public static Course courseFromId(String courseId)
         throws IOException, InterruptedException, ServerErrorException {
         var resp = objectMapper.readValue(getResponse(
 
@@ -106,6 +106,23 @@ public class CourseManagementCommunicator extends  Communicator {
         return new Course(resp.getCourseId(), resp.getCourseName(), resp.getTeacherId(),
             enrollments.stream().map(e -> new Enrollment(e.getStudentId(), e.getCourseId()))
                 .collect(Collectors.toList()));
+    }
+
+    /**
+     * Retrieves the list of courses based on the id of a teacher.
+     *
+     * @param teacherId - the id of the teacher
+     * @return a list of courses
+     * @throws IOException - an input/output exception
+     * @throws InterruptedException - an interrupted exception
+     * @throws ServerErrorException - a server error exception
+     */
+    public static List<BareCourse> coursesFromTeacher(String teacherId)
+            throws IOException, InterruptedException, ServerErrorException {
+        var resp = objectMapper.readValue(getResponse(
+                "/course/teacher/" + teacherId, Constants.COURSE_SERVER_URL).body(),
+                new TypeReference<List<BareCourse>>(){});
+        return resp;
     }
 }
 
