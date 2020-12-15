@@ -329,12 +329,15 @@ public class CalendarController {
     @SuppressWarnings({"PMD.DataflowAnomalyAnalysis", "PMD.AvoidDuplicateLiterals"})
     // we need to add specific values to lectureIds
     // we need to suppress this warning for every method
-    public ResponseEntity<?> indicateAbsence(String userId, String courseId,
-                                 @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+    public ResponseEntity<?> indicateAbsence(HttpServletRequest request,
+                                             String userId, String courseId,
+                                             @DateTimeFormat(iso = DateTimeFormat
+                                             .ISO.DATE) LocalDate date)
+            throws IOException, InterruptedException {
 
-        // we should check here that the user has that id, since you should only be able to
-        // indicate absence for yourself!
-
+        if (!validateRole(request, studentRole).equals(userId)) {
+            return ResponseEntity.ok(noAccessMessage);
+        }
         try {
             int lectureId = lectureRepository
                     .findByDateAndCourseId(date.plusDays(1), courseId).getLectureId();
