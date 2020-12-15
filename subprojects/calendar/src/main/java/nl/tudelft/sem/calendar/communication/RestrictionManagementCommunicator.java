@@ -29,14 +29,9 @@ public class RestrictionManagementCommunicator extends Communicator {
 
         var response = getResponse("/restrictions/getAllRoomsWithAdjustedCapacity",
                 Constants.RESTRICTION_SERVER_URL);
-        Optional<Iterator<Room>> it = objectMapper.readValue(response.body(),
+        List<Room> roomList = objectMapper.readValue(response.body(),
                 new TypeReference<>() {});
-        List<Room> ret = new ArrayList<>();
-        if (it.isPresent()) {
-            it.get().forEachRemaining(ret::add);
-        }
-
-        return ret;
+        return roomList;
     }
 
     /**
