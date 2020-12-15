@@ -1,14 +1,16 @@
 package nl.tudelft.sem.calendar.communication;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import java.io.IOException;
-import java.time.LocalTime;
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
-import nl.tudelft.sem.calendar.util.Constants;
+import java.util.Optional;
+import com.fasterxml.jackson.core.type.TypeReference;
 import nl.tudelft.sem.calendar.entities.Room;
 import nl.tudelft.sem.calendar.exceptions.ServerErrorException;
+import nl.tudelft.sem.calendar.util.Constants;
 import org.springframework.stereotype.Service;
+
 
 @Service
 public class RestrictionManagementCommunicator extends Communicator {
@@ -22,12 +24,19 @@ public class RestrictionManagementCommunicator extends Communicator {
      * @throws ServerErrorException a server error exception
      */
     public List<Room> getAllRoomsWithAdjustedCapacity() throws
+
             InterruptedException, ServerErrorException, IOException {
 
         var response = getResponse("/getAllRoomsWithAdjustedCapacity",
                 Constants.RESTRICTION_SERVER_URL);
-        return objectMapper.readValue(response.body(), new TypeReference<>() {
-        });
+        Optional<Iterator<Room>> it = objectMapper.readValue(response.body(),
+                new TypeReference<>() {});
+        List<Room> ret = new ArrayList<>();
+        if (it.isPresent()) {
+            it.get().forEachRemaining(ret::add);
+        }
+
+        return ret;
     }
 
     /**
@@ -56,6 +65,7 @@ public class RestrictionManagementCommunicator extends Communicator {
      * @throws ServerErrorException a server error exception
      */
     public int getStartTime() throws
+
             InterruptedException, ServerErrorException, IOException {
 
         var response = getResponse("/getStartTime",
@@ -72,7 +82,9 @@ public class RestrictionManagementCommunicator extends Communicator {
      * @throws InterruptedException an interrupted exception
      * @throws ServerErrorException a server error exception
      */
+
     public int getEndTime() throws
+
             InterruptedException, ServerErrorException, IOException {
 
         var response = getResponse("/getEndTime",
@@ -80,9 +92,25 @@ public class RestrictionManagementCommunicator extends Communicator {
         return objectMapper.readValue(response.body(), new TypeReference<>() {
         });
     }
-}
+    
+    /**
+     * Returns the name of the room with given id.
+     *
+     * @param roomId of the room
+     * @return name of the room
+     * @throws IOException an input/output exception
+     * @throws InterruptedException an interrupted exception
+     * @throws ServerErrorException a server error exception
+     */
+    public String getRoomName(int roomId) throws
+            InterruptedException, ServerErrorException, IOException {
 
-//
+        var response = getResponse("/getRoomName" + roomId,
+                Constants.ROOMS_SERVER_URL);
+        return objectMapper.readValue(response.body(), new TypeReference<String>() {
+        });
+    }
+}//
 //    /**
 //     * This method mocks the getAllRoomsWithAdjustedCapacity endpoint from the restriction
 //     * management service.

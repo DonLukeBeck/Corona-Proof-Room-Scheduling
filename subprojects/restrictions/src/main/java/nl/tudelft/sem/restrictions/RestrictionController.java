@@ -1,16 +1,21 @@
 package nl.tudelft.sem.restrictions;
 
+import java.io.IOException;
 import java.time.LocalTime;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import nl.tudelft.sem.restrictions.communication.RoomsCommunicator;
+import nl.tudelft.sem.restrictions.communication.ServerErrorException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.ResponseBody;
 
-@RestController // This means that this class is a RestController
+@Controller // This means that this class is a RestController
 @RequestMapping(path = "/restrictions") // URL's start with /restrictions (after Application path)
 public class RestrictionController {
 
@@ -34,7 +39,7 @@ public class RestrictionController {
      * @return message containing the action that has been done
      */
     public String addNewRestriction(String name, float value) {
-        Optional<Restriction> r = restrictionRepository.getRestrictionByName(name);
+        Optional<Restriction> r = restrictionRepository.findByName(name);
         if (r.isPresent()) {
             if (r.get().getValue() == value) {
                 return "Already Exists";
@@ -61,7 +66,7 @@ public class RestrictionController {
      * @return the value of the restriction or -999.9 if does not exists
      */
     public float getRestrictionVal(String name) {
-        Optional<Restriction> r = restrictionRepository.getRestrictionByName(name);
+        Optional<Restriction> r = restrictionRepository.findByName(name);
         if (r.isPresent()) {
             return r.get().getValue();
         }
@@ -113,12 +118,11 @@ public class RestrictionController {
      * @param bigOrSmallRoom boolean representing if the parameter is for big (1) or small (0) rooms
      * @return a string containing the success or error message
      */
-    @PostMapping(path = "/getCapacityRestriction") // Map ONLY POST Requests
-    public float getCapacityRestriction(@RequestParam boolean bigOrSmallRoom) {
+    public int getCapacityRestriction(@RequestParam boolean bigOrSmallRoom) {
         if (bigOrSmallRoom) {
-            return getRestrictionVal("bigRoomMaxPercentage");
+            return (int) getRestrictionVal("bigRoomMaxPercentage");
         } else {
-            return getRestrictionVal("smallRoomMaxPercentage");
+            return (int) getRestrictionVal("smallRoomMaxPercentage");
         }
     }
 
@@ -127,9 +131,8 @@ public class RestrictionController {
      *
      * @return float representing minimum seat number
      */
-    @GetMapping(path = "/getMinSeatsBig") // Map ONLY POST Requests
-    public float getMinSeatsBig() {
-        return getRestrictionVal("minSeatsBig");
+    public int getMinSeatsBig() {
+        return (int) getRestrictionVal("minSeatsBig");
     }
 
     /**
@@ -138,8 +141,9 @@ public class RestrictionController {
      * @return time gap as  a float
      */
     @GetMapping(path = "/getTimeGapLength") // Map ONLY POST Requests
-    public float getTimeGapLength() {
-        return getRestrictionVal("gapTimeInMinutes");
+    @ResponseBody
+    public ResponseEntity<?> getTimeGapLength() {
+        return ResponseEntity.ok((int) getRestrictionVal("gapTimeInMinutes"));
     }
 
     /**
@@ -170,8 +174,9 @@ public class RestrictionController {
      * @return start time as a localtime
      */
     @GetMapping(path = "/getStartTime") // Map ONLY POST Requests
-    public LocalTime getStartTime() {
-        return LocalTime.ofSecondOfDay((int) getRestrictionVal("startTime"));
+    @ResponseBody
+    public ResponseEntity<?> getStartTime() {
+        return ResponseEntity.ok((int) getRestrictionVal("startTime"));
     }
 
     /**
@@ -180,37 +185,30 @@ public class RestrictionController {
      * @return end time as a localtime
      */
     @GetMapping(path = "/getEndTime") // Map ONLY POST Requests
-    public LocalTime getEndTime() {
-        return LocalTime.ofSecondOfDay((int) getRestrictionVal("endTime"));
+    @ResponseBody
+    public ResponseEntity<?> getEndTime() {
+        return ResponseEntity.ok((int) getRestrictionVal("endTime"));
     }
 
-    /*
+    /**
+     * Returns list of rooms with adjusted capacity.
+     *
+     * @return list of rooms
+     */
     @GetMapping(path = "/getAllRoomsWithAdjustedCapacity") // Map ONLY POST Requests
-    public Iterable<Room> getAllRoomsWithAdjustedCapacity() {
-        Iterable<Room> it = RoomController.getAllRooms();
+    @ResponseBody
+    public ResponseEntity<?> getAllRoomsWithAdjustedCapacity()
+            throws InterruptedException, ServerErrorException, IOException {
+        Iterable<Room> it = RoomsCommunicator.getAllRooms();
         for (Room r : it) {
             int cap = r.getCapacity();
             if (cap >= getMinSeatsBig()) {
-                r.setCapacity(cap*(getCapacityRestriction(true)/100));
+                r.setCapacity(cap * (getCapacityRestriction(true) / 100));
             } else {
-                r.setCapacity(cap*(getCapacityRestriction(false)/100));
+                r.setCapacity(cap * (getCapacityRestriction(false) / 100));
             }
         }
-        return it;
+        return ResponseEntity.ok(it);
     }
-
-    @GetMapping(path = "/getRoomWithAdjustedCapacity") // Map ONLY POST Requests
-    Room getRoomWithAdjustedCapacity(int roomId) {
-        Room r = RoomController.getRoom(roomId);
-        int cap = r.getCapacity();
-        if (cap >= getMinSeatsBig()) {
-            r.setCapacity(cap*(getCapacityRestriction(true)/100));
-        } else {
-            r.setCapacity(cap*(getCapacityRestriction(false)/100));
-        }
-        return r;
-    }
-    */
-
 }
 

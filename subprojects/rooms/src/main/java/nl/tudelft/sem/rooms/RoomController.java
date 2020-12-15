@@ -1,12 +1,15 @@
 package nl.tudelft.sem.rooms;
 
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.ResponseBody;
 
-@RestController // This means that this class is a RestController
+@Controller // This means that this class is a RestController
 @RequestMapping(path = "/rooms") // URL's start with /restrictions (after Application path)
 public class RoomController {
 
@@ -30,10 +33,9 @@ public class RoomController {
      * @return success or error message
      */
     public String addNewRoom(String name, int capacity) {
-        for (Room ro : roomRepository.findAll()) {
-            if (ro.getName().equals(name)) {
-                return "Already Exists";
-            }
+        Optional<Room> r1 = roomRepository.findByName(name);
+        if (r1.isPresent()) {
+            return "Already Exists";
         }
         final int invCap = 1;
         if (capacity < invCap) {
@@ -53,13 +55,12 @@ public class RoomController {
      * @return success or error message
      */
     public String deleteRoom(String name) {
-        for (Room ro : roomRepository.findAll()) {
-            if (ro.getName().equals(name)) {
-                roomRepository.deleteById(ro.getRoomId());
-                return "Deleted";
-            }
+        Optional<Room> ro = roomRepository.findByName(name);
+        if (ro.isPresent()) {
+            roomRepository.deleteById(ro.get().getRoomId());
+            return "Deleted";
         }
-        return "DNE";
+        return null;
     }
 
     /**
@@ -68,19 +69,25 @@ public class RoomController {
      * @return iterable containing all rooms
      */
     @PostMapping(path = "/getAllRooms") // Map ONLY POST Requests
-    public Iterable<Room> getAllRooms() {
-        return roomRepository.findAll();
+    @ResponseBody
+    public ResponseEntity<?> getAllRooms() {
+        return ResponseEntity.ok(roomRepository.findAll());
     }
 
     /**
-     * Returns the room by its id.
+     * Returns the room name by its id.
      *
      * @param roomId of the room
-     * @return room entity
+     * @return room name
      */
-    @PostMapping(path = "/getRoom") // Map ONLY POST Requests
-    public Room getRoom(@RequestParam int roomId) {
-        return roomRepository.findById(roomId).orElse(null);
+    @PostMapping(path = "/getRoomName") // Map ONLY POST Requests
+    @ResponseBody
+    public ResponseEntity<?>  getRoomName(@RequestParam int roomId) {
+        Room r = roomRepository.findById(roomId).orElse(null);
+        if (r != null) {
+            return ResponseEntity.ok(r.getName());
+        }
+        return ResponseEntity.notFound().build();
     }
 
 }

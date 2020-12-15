@@ -74,15 +74,16 @@ public class CalendarController {
 
         try {
             // Make API call to retrieve the start time
-            LocalTime startTime =
-            LocalTime.ofSecondOfDay(restrictionManagementCommunicator.getStartTime());
+            LocalTime startTime = LocalTime
+                    .ofSecondOfDay(restrictionManagementCommunicator.getStartTime());
             // Make API call to retrieve the end time
-            LocalTime endTime =
-            LocalTime.ofSecondOfDay(restrictionManagementCommunicator.getEndTime());
+            LocalTime endTime = LocalTime
+                    .ofSecondOfDay(restrictionManagementCommunicator.getEndTime());
             // Make API call to retrieve time gap length
             int timeGapLength = restrictionManagementCommunicator.getTimeGapLength();
             // Make API call to retrieve rooms with restricted capacity
-            List<Room> rooms = restrictionManagementCommunicator.getAllRoomsWithAdjustedCapacity();
+            List<Room> rooms =
+                    restrictionManagementCommunicator.getAllRoomsWithAdjustedCapacity();
             // Get all the lectures to be scheduled
             List<Lecture> lecturesToSchedule = courseManagementCommunicator
                     .getToBeScheduledLecturesTest();
