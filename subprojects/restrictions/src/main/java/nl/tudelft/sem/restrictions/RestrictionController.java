@@ -204,9 +204,9 @@ public class RestrictionController {
         for (Room r : it) {
             int cap = r.getCapacity();
             if (cap >= getMinSeatsBig()) {
-                r.setCapacity(cap * (getCapacityRestriction(true) / 100));
+                r.setCapacity((int) (cap * (getCapacityRestriction(true) / 100.0)));
             } else {
-                r.setCapacity(cap * (getCapacityRestriction(false) / 100));
+                r.setCapacity((int) (cap * (getCapacityRestriction(false) / 100.0)));
             }
         }
         return ResponseEntity.ok(it);
