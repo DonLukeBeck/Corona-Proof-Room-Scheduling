@@ -7,15 +7,20 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import nl.tudelft.sem.calendar.communication.CourseManagementCommunicator;
 import nl.tudelft.sem.calendar.communication.RestrictionManagementCommunicator;
-import nl.tudelft.sem.calendar.entities.*;
+import nl.tudelft.sem.calendar.entities.Attendance;
+import nl.tudelft.sem.calendar.entities.BareCourse;
+import nl.tudelft.sem.calendar.entities.Lecture;
+import nl.tudelft.sem.calendar.entities.Room;
 import nl.tudelft.sem.calendar.exceptions.ServerErrorException;
 import nl.tudelft.sem.calendar.repositories.AttendanceRepository;
 import nl.tudelft.sem.calendar.repositories.LectureRepository;
 import nl.tudelft.sem.calendar.scheduling.LectureScheduler;
 import nl.tudelft.sem.calendar.util.JwtValidate;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -30,6 +35,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(path = "/calendar")
 
 public class CalendarController {
+
+    private String noAccessMessage =
+            "You are not allowed to view this page. Please contact administrator.";
 
     @Autowired
     transient LectureScheduler lectureScheduler;
@@ -50,11 +58,17 @@ public class CalendarController {
      * This method will form the main API endpoint for the Scheduling functionality, once the
      * connection face with the other services is determined, it will be implemented to match up.
      *
-     * @return a string indicating success or failure
+     * @return a response entity indicating success or failure.
      */
     @PostMapping(path = "/scheduleLectures")
     @ResponseBody
-    public ResponseEntity<?> schedulePlannedLectures() {
+    public ResponseEntity<?> schedulePlannedLectures(HttpServletRequest request)
+            throws InterruptedException, IOException, JSONException {
+
+        String validation = validateRole(request, "teacher");
+        if(validation.equals(noAccessMessage)) {
+            return ResponseEntity.ok(noAccessMessage);
+        }
 
         try {
             // Make API call to retrieve the start time
@@ -74,7 +88,7 @@ public class CalendarController {
             // Schedule the lecture
             lectureScheduler.scheduleAllLectures();
 
-            return ResponseEntity.ok(HttpStatus.CREATED);
+            return ResponseEntity.ok("Successfully scheduled lectures.");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Internal server error.");
@@ -84,28 +98,26 @@ public class CalendarController {
     /**
      * This method will return the personal schedule of a student.
      *
-     * @param studentId the userId of the student.
+     * @param request an object containing authorization properties.
      *
-     * @return returns a list with the lectures for a student
+     * @return returns a list with the lectures for a student if granted access.
      */
     @GetMapping(path = "/getMyPersonalScheduleStudent") // Map ONLY GET Requests
     @ResponseBody
     @SuppressWarnings({"PMD.DataflowAnomalyAnalysis", "PMD.AvoidDuplicateLiterals"})
     // we need to add specific values to lectureIds
     // we need to suppress this warning for every method
-    public Object getMyPersonalScheduleStudent(HttpServletRequest request, String studentId) throws IOException, InterruptedException {
-/*
-        String role = RoleValidation.getRole(request);
-        try {
-            if (!role.equals("student")) {
-                return "You are not allowed to view this page. Please contact administrator.";
-            }
-        } catch (Exception e) {
-            return "You are not allowed to view this page. Please contact administrator.";
+    public ResponseEntity<?> getMyPersonalScheduleStudent(HttpServletRequest request)
+            throws IOException, InterruptedException, JSONException {
+
+        String validation = validateRole(request, "student");
+        if(validation.equals(noAccessMessage)) {
+            return ResponseEntity.ok(noAccessMessage);
         }
-*/
+
         List<Lecture> lectures = new ArrayList<>();
-        Map<Integer, Boolean> lectureIdPhysical = createLectureIdPhysicalMap(studentId);
+        Map<Integer, Boolean> lectureIdPhysical = createLectureIdPhysicalMap(
+                validation);
 
         for (Map.Entry<Integer, Boolean> idPhysical : lectureIdPhysical.entrySet()) {
             Lecture l = lectureRepository.findByLectureId(idPhysical.getKey());
@@ -118,26 +130,27 @@ public class CalendarController {
     /**
      * This method will return the personal schedule of a teacher.
      *
-     * @return returns a list with the lectures for a teacher
+     * @param request an object containing authorization properties.
+     *
+     * @return returns a list with the lectures for a teacher if granted access.
      */
     @GetMapping(path = "/getMyPersonalScheduleTeacher") // Map ONLY GET Requests
     @ResponseBody
     @SuppressWarnings({"PMD.DataflowAnomalyAnalysis", "PMD.AvoidDuplicateLiterals"})
     // we need to add specific values to lectureIds
     // we need to suppress this warning for every method
-    public ResponseEntity<?> getMyPersonalScheduleTeacher(HttpServletRequest request) throws IOException, InterruptedException, ServerErrorException {
+    public ResponseEntity<?> getMyPersonalScheduleTeacher(HttpServletRequest request)
+            throws IOException, InterruptedException, ServerErrorException, JSONException {
 
-        JSONObject jwtInfo = JwtValidate.jwtValidate(request);
-        try {
-            if (!jwtInfo.getString("role").equals("teacher")) {
-                ResponseEntity.ok("You are not allowed to view this page. Please contact administrator.");
-            }
-        } catch (Exception e) {
-            ResponseEntity.ok("You are not allowed to view this page. Please contact administrator.");
+        String validation = validateRole(request, "teacher");
+        if(validation.equals(noAccessMessage)) {
+            return ResponseEntity.ok(noAccessMessage);
         }
 
-        List<BareCourse> courseList = CourseManagementCommunicator.coursesFromTeacher(jwtInfo.getString("netid"));
-        List<Lecture> lectureList = new ArrayList<Lecture>();
+        List<BareCourse> courseList =
+                CourseManagementCommunicator.coursesFromTeacher(validation);
+
+        List<Lecture> lectureList = new ArrayList<>();
         for(BareCourse bareCourse : courseList) {
             List<Lecture> lectures = lectureRepository.findByCourseId(bareCourse.getCourseId());
             for(Lecture l : lectures){
@@ -151,29 +164,27 @@ public class CalendarController {
     /**
      * This method will return the personal schedule of a user for a given day.
      *
-     * @param studentId the userId of the user.
+     * @param request an object containing authorization properties.
      * @param date the date for which the schedule must be given.
      *
-     * @return returns a list with the lectures for a the user for a given day
+     * @return returns a list with the lectures for a the user for a given day if granted access.
      */
     @GetMapping(path = "/getMyPersonalScheduleForDayStudent") // Map ONLY GET Requests
     @ResponseBody
     @SuppressWarnings({"PMD.DataflowAnomalyAnalysis", "PMD.AvoidDuplicateLiterals"})
     // we need to add specific values to lectureIds
     // we need to suppress this warning for every method
-    public Object getMyPersonalScheduleForDayStudent(HttpServletRequest request, String studentId, LocalDate date) throws IOException, InterruptedException {
-        /*
-        String role = RoleValidation.getRole(request);
-        try {
-            if (!role.equals("student")) {
-                return "You are not allowed to view this page. Please contact administrator.";
-            }
-        } catch (Exception e) {
-            return "You are not allowed to view this page. Please contact administrator.";
+    public ResponseEntity<?> getMyPersonalScheduleForDayStudent(
+            HttpServletRequest request, LocalDate date)
+            throws IOException, InterruptedException, JSONException {
+
+        String validation = validateRole(request, "student");
+        if(validation.equals(noAccessMessage)) {
+            return ResponseEntity.ok(noAccessMessage);
         }
-*/
+
         ArrayList<Lecture> lectures = new ArrayList<>();
-        Map<Integer, Boolean> lectureIdPhysical = createLectureIdPhysicalMap(studentId);
+        Map<Integer, Boolean> lectureIdPhysical = createLectureIdPhysicalMap(validation);
 
         for (Lecture l : lectureRepository.findByDate(date)) {
             if (lectureIdPhysical.containsKey(l.getLectureId())) {
@@ -187,61 +198,64 @@ public class CalendarController {
     /**
      * This method will return the personal schedule of a user for a given day.
      *
-     * @param teacherId the userId of the user.
+     * @param request an object containing authorization properties.
      * @param date the date for which the schedule must be given.
      *
-     * @return returns a list with the lectures for a the user for a given day
+     * @return returns a list with the lectures for a the user for a given day if granted access.
      */
     @GetMapping(path = "/getMyPersonalScheduleForDayTeacher") // Map ONLY GET Requests
     @ResponseBody
     @SuppressWarnings({"PMD.DataflowAnomalyAnalysis", "PMD.AvoidDuplicateLiterals"})
     // we need to add specific values to lectureIds
     // we need to suppress this warning for every method
-    public Object getMyPersonalScheduleForDayTeacher(HttpServletRequest request, String teacherId, LocalDate date) throws IOException, InterruptedException, ServerErrorException {
-      /*  String role = RoleValidation.getRole(request);
-        try {
-            if (!role.equals("teacher")) {
-                return "You are not allowed to view this page. Please contact administrator.";
-            }
-        } catch (Exception e) {
-            return "You are not allowed to view this page. Please contact administrator.";
+    public ResponseEntity<?> getMyPersonalScheduleForDayTeacher(
+            HttpServletRequest request, LocalDate date)
+            throws IOException, InterruptedException, ServerErrorException, JSONException {
+
+        String validation = validateRole(request, "teacher");
+        if(validation.equals(noAccessMessage)) {
+            return ResponseEntity.ok(noAccessMessage);
         }
-*/
-       // String courseId = CourseManagementCommunicator.coursesFromTeacher(teacherId);
-        //List<Lecture> result = lectureRepository.findByCourseId(courseId);
-      //  for (Lecture i : result) {
-      //      if (i.getDate() != date) {
-     //           result.remove(i);
-     //       }
-     //   }
-        return ResponseEntity.ok(request);
+
+        List<BareCourse> courseList =
+                CourseManagementCommunicator.coursesFromTeacher(validation);
+        List<Lecture> lectureList = new ArrayList<>();
+
+        for(BareCourse bareCourse : courseList) {
+            List<Lecture> lectures =
+                    lectureRepository.findByCourseIdAndDate(bareCourse.getCourseId(), date);
+            for(Lecture l : lectures){
+                l.setSelectedForOnCampus(true);
+                lectureList.add(l);
+            }
+        }
+        return ResponseEntity.ok(lectureList);
     }
 
     /**
      * This method will return the personal schedule of a user for a given course.
      *
-     * @param userId the userId of the user.
+     * @param request an object containing authorization properties.
      * @param courseId the course for which the schedule must be given.
      *
-     * @return returns a list with the lectures for a the user for a given course
+     * @return returns a list with the lectures for a the user for a given course if granted access.
      */
     @GetMapping(path = "/getMyPersonalScheduleForCourseStudent") // Map ONLY GET Requests
     @ResponseBody
     @SuppressWarnings({"PMD.DataflowAnomalyAnalysis", "PMD.AvoidDuplicateLiterals"})
     // we need to add specific values to lectureIds
     // we need to suppress this warning for every method
-    public Object getMyPersonalScheduleForCourseStudent(HttpServletRequest request,String userId, String courseId) throws IOException, InterruptedException {
-       /* String role = RoleValidation.getRole(request);
-        try {
-            if (!role.equals("student")) {
-                return "You are not allowed to view this page. Please contact administrator.";
-            }
-        } catch (Exception e) {
-            return "You are not allowed to view this page. Please contact administrator.";
+    public ResponseEntity<?> getMyPersonalScheduleForCourseStudent(
+            HttpServletRequest request, String courseId)
+            throws IOException, InterruptedException, JSONException {
+
+        String validation = validateRole(request, "student");
+        if(validation.equals(noAccessMessage)) {
+            return ResponseEntity.ok(noAccessMessage);
         }
-*/
+
         ArrayList<Lecture> lectures = new ArrayList<>();
-        Map<Integer, Boolean> lectureIdPhysical = createLectureIdPhysicalMap(userId);
+        Map<Integer, Boolean> lectureIdPhysical = createLectureIdPhysicalMap(validation);
 
         for (Lecture l : lectureRepository.findByCourseId(courseId)) {
             if (lectureIdPhysical.containsKey(l.getLectureId())) {
@@ -255,39 +269,104 @@ public class CalendarController {
     /**
      * This method will return the personal schedule of a user for a given course.
      *
-     * @param teacherId the userId of the user.
+     * @param request an object containing authorization properties.
      * @param courseId the course for which the schedule must be given.
      *
-     * @return returns a list with the lectures for a the user for a given course
+     * @return returns a list with the lectures for a the user for a given course if granted access.
      */
     @GetMapping(path = "/getMyPersonalScheduleForCourseTeacher") // Map ONLY GET Requests
     @ResponseBody
     @SuppressWarnings({"PMD.DataflowAnomalyAnalysis", "PMD.AvoidDuplicateLiterals"})
     // we need to add specific values to lectureIds
     // we need to suppress this warning for every method
-    public Object getMyPersonalScheduleForCourseTeacher(HttpServletRequest request, String teacherId, String courseId) throws IOException, InterruptedException, ServerErrorException {
-       /* String role = RoleValidation.getRole(request);
-        try {
-            if (!role.equals("teacher")) {
-                return "You are not allowed to view this page. Please contact administrator.";
-            }
-        } catch (Exception e) {
-            return "You are not allowed to view this page. Please contact administrator.";
-        }*/
-        List<Lecture> result = lectureRepository.findByCourseId(courseId);
-        for (Lecture i : result) {
-            if (i.getCourseId() != courseId) {
-                result.remove(i);
-            }
+    public ResponseEntity<?> getMyPersonalScheduleForCourseTeacher(
+            HttpServletRequest request, String courseId)
+            throws IOException, InterruptedException, JSONException {
+
+        String validation = validateRole(request, "teacher");
+
+        if(validation.equals(noAccessMessage)) {
+            return ResponseEntity.ok(noAccessMessage);
         }
+
+        // Should we check if the teacher actually teaches the course?
+
+        List<Lecture> result = lectureRepository.findByCourseId(courseId);
         return ResponseEntity.ok(result);
+    }
+
+    /**
+     * This method is used by a user to indicate that
+     * the user will be absent during a fysical lecture.
+     *
+     * @param userId the userId of the user.
+     * @param courseId the course for which the user will be absent.
+     * @param date the date on which the lecture would have took place
+     *
+     * @return a string with 'success' if done.
+     */
+    @PostMapping(path = "/indicateAbsence")
+    @ResponseBody
+    @SuppressWarnings({"PMD.DataflowAnomalyAnalysis", "PMD.AvoidDuplicateLiterals"})
+    // we need to add specific values to lectureIds
+    // we need to suppress this warning for every method
+    public ResponseEntity<?> indicateAbsence(String userId, String courseId, LocalDate date) {
+
+        // Should we add validation here too?
+
+        try {
+            int lectureId = lectureRepository.findByDateAndCourseId(date, courseId).getLectureId();
+
+            for (Attendance a :
+                    attendanceRepository.findByLectureIdAndStudentId(lectureId, userId)) {
+                attendanceRepository.delete(a);
+                a.setPhysical(false);
+                attendanceRepository.save(a);
+            }
+            return ResponseEntity.ok("Indicated absence.");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Could not indicated absence.");
+        }
+    }
+
+    /**
+     * This method is used by a lecture to retrieve a list of netIds belonging to students that
+     * were selected to attend the lecture on-campus.
+     *
+     * @param request an object containing authorization properties.
+     * @param courseId the course for which the user will be absent.
+     * @param date the date on which the lecture would have took place
+     *
+     * @return a list of netIds of selected students
+     */
+    @GetMapping(path = "/getPhysicalAttendantsForLecture")
+    @ResponseBody
+    public ResponseEntity<?> getPhysicalAttendantsForLecture(
+            HttpServletRequest request, String courseId, LocalDate date)
+            throws InterruptedException, IOException, JSONException {
+
+        String validation = validateRole(request, "teacher");
+
+        if(validation.equals(noAccessMessage)) {
+            return ResponseEntity.ok(noAccessMessage);
+        }
+
+        int lectureId = lectureRepository.findByDateAndCourseId(date, courseId).getLectureId();
+        List<String> netIds = attendanceRepository
+                        .findByLectureId(lectureId).stream()
+                        .filter(Attendance::getPhysical)
+                        .map(Attendance::getStudentId)
+                        .collect(Collectors.toList());
+
+        return ResponseEntity.ok(netIds);
     }
 
     /**
      * Helper method to create a map in which the lectureId and a boolean
      * indicating physical presence are stored.
      *
-     * @param userId - the userId of the user to look for
+     * @param userId the userId of the user to look for
      *
      * @return a map containing a lectureId and a boolean indicating physical presence
      */
@@ -300,39 +379,24 @@ public class CalendarController {
     }
 
     /**
-     * This method is used by a user to indicate that
-     * the user will be absent during a fysical lecture.
+     * Helper method to validate the role of a user.
      *
-     * @param userId the userId of the user.
-     * @param courseId the course for which the user will be absent.
-     * @param date the date on which the lecture would have took place
+     * @param request the request containing jwt token information
+     * @param role the desired role
      *
-     * @return a string with 'success' if done
+     * @return an error message if the user hasn't got the desired role, else its netId.
      */
-    @PostMapping(path = "/indicateAbsence")
-    @ResponseBody
-    @SuppressWarnings({"PMD.DataflowAnomalyAnalysis", "PMD.AvoidDuplicateLiterals"})
-    // we need to add specific values to lectureIds
-    // we need to suppress this warning for every method
-    public ResponseEntity<?> indicateAbsence(String userId, String courseId, LocalDate date) {
-        try {
-            int lectureId = 0;
-            for (Lecture l : lectureRepository.findByDate(date)) {
-                if (l.getCourseId().equals(courseId)) {
-                    lectureId = l.getLectureId();
-                }
-            }
+    public String validateRole(HttpServletRequest request, String role)
+            throws JSONException, IOException, InterruptedException {
 
-            for (Attendance a :
-                    attendanceRepository.findByLectureIdAndStudentId(lectureId, userId)) {
-                attendanceRepository.delete(a);
-                a.setPhysical(false);
-                attendanceRepository.save(a);
+        JSONObject jwtInfo = JwtValidate.jwtValidate(request);
+        try {
+            if (!jwtInfo.getString("role").equals(role)) {
+                return noAccessMessage;
             }
-            return ResponseEntity.ok(HttpStatus.ACCEPTED);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Internal server error.");
+            return noAccessMessage;
         }
+        return jwtInfo.getString("netid");
     }
 }
