@@ -1,6 +1,5 @@
 package nl.tudelft.sem.calendar.communication;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import java.io.IOException;
 import nl.tudelft.sem.calendar.exceptions.ServerErrorException;
 import nl.tudelft.sem.calendar.util.Constants;
@@ -21,10 +20,10 @@ public class RoomManagementCommunicator extends Communicator {
     public String getRoomName(int roomId) throws
             InterruptedException, ServerErrorException, IOException {
 
-        var response = getResponse("/rooms/getRoomName" + roomId,
+        var response = getResponse("/rooms/getRoomName?roomId=" + roomId,
                 Constants.ROOMS_SERVER_URL);
-        return objectMapper.readValue(response.body(), new TypeReference<String>() {
-        });
+
+        return response.body();
     }
 
 

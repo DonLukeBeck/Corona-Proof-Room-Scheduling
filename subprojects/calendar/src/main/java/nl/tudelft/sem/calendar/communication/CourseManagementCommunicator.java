@@ -34,7 +34,7 @@ public class CourseManagementCommunicator extends  Communicator {
     public List<Lecture> getToBeScheduledLectures(LocalDate date)
         throws IOException, InterruptedException, ServerErrorException {
 
-        var response = getResponse("/lecture/lectures/date/"
+        var response = getResponse("/lecture/date/"
                 + encode(date.toString()), Constants.COURSE_SERVER_URL);
         var bareLectures
             = objectMapper.readValue(response.body(), new TypeReference<List<BareLecture>>() {});
@@ -49,36 +49,6 @@ public class CourseManagementCommunicator extends  Communicator {
             lectureList.add(Lecture.builder().course(courseMap.get(l.getCourseId()))
                 .courseId(l.getCourseId()).durationInMinutes(l.getDurationInMinutes())
                 .date(l.getDate()).build());
-        }
-        return lectureList;
-    }
-
-    /**
-     * Retrieves all lectures for scheduling from the Course Management Service.
-     *
-     * @return a list of {@link Lecture} objects, used in the scheduling process.
-     *
-     * @throws IOException an input/output exception
-     * @throws InterruptedException an interrupted exception
-     * @throws ServerErrorException a server error exception
-     */
-    public List<Lecture> getToBeScheduledLecturesTest()
-        throws InterruptedException, ServerErrorException, IOException {
-
-        var response = getResponse("/lecture/lectures", Constants.COURSE_SERVER_URL);
-        var bareLectures = objectMapper.readValue(response.body(),
-                new TypeReference<List<BareLecture>>() {});
-        // this isn't a DU-anomaly since we use it to store and retrieve courses inside the for loop
-        @SuppressWarnings("PMD.DataflowAnomalyAnalysis")
-        var courseMap = new HashMap<String, Course>();
-        var lectureList = new ArrayList<Lecture>();
-        for (var l : bareLectures) {
-            if (!courseMap.containsKey(l.getCourseId())) {
-                courseMap.put(l.getCourseId(), courseFromId(l.getCourseId()));
-            }
-            lectureList.add(Lecture.builder().course(courseMap.get(l.getCourseId()))
-                    .courseId(l.getCourseId()).durationInMinutes(l.getDurationInMinutes())
-                    .date(l.getDate()).build());
         }
         return lectureList;
     }
