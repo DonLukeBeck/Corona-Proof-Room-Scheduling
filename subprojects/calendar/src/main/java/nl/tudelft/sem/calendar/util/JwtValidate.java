@@ -1,4 +1,4 @@
-package nl.tudelft.sem.courses.util;
+package nl.tudelft.sem.calendar.util;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -7,8 +7,10 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import javax.servlet.http.HttpServletRequest;
+import org.json.JSONException;
+import org.json.JSONObject;
 
-public class RoleValidation {
+public class JwtValidate {
 
     private static HttpClient client = HttpClient.newBuilder().build();
     private static String uri = "/validate";
@@ -22,9 +24,11 @@ public class RoleValidation {
 
     @SuppressWarnings("PMD.DataflowAnomalyAnalysis")
     // Found 'DD'-anomaly for variable 'token'
-    // This is not a redefinition of the same variable since we cannot initialise the token in an if statement
-    public static String getRole(HttpServletRequest request)
-            throws IOException, InterruptedException {
+    // This is not a redefinition of the same variable
+    // we cannot initialise the token in an if statement
+    public static JSONObject jwtValidate(HttpServletRequest request)
+            throws IOException, InterruptedException, JSONException {
+
 
         //extract authorization from request
         String authorizationHeader = request.getHeader("Authorization");
@@ -41,6 +45,7 @@ public class RoleValidation {
         HttpRequest identityRequest = builder.build();
         HttpResponse<String> response;
         response = client.send(identityRequest, HttpResponse.BodyHandlers.ofString());
+        final JSONObject obj = new JSONObject(response.body());
 
         //check whether the response is from the identity service and not some man in the middle
         if (!response.uri().toString().equals("http://localhost:8083/validate")) {
@@ -48,7 +53,7 @@ public class RoleValidation {
         }
 
         if (response.statusCode() == HttpURLConnection.HTTP_OK) {
-            return response.body();
+            return obj;
         }
 
         return null;

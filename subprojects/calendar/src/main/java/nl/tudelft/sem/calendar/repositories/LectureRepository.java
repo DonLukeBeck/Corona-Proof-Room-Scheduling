@@ -1,5 +1,6 @@
 package nl.tudelft.sem.calendar.repositories;
 
+import java.sql.Date;
 import java.time.LocalDate;
 import java.util.List;
 import nl.tudelft.sem.calendar.entities.Lecture;
@@ -15,6 +16,10 @@ public interface LectureRepository extends JpaRepository<Lecture, Integer> {
 
     List<Lecture> findByCourseId(String courseId);
 
+    List<Lecture> findByCourseIdAndDate(String courseId, LocalDate date);
+
     List<Lecture> findByDate(LocalDate date);
+
+    Lecture findByDateAndCourseId(LocalDate date, String courseId);
 
 }

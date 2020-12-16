@@ -1,9 +1,7 @@
-package nl.tudelft.sem.rooms;
+package nl.tudelft.sem.courses;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 
-@SpringBootTest
 public class ApplicationTest {
 
     @Test

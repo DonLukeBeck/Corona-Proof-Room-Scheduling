@@ -1,6 +1,7 @@
 package nl.tudelft.sem.courses.entity;
 
 import java.sql.Date;
+import java.time.LocalDate;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -17,7 +18,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "Lecture")
+@Table(name = "lecture")
 public class Lecture {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
