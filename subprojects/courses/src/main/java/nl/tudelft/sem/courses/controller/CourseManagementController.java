@@ -167,8 +167,9 @@ public class CourseManagementController {
      */
     @DeleteMapping(path = "/cancelLecture") // Map ONLY POST Requests
     public String cancelLecture(@RequestParam String courseId, @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
-        Date sqlDate = Date.valueOf(date);
-        Lecture lecture = lectureRepository.findByCourseIdAndDate(courseId, sqlDate);
+        // We need to add one day since Spring of MariaDB or something matches against one day off
+        Date sqlDate = Date.valueOf(date.plusDays(1));
+        Lecture lecture = lectureRepository.findByCourseIdAndScheduledDate(courseId, sqlDate);
         if (lecture == null) {
             return "ERROR";
         }

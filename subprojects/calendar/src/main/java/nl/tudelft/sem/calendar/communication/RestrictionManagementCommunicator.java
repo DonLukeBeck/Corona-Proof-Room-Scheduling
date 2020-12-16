@@ -1,11 +1,9 @@
 package nl.tudelft.sem.calendar.communication;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
+
 import com.fasterxml.jackson.core.type.TypeReference;
+import java.io.IOException;
+import java.util.List;
 import nl.tudelft.sem.calendar.entities.Room;
 import nl.tudelft.sem.calendar.exceptions.ServerErrorException;
 import nl.tudelft.sem.calendar.util.Constants;
@@ -29,14 +27,9 @@ public class RestrictionManagementCommunicator extends Communicator {
 
         var response = getResponse("/restrictions/getAllRoomsWithAdjustedCapacity",
                 Constants.RESTRICTION_SERVER_URL);
-        Optional<Iterator<Room>> it = objectMapper.readValue(response.body(),
+        List<Room> roomList = objectMapper.readValue(response.body(),
                 new TypeReference<>() {});
-        List<Room> ret = new ArrayList<>();
-        if (it.isPresent()) {
-            it.get().forEachRemaining(ret::add);
-        }
-
-        return ret;
+        return roomList;
     }
 
     /**
@@ -94,7 +87,7 @@ public class RestrictionManagementCommunicator extends Communicator {
     }
     
 
-}//
+} //
 //    /**
 //     * This method mocks the getAllRoomsWithAdjustedCapacity endpoint from the restriction
 //     * management service.
