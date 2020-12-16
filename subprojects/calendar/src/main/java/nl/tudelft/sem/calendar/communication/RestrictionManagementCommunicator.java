@@ -1,6 +1,5 @@
 package nl.tudelft.sem.calendar.communication;
 
-
 import com.fasterxml.jackson.core.type.TypeReference;
 import java.io.IOException;
 import java.util.List;
@@ -27,9 +26,9 @@ public class RestrictionManagementCommunicator extends Communicator {
 
         var response = getResponse("/restrictions/getAllRoomsWithAdjustedCapacity",
                 Constants.RESTRICTION_SERVER_URL);
-        List<Room> roomList = objectMapper.readValue(response.body(),
+
+        return objectMapper.readValue(response.body(),
                 new TypeReference<>() {});
-        return roomList;
     }
 
     /**
@@ -85,9 +84,9 @@ public class RestrictionManagementCommunicator extends Communicator {
         return objectMapper.readValue(response.body(), new TypeReference<>() {
         });
     }
-    
-
-} //
+}
+// THE CODE BELOW IS A MOCK CODE, IT IS HERE AS B PLAN
+//
 //    /**
 //     * This method mocks the getAllRoomsWithAdjustedCapacity endpoint from the restriction
 //     * management service.
