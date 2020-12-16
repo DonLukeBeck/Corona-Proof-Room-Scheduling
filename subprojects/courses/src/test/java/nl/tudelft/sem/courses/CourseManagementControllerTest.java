@@ -31,6 +31,7 @@ import java.net.http.HttpHeaders;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.sql.Date;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -48,9 +49,9 @@ import static org.mockito.Mockito.when;
 @SuppressWarnings("PMD.BeanMembersShouldSerialize")
 public class CourseManagementControllerTest {
 
-    private AddCourse Addcourse;
+    private AddCourse addcourse;
     private Course course;
-    private AddLecture Addlecture;
+    private AddLecture addlecture;
     private Lecture lecture;
     private Enrollment enrollment;
     private static Date date;
@@ -97,14 +98,14 @@ public class CourseManagementControllerTest {
         participants = new ArrayList<>();
         participants.add(enrollment.getStudentId());
 
-        this.Addcourse = new AddCourse(courseId, courseName, teacherId, participants);
+        this.addcourse = new AddCourse(courseId, courseName, teacherId, participants);
         this.course = new Course();
         course.setCourseName(courseName);
         course.setTeacherId(teacherId);
         course.setCourseId(courseId);
 
         date = new Date(1220227200L * 1000);
-        this.Addlecture = new AddLecture(courseId, date, 30);
+        this.addlecture = new AddLecture(courseId, date, 30);
         this.lecture = new Lecture();
         lecture.setDuration(30);
         lecture.setScheduledDate(date);
@@ -121,7 +122,7 @@ public class CourseManagementControllerTest {
         when(enrollmentRepository.findByCourseId(course.getCourseName())).thenReturn(enrollments);
 
         when(lectureRepository.findByCourseId(course.getCourseName())).thenReturn(lectures);
-        when(lectureRepository.findByCourseIdAndDate(course.getCourseName(), date)).thenReturn(lecture);
+        when(lectureRepository.findByCourseIdAndScheduledDate(course.getCourseName(), date)).thenReturn(lecture);
 
         when(request.getHeader("Authorization")).thenReturn("Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJsdWthIiwic2NvcGUiOlt7ImF1dGhvcml0eSI6IlJPTEVfVEVBQ0hFUiJ9XSwiZXhwIjoxNjA4MDQ2MTM2LCJpYXQiOjE2MDgwNDI1MzZ9.1Pn1WnHIsa6YHIGqmnCPogfmvPqwXIjpwuhotzk6SnU"); //????
 
@@ -205,13 +206,14 @@ public class CourseManagementControllerTest {
 
     @Test
     void planNewLectureSuccess() {
-        assertEquals("Lecture added", courseManagementController.planNewLecture(lecture.getCourseId(), lecture.getDuration(), lecture.getScheduledDate()));
+        assertEquals("Lecture added", courseManagementController.planNewLecture(addlecture));
     }
 
     @Test
     void planNewLectureFail() {
-        assertEquals(errorMessage, courseManagementController.planNewLecture("Random number", lecture.getDuration(), lecture.getScheduledDate()));
-        assertEquals(errorMessage, courseManagementController.planNewLecture(lecture.getCourseId(), -8, lecture.getScheduledDate()));
+        addlecture.setCourseId("randomCourseIdFail");
+        assertEquals("The course with id randomCourseIdFail does not exist.", courseManagementController.planNewLecture(addlecture));
+        assertEquals("The course with id " + addlecture.getCourseId()  + " does not exist.", courseManagementController.planNewLecture(addlecture));
     }
 
     @Test
@@ -223,8 +225,9 @@ public class CourseManagementControllerTest {
 
     @Test
     void cancelLectureFail() {
-        date = new Date(1220227299L * 1000);
-        assertEquals(errorMessage, courseManagementController.cancelLecture("Random Number", lecture.getScheduledDate()));
-        assertEquals(errorMessage, courseManagementController.cancelLecture(lecture.getCourseId(), date));
+        LocalDate localDate = date.toLocalDate();
+        assertEquals(errorMessage, courseManagementController.cancelLecture("randomCourseIdFail", localDate));
+        localDate = LocalDate.of(1985, 1, 8);
+        assertEquals(errorMessage, courseManagementController.cancelLecture(lecture.getCourseId(), localDate));
     }
 }

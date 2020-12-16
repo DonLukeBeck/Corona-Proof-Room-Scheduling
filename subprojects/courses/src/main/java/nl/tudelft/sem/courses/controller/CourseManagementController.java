@@ -162,29 +162,27 @@ public class CourseManagementController {
     @SuppressWarnings("PMD.DataflowAnomalyAnalysis")
     // Found 'DD'-anomaly for variable 'lectureId' (lines '96'-'98').
     // -> correct since we need to count
-    public String planNewLecture(@RequestParam String courseId, @RequestParam int durationInMinutes,
-                                 @RequestParam  Date date) {
-        if (courseId == null || durationInMinutes < 0) {
-            return errorMessage;
-        }
-        if (courseRepository.findByCourseId(courseId) != null) {
-            int lectureId = 1 + lectureRepository.findAll().size();
+    public String planNewLecture(@RequestBody AddLecture addLecture) {
+        if (courseRepository.findByCourseId(addLecture.getCourseId()) != null) {
             Lecture lecture = new Lecture();
-            lecture.setCourseId(courseId);
-            lecture.setDuration(durationInMinutes);
-            //lecture.setLectureId(lectureId);
-            lecture.setScheduledDate(date);
+            lecture.setCourseId(addLecture.getCourseId());
+            lecture.setDuration(addLecture.getDurationInMinutes());
+            lecture.setScheduledDate(addLecture.getDate());
             lectureRepository.save(lecture);
             return "Lecture added";
+        } else {
+            return "The course with id " + addLecture.getCourseId() + " does not exist.";
         }
-        return errorMessage;
     }
+
 
     /**
      * Cancels a lecture with provided arguments.
      */
     @DeleteMapping(path = "/cancelLecture") // Map ONLY POST Requests
-    public String cancelLecture(@RequestParam String courseId, @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+    public String cancelLecture(@RequestParam String courseId,
+                                @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+                                        LocalDate date) {
         // We need to add one day since Spring of MariaDB or something matches against one day off
         Date sqlDate = Date.valueOf(date.plusDays(1));
         Lecture lecture = lectureRepository.findByCourseIdAndScheduledDate(courseId, sqlDate);
