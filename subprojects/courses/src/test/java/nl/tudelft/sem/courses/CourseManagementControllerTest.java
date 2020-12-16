@@ -54,7 +54,8 @@ public class CourseManagementControllerTest {
     private AddLecture addlecture;
     private Lecture lecture;
     private Enrollment enrollment;
-    private static Date date;
+    private LocalDate localDate;
+    private Date sqlDate;
     private List<String> participants;
     private List<Enrollment> enrollments;
     private List<Lecture> lectures;
@@ -104,11 +105,12 @@ public class CourseManagementControllerTest {
         course.setTeacherId(teacherId);
         course.setCourseId(courseId);
 
-        date = new Date(1220227200L * 1000);
-        this.addlecture = new AddLecture(courseId, date, 30);
+        localDate = LocalDate.of(2020, 1, 8);
+        this.sqlDate = Date.valueOf(localDate);
+        this.addlecture = new AddLecture(courseId, sqlDate, 30);
         this.lecture = new Lecture();
         lecture.setDuration(30);
-        lecture.setScheduledDate(date);
+        lecture.setScheduledDate(sqlDate);
         lecture.setCourseId(courseId);
         lectures = new ArrayList<>();
         lectures.add(lecture);
@@ -119,10 +121,10 @@ public class CourseManagementControllerTest {
         when(courseRepository.findByCourseName(course.getCourseName())).thenReturn(course);
         when(courseRepository.findByTeacherId(course.getTeacherId())).thenReturn(course);
 
-        when(enrollmentRepository.findByCourseId(course.getCourseName())).thenReturn(enrollments);
+        when(enrollmentRepository.findByCourseId(course.getCourseId())).thenReturn(enrollments);
 
-        when(lectureRepository.findByCourseId(course.getCourseName())).thenReturn(lectures);
-        when(lectureRepository.findByCourseIdAndScheduledDate(course.getCourseName(), date)).thenReturn(lecture);
+        when(lectureRepository.findByCourseId(course.getCourseId())).thenReturn(lectures);
+        when(lectureRepository.findByCourseIdAndScheduledDate(course.getCourseId(), Date.valueOf(localDate.plusDays(1)))).thenReturn(lecture);
 
         when(request.getHeader("Authorization")).thenReturn("Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJsdWthIiwic2NvcGUiOlt7ImF1dGhvcml0eSI6IlJPTEVfVEVBQ0hFUiJ9XSwiZXhwIjoxNjA4MDQ2MTM2LCJpYXQiOjE2MDgwNDI1MzZ9.1Pn1WnHIsa6YHIGqmnCPogfmvPqwXIjpwuhotzk6SnU"); //????
 
@@ -139,6 +141,7 @@ public class CourseManagementControllerTest {
         assertNotNull(courseManagementController);
     }
 
+
     /**
     @Test
     void createNewCourseSuccess() throws IOException, InterruptedException {
@@ -148,14 +151,17 @@ public class CourseManagementControllerTest {
                 courseManagementController.createNewCourse
                         (request, newOne));
     }
+     */
 
+    /**
     @Test
     void createNewCourseFail() throws IOException, InterruptedException {
         assertEquals("Already Exists",
                 courseManagementController.createNewCourse
-                        (request, Addcourse));
+                        (request, addcourse));
     }
      */
+
 
     @Test
     void deleteCourseSuccess() {
@@ -191,6 +197,7 @@ public class CourseManagementControllerTest {
 
     @Test
     void getCourseParticipantsFail() {
+        enrollment.setCourseId("randomCourseIdFail");
         assertEquals(0, courseManagementController.getCourseParticipants(enrollment.getCourseId()).size());
     }
 
@@ -220,12 +227,11 @@ public class CourseManagementControllerTest {
     void cancelLectureSuccess() {
         // the method cancelLecture does not work
         // Uncomment line below if method is fixed
-        // assertEquals("Lecture deleted", courseManagementController.cancelLecture(lecture.getCourseId(), lecture.getScheduledDate()));
+        assertEquals("Lecture deleted", courseManagementController.cancelLecture(lecture.getCourseId(), localDate));
     }
 
     @Test
     void cancelLectureFail() {
-        LocalDate localDate = date.toLocalDate();
         assertEquals(errorMessage, courseManagementController.cancelLecture("randomCourseIdFail", localDate));
         localDate = LocalDate.of(1985, 1, 8);
         assertEquals(errorMessage, courseManagementController.cancelLecture(lecture.getCourseId(), localDate));
