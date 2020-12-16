@@ -69,7 +69,7 @@ public class CalendarController {
      */
     @PostMapping(path = "/scheduleLectures")
     @ResponseBody
-    public ResponseEntity<?> schedulePlannedLectures(HttpServletRequest request)
+    public ResponseEntity<?> scheduleLectures(HttpServletRequest request)
             throws InterruptedException, IOException, JSONException {
 
         String validation = validateRole(request, teacherRole);

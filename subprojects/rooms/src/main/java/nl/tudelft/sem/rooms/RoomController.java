@@ -87,7 +87,7 @@ public class RoomController {
      * @param roomId of the room
      * @return room name
      */
-    @PostMapping(path = "/getRoomName") // Map ONLY POST Requests
+    @GetMapping(path = "/getRoomName") // Map ONLY POST Requests
     @ResponseBody
     public ResponseEntity<?> getRoomName(@RequestParam int roomId) {
         Room r = roomRepository.findById(roomId).orElse(null);
