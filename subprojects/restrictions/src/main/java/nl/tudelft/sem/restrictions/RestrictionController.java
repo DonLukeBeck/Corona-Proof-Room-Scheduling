@@ -86,12 +86,10 @@ public class RestrictionController {
                                          @RequestParam float maxPercentageAllowed) {
         if (bigOrSmallRoom) {
             return ResponseEntity.ok(
-                    addNewRestriction("bigRoomMaxPercentage",
-                            maxPercentageAllowed));
+                    addNewRestriction("bigRoomMaxPercentage", maxPercentageAllowed));
         } else {
             return ResponseEntity.ok(
-                    addNewRestriction("smallRoomMaxPercentage",
-                            maxPercentageAllowed));
+                    addNewRestriction("smallRoomMaxPercentage", maxPercentageAllowed));
         }
     }
 
