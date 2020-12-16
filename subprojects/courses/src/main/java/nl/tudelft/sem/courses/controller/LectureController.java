@@ -51,9 +51,7 @@ public class LectureController {
     @GetMapping("/date/{date}")
     @ResponseBody
     public ResponseEntity<?> listLecturesAfterDate(
-            @PathVariable("date")
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-                    LocalDate date) {
+            @PathVariable("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
         return ResponseEntity.ok(bareFromLecture(lectureRepository.findAll().stream()
             .filter(l -> date.isBefore(l.getScheduledDate().toLocalDate())))
             .collect(Collectors.toList()));

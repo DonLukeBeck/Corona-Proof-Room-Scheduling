@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "Restriction")
+@Table(name = "restriction")
 public class Restriction {
     @Id
     @Column(name = "name")

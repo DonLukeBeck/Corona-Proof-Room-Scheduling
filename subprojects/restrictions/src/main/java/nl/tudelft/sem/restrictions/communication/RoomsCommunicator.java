@@ -4,7 +4,9 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import java.io.IOException;
 import java.util.List;
 import nl.tudelft.sem.restrictions.Room;
+import org.springframework.stereotype.Service;
 
+@Service
 public class RoomsCommunicator extends Communicator {
 
     /**
