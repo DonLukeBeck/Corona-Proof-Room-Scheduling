@@ -1,7 +1,7 @@
 package nl.tudelft.sem.calendar.communication;
 
-import java.io.IOException;
 import com.fasterxml.jackson.core.type.TypeReference;
+import java.io.IOException;
 import nl.tudelft.sem.calendar.exceptions.ServerErrorException;
 import nl.tudelft.sem.calendar.util.Constants;
 import org.springframework.stereotype.Service;

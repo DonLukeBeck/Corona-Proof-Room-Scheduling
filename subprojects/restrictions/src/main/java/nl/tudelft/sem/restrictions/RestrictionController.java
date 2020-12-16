@@ -85,9 +85,13 @@ public class RestrictionController {
     public ResponseEntity<?> setCapacityRestriction(@RequestParam boolean bigOrSmallRoom,
                                          @RequestParam float maxPercentageAllowed) {
         if (bigOrSmallRoom) {
-            return ResponseEntity.ok(addNewRestriction("bigRoomMaxPercentage", maxPercentageAllowed));
+            return ResponseEntity.ok(
+                    addNewRestriction("bigRoomMaxPercentage",
+                            maxPercentageAllowed));
         } else {
-            return ResponseEntity.ok(addNewRestriction("smallRoomMaxPercentage", maxPercentageAllowed));
+            return ResponseEntity.ok(
+                    addNewRestriction("smallRoomMaxPercentage",
+                            maxPercentageAllowed));
         }
     }
 
