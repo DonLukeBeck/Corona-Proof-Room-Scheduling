@@ -26,6 +26,7 @@ public class RestrictionManagementCommunicator extends Communicator {
 
         var response = getResponse("/restrictions/getAllRoomsWithAdjustedCapacity",
                 Constants.RESTRICTION_SERVER_URL);
+
         return objectMapper.readValue(response.body(),
                 new TypeReference<>() {});
     }

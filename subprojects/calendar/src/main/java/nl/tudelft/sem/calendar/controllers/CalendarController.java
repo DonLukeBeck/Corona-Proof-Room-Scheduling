@@ -24,6 +24,7 @@ import nl.tudelft.sem.calendar.util.JwtValidate;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -90,7 +91,7 @@ public class CalendarController {
                     restrictionManagementCommunicator.getAllRoomsWithAdjustedCapacity();
             // Get all the lectures to be scheduled
             List<Lecture> lecturesToSchedule = courseManagementCommunicator
-                    .getToBeScheduledLecturesTest();
+                    .getToBeScheduledLectures(LocalDate.of(2020, 03, 27));
             // Create the scheduler that does the scheduling
             lectureScheduler.setFields(rooms, lecturesToSchedule, startTime,
                     endTime, timeGapLength);
@@ -99,6 +100,7 @@ public class CalendarController {
 
             return ResponseEntity.ok("Successfully scheduled lectures.");
         } catch (Exception e) {
+            System.out.println(e.toString());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Internal server error.");
         }
@@ -186,7 +188,8 @@ public class CalendarController {
     // we need to add specific values to lectureIds
     // we need to suppress this warning for every method
     public ResponseEntity<?> getMyPersonalScheduleForDayStudent(
-            HttpServletRequest request, LocalDate date)
+            HttpServletRequest request,
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date)
             throws IOException, InterruptedException, JSONException, ServerErrorException {
 
         String validation = validateRole(request, studentRole);
@@ -197,7 +200,7 @@ public class CalendarController {
         ArrayList<Lecture> lectures = new ArrayList<>();
         Map<Integer, Boolean> lectureIdPhysical = createLectureIdPhysicalMap(validation);
 
-        for (Lecture l : lectureRepository.findByDate(date)) {
+        for (Lecture l : lectureRepository.findByDate(date.plusDays(1))) {
             if (lectureIdPhysical.containsKey(l.getLectureId())) {
                 l.setSelectedForOnCampus(lectureIdPhysical.get(l.getLectureId()));
                 l.setRoomName(roomManagementCommunicator.getRoomName(l.getRoomId()));
@@ -221,7 +224,8 @@ public class CalendarController {
     // we need to add specific values to lectureIds
     // we need to suppress this warning for every method
     public ResponseEntity<?> getMyPersonalScheduleForDayTeacher(
-            HttpServletRequest request, LocalDate date)
+            HttpServletRequest request,
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date)
             throws IOException, InterruptedException, ServerErrorException, JSONException {
 
         String validation = validateRole(request, teacherRole);
@@ -235,7 +239,8 @@ public class CalendarController {
 
         for (BareCourse bareCourse : courseList) {
             List<Lecture> lectures =
-                    lectureRepository.findByCourseIdAndDate(bareCourse.getCourseId(), date);
+                    lectureRepository.findByCourseIdAndDate(bareCourse.getCourseId(),
+                            date.plusDays(1));
             for (Lecture l : lectures) {
                 l.setSelectedForOnCampus(true);
                 l.setRoomName(roomManagementCommunicator.getRoomName(l.getRoomId()));
@@ -324,12 +329,18 @@ public class CalendarController {
     @SuppressWarnings({"PMD.DataflowAnomalyAnalysis", "PMD.AvoidDuplicateLiterals"})
     // we need to add specific values to lectureIds
     // we need to suppress this warning for every method
-    public ResponseEntity<?> indicateAbsence(String userId, String courseId, LocalDate date) {
+    public ResponseEntity<?> indicateAbsence(HttpServletRequest request,
+                                             String userId, String courseId,
+                                             @DateTimeFormat(iso = DateTimeFormat
+                                             .ISO.DATE) LocalDate date)
+            throws IOException, InterruptedException {
 
-        // Should we add validation here too?
-
+        if (!validateRole(request, studentRole).equals(userId)) {
+            return ResponseEntity.ok(noAccessMessage);
+        }
         try {
-            int lectureId = lectureRepository.findByDateAndCourseId(date, courseId).getLectureId();
+            int lectureId = lectureRepository
+                    .findByDateAndCourseId(date.plusDays(1), courseId).getLectureId();
 
             for (Attendance a :
                     attendanceRepository.findByLectureIdAndStudentId(lectureId, userId)) {
@@ -357,7 +368,8 @@ public class CalendarController {
     @GetMapping(path = "/getPhysicalAttendantsForLecture")
     @ResponseBody
     public ResponseEntity<?> getPhysicalAttendantsForLecture(
-            HttpServletRequest request, String courseId, LocalDate date)
+            HttpServletRequest request, String courseId,
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date)
             throws InterruptedException, IOException, JSONException {
 
         String validation = validateRole(request, teacherRole);
@@ -366,7 +378,8 @@ public class CalendarController {
             return ResponseEntity.ok(noAccessMessage);
         }
 
-        int lectureId = lectureRepository.findByDateAndCourseId(date, courseId).getLectureId();
+        int lectureId = lectureRepository.findByDateAndCourseId(date.plusDays(1),
+                courseId).getLectureId();
         List<String> netIds = attendanceRepository
                         .findByLectureId(lectureId).stream()
                         .filter(Attendance::getPhysical)
