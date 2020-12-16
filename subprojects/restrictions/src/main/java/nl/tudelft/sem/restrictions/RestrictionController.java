@@ -23,13 +23,18 @@ public class RestrictionController {
     @Autowired
     private transient RestrictionRepository restrictionRepository;
 
+    @Autowired
+    private transient RoomsCommunicator roomsCommunicator;
+
     /**
      * Initializes the repository that is being used.
      *
      * @param restrictionRepository the repository that will be used
      */
-    public RestrictionController(RestrictionRepository restrictionRepository) {
+    public RestrictionController(RestrictionRepository restrictionRepository,
+                                 RoomsCommunicator roomsCommunicator) {
         this.restrictionRepository = restrictionRepository;
+        this.roomsCommunicator = roomsCommunicator;
     }
 
     /**
@@ -202,7 +207,7 @@ public class RestrictionController {
     @ResponseBody
     public ResponseEntity<?> getAllRoomsWithAdjustedCapacity()
             throws InterruptedException, ServerErrorException, IOException {
-        List<Room> it = RoomsCommunicator.getAllRooms();
+        List<Room> it = roomsCommunicator.getAllRooms();
         for (Room r : it) {
             int cap = r.getCapacity();
             if (cap >= getMinSeatsBig()) {

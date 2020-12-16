@@ -61,7 +61,7 @@ public class CourseManagementController {
     }
 
     public JSONObject validate(HttpServletRequest request)
-            throws IOException, InterruptedException {
+            throws IOException, InterruptedException, JSONException {
         JSONObject jwtInfo = jwtValidate.jwtValidate(request);
         return jwtInfo;
     }
