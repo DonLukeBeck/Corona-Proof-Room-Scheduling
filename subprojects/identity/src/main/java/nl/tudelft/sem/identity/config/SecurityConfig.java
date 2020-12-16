@@ -9,6 +9,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.BeanIds;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -37,13 +38,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         auth.userDetailsService(userDetailsService);
     }
 
+    /**
+     * This method configures the roles which are authorized to request certain uri.
+     */
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         //authorize requests depending on roles
         http.csrf().disable().authorizeRequests()
                 .antMatchers("/login").permitAll()
-                .antMatchers("/see-schedule").hasAnyRole("STUDENT", "TEACHER")
-                .antMatchers("/create-courses").hasAnyRole("TEACHER")
                 .and().exceptionHandling().and().sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
