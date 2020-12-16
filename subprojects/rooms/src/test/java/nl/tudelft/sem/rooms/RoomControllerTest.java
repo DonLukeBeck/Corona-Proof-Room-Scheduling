@@ -49,10 +49,10 @@ class RoomControllerTest {
 
     }
 
-        @Test
-        public void constructorNotNull() {
-            assertNotNull(roomController);
-        }
+    @Test
+    public void constructorNotNull() {
+        assertNotNull(roomController);
+    }
 
     @Test
     void addNewRoom() {
