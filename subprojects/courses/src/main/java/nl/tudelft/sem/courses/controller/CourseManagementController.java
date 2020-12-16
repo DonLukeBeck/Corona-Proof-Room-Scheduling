@@ -184,9 +184,8 @@ public class CourseManagementController {
      * Cancels a lecture with provided arguments.
      */
     @DeleteMapping(path = "/cancelLecture") // Map ONLY POST Requests
-    public String cancelLecture(@RequestParam String courseId, @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
-        Date sqlDate = Date.valueOf(date);
-        Lecture lecture = lectureRepository.findByCourseIdAndDate(courseId, sqlDate);
+    public String cancelLecture(@RequestParam String courseId, @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date date) {
+        Lecture lecture = lectureRepository.findByCourseIdAndDate(courseId, date);
         if (lecture == null) {
             return errorMessage;
         }

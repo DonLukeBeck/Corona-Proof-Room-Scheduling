@@ -131,8 +131,6 @@ public class CourseManagementControllerTest {
 
         //when(jwt.jwtValidate(request)).thenReturn(obj);
         //when(courseManagementController.validate(request)).thenReturn(obj);
-
-
     }
 
     @Test
