@@ -9,9 +9,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
-import nl.tudelft.sem.calendar.communication.CourseManagementCommunicator;
-import nl.tudelft.sem.calendar.communication.RestrictionManagementCommunicator;
-import nl.tudelft.sem.calendar.communication.RoomManagementCommunicator;
+import nl.tudelft.sem.calendar.communication.CourseCommunicator;
+import nl.tudelft.sem.calendar.communication.RestrictionCommunicator;
+import nl.tudelft.sem.calendar.communication.RoomCommunicator;
 import nl.tudelft.sem.calendar.entities.Attendance;
 import nl.tudelft.sem.calendar.entities.BareCourse;
 import nl.tudelft.sem.calendar.entities.Lecture;
@@ -27,13 +27,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
 
-@RestController
+@Controller
 @RequestMapping(path = "/calendar")
 public class CalendarController {
 
@@ -52,13 +52,39 @@ public class CalendarController {
     private transient LectureRepository lectureRepository;
 
     @Autowired
-    private transient RestrictionManagementCommunicator restrictionManagementCommunicator;
+    private transient RestrictionCommunicator restrictionCommunicator;
 
     @Autowired
-    private transient CourseManagementCommunicator courseManagementCommunicator;
+    private transient CourseCommunicator courseCommunicator;
 
     @Autowired
-    private transient RoomManagementCommunicator roomManagementCommunicator;
+    private transient RoomCommunicator roomCommunicator;
+
+
+    /**
+     * Constructor used for testing to inject mockable dependencies.
+     * @param lectureScheduler the lecture scheduler
+     * @param attendanceRepository the attendance repository
+     * @param lectureRepository the lecture repository
+     * @param restrictionCommunicator the communicator for the restrictions service
+     * @param courseCommunicator the communicator for the course service
+     * @param roomCommunicator  the communicator for the room service
+     */
+    public CalendarController(
+            LectureScheduler lectureScheduler,
+            AttendanceRepository attendanceRepository,
+            LectureRepository lectureRepository,
+            RestrictionCommunicator restrictionCommunicator,
+            CourseCommunicator courseCommunicator,
+            RoomCommunicator roomCommunicator) {
+
+        this.lectureScheduler = lectureScheduler;
+        this.attendanceRepository = attendanceRepository;
+        this.lectureRepository = lectureRepository;
+        this.restrictionCommunicator = restrictionCommunicator;
+        this.courseCommunicator = courseCommunicator;
+        this.roomCommunicator = roomCommunicator;
+    }
 
     /**
      * This method will form the main API endpoint for the Scheduling functionality, once the
@@ -79,19 +105,19 @@ public class CalendarController {
         try {
             // Make API call to retrieve the start time
             LocalTime startTime = LocalTime
-                    .ofSecondOfDay(restrictionManagementCommunicator.getStartTime());
+                    .ofSecondOfDay(restrictionCommunicator.getStartTime());
 
             // Make API call to retrieve the end time
             LocalTime endTime = LocalTime
-                    .ofSecondOfDay(restrictionManagementCommunicator.getEndTime());
+                    .ofSecondOfDay(restrictionCommunicator.getEndTime());
             // Make API call to retrieve time gap length
-            int timeGapLength = restrictionManagementCommunicator.getTimeGapLength();
+            int timeGapLength = restrictionCommunicator.getTimeGapLength();
             // Make API call to retrieve rooms with restricted capacity
             List<Room> rooms =
-                    restrictionManagementCommunicator.getAllRoomsWithAdjustedCapacity();
+                    restrictionCommunicator.getAllRoomsWithAdjustedCapacity();
             // Get all the lectures to be scheduled
-            List<Lecture> lecturesToSchedule = courseManagementCommunicator
-                    .getToBeScheduledLectures(LocalDate.of(2020, 03, 27));
+            List<Lecture> lecturesToSchedule = courseCommunicator
+                    .getToBeScheduledLectures(LocalDate.now());
             // Create the scheduler that does the scheduling
             lectureScheduler.setFields(rooms, lecturesToSchedule, startTime,
                     endTime, timeGapLength);
@@ -100,7 +126,6 @@ public class CalendarController {
 
             return ResponseEntity.ok("Successfully scheduled lectures.");
         } catch (Exception e) {
-            System.out.println(e.toString());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Internal server error.");
         }
@@ -133,7 +158,7 @@ public class CalendarController {
         for (Map.Entry<Integer, Boolean> idPhysical : lectureIdPhysical.entrySet()) {
             Lecture l = lectureRepository.findByLectureId(idPhysical.getKey());
             l.setSelectedForOnCampus(idPhysical.getValue());
-            l.setRoomName(roomManagementCommunicator.getRoomName(l.getRoomId()));
+            l.setRoomName(roomCommunicator.getRoomName(l.getRoomId()));
             lectures.add(l);
         }
         return ResponseEntity.ok(lectures);
@@ -160,14 +185,14 @@ public class CalendarController {
         }
 
         List<BareCourse> courseList =
-                courseManagementCommunicator.coursesFromTeacher(validation);
+                courseCommunicator.coursesFromTeacher(validation);
 
         List<Lecture> lectureList = new ArrayList<>();
         for (BareCourse bareCourse : courseList) {
             List<Lecture> lectures = lectureRepository.findByCourseId(bareCourse.getCourseId());
             for (Lecture l : lectures) {
                 l.setSelectedForOnCampus(true);
-                l.setRoomName(roomManagementCommunicator.getRoomName(l.getRoomId()));
+                l.setRoomName(roomCommunicator.getRoomName(l.getRoomId()));
                 lectureList.add(l);
             }
         }
@@ -203,7 +228,7 @@ public class CalendarController {
         for (Lecture l : lectureRepository.findByDate(date.plusDays(1))) {
             if (lectureIdPhysical.containsKey(l.getLectureId())) {
                 l.setSelectedForOnCampus(lectureIdPhysical.get(l.getLectureId()));
-                l.setRoomName(roomManagementCommunicator.getRoomName(l.getRoomId()));
+                l.setRoomName(roomCommunicator.getRoomName(l.getRoomId()));
                 lectures.add(l);
             }
         }
@@ -234,7 +259,7 @@ public class CalendarController {
         }
 
         List<BareCourse> courseList =
-               courseManagementCommunicator.coursesFromTeacher(validation);
+               courseCommunicator.coursesFromTeacher(validation);
         List<Lecture> lectureList = new ArrayList<>();
 
         for (BareCourse bareCourse : courseList) {
@@ -243,7 +268,7 @@ public class CalendarController {
                             date.plusDays(1));
             for (Lecture l : lectures) {
                 l.setSelectedForOnCampus(true);
-                l.setRoomName(roomManagementCommunicator.getRoomName(l.getRoomId()));
+                l.setRoomName(roomCommunicator.getRoomName(l.getRoomId()));
                 lectureList.add(l);
             }
         }
@@ -278,7 +303,7 @@ public class CalendarController {
         for (Lecture l : lectureRepository.findByCourseId(courseId)) {
             if (lectureIdPhysical.containsKey(l.getLectureId())) {
                 l.setSelectedForOnCampus(lectureIdPhysical.get(l.getLectureId()));
-                l.setRoomName(roomManagementCommunicator.getRoomName(l.getRoomId()));
+                l.setRoomName(roomCommunicator.getRoomName(l.getRoomId()));
                 lectures.add(l);
             }
         }

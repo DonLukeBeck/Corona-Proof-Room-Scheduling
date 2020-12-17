@@ -6,7 +6,7 @@ import nl.tudelft.sem.calendar.util.Constants;
 import org.springframework.stereotype.Service;
 
 @Service
-public class RoomManagementCommunicator extends Communicator {
+public class RoomCommunicator extends Communicator {
 
     /**
      * Returns the name of the room with given id.
