@@ -59,8 +59,8 @@ public class LectureScheduler {
 
         this.roomList = roomList;
         this.lecturesToSchedule = lecturesToSchedule;
-        this.startTime = startTime;
-        this.endTime = endTime;
+        this.startTime = startTime.plusHours(1);
+        this.endTime = endTime.plusHours(1);
         this.timeGapLengthInMinutes = timeGapLengthInMinutes;
         this.roomAvailability = new LocalTime[roomList.size()];
         this.allParticipants = new HashMap<>();
