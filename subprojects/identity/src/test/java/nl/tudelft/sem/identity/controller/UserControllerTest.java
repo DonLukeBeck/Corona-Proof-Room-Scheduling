@@ -81,11 +81,14 @@ public class UserControllerTest {
     @Test
     public void loginCorrect() throws Exception {
 
-        String jwt = mockMvc.perform(post(loginUri)
+        String jwtJsonString = mockMvc.perform(post(loginUri)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
             .content(objectMapper.writeValueAsString(authenticationRequest)))
                 .andExpect(status().isOk())
             .andReturn().getResponse().getContentAsString();
+
+        JSONObject jwtJson = new JSONObject(jwtJsonString);
+        String jwt = jwtJson.getString("message");
 
         Claims claims = Jwts.parser().setSigningKey(jwtUtil.getSecret()).parseClaimsJws(jwt)
                 .getBody();
@@ -107,7 +110,8 @@ public class UserControllerTest {
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
 
-
+        JSONObject obj = new JSONObject(jwt);
+        assertThat(obj.getString("message")).isEqualTo("Authentication failure");
     }
 
     @Test
@@ -120,18 +124,15 @@ public class UserControllerTest {
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
 
-        assertThat(jwt).isEqualTo("Authentication failure");
+        JSONObject obj = new JSONObject(jwt);
+        assertThat(obj.getString("message")).isEqualTo("Authentication failure");
     }
 
     @Test
     public void validateCorrectStudent() throws Exception {
 
-        String jwt = mockMvc.perform(post(loginUri)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(objectMapper.writeValueAsString(authenticationRequest)))
-                .andExpect(status().isOk())
-                .andReturn().getResponse().getContentAsString();
-        
+        String jwt = jwtUtil.generateToken(netid);
+
         String jsonToken = mockMvc.perform(post(validateUri)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(jwt)).andExpect(status().isOk())
@@ -152,12 +153,7 @@ public class UserControllerTest {
                 password);
         when(userRepository.findByNetid(correctUser.getNetid())).thenReturn(correctUser);
         
-        String jwt = mockMvc.perform(post(loginUri)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(objectMapper.writeValueAsString(authenticationRequest)))
-                .andExpect(status().isOk())
-                .andReturn().getResponse().getContentAsString();
-
+        String jwt = jwtUtil.generateToken(netid);
    
         String jsonToken = mockMvc.perform(post(validateUri)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -167,6 +163,27 @@ public class UserControllerTest {
         JSONObject obj = new JSONObject(jsonToken);
         assertThat(obj.getString("role")).isEqualTo("teacher");
         assertThat(obj.getString("netid")).isEqualTo(netid);
+    }
+
+    @Test
+    public void validateFailed() throws Exception {
+
+        User correctUser = new User(netid,
+                encoder.encode(password),
+                "fail", false);
+        this.authenticationRequest = new AuthenticationRequest(correctUser.getNetid(),
+                password);
+        when(userRepository.findByNetid(correctUser.getNetid())).thenReturn(correctUser);
+
+        String jwt = jwtUtil.generateToken(netid);
+
+        String jsonToken = mockMvc.perform(post(validateUri)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(jwt)).andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+
+        JSONObject obj = new JSONObject(jsonToken);
+        assertThat(obj.getString("role")).isEqualTo("null");
     }
 
 }
