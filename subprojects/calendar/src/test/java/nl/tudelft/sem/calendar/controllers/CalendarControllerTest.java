@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -174,6 +175,9 @@ class CalendarControllerTest {
         when(lectureRepository.findByLectureId(lecturesToSchedule.get(1).getLectureId()))
         .thenReturn(lecturesToSchedule.get(1));
 
+        when(lectureRepository.findByCourseId(lecturesToSchedule.get(1).getCourseId()))
+                .thenReturn(Arrays.asList(lecturesToSchedule.get(1)));
+
         when(roomCommunicator.getRoomName(lecturesToSchedule.get(0).getLectureId()))
         .thenReturn(lecturesToSchedule.get(0).getRoomName());
         when(roomCommunicator.getRoomName(lecturesToSchedule.get(1).getLectureId()))
@@ -260,7 +264,13 @@ class CalendarControllerTest {
     }
 
     @Test
-    void testGetMyPersonalScheduleForDayStudentSuccess() {
+    void testGetMyPersonalScheduleForDayStudentSuccess()
+                throws InterruptedException, ServerErrorException, IOException {
+        //ResponseEntity<List<Lecture>> result =
+        //(ResponseEntity<List<Lecture>>) calendarController.getMyPersonalScheduleForDayStudent(studentRequest, dates[0]);
+                                                           assertEquals(2, Objects.requireNonNull(result.getBody()).size());
+
+
     }
 
     @Test
@@ -282,25 +292,38 @@ class CalendarControllerTest {
     }
 
     @Test
-    void testGetMyPersonalScheduleForCourseStudentSuccess() {
+    void testGetMyPersonalScheduleForCourseStudentSuccess()
+            throws InterruptedException, ServerErrorException, IOException {
+
+        ResponseEntity<List<Lecture>> result =
+        (ResponseEntity<List<Lecture>>) calendarController.getMyPersonalScheduleForCourseStudent(studentRequest,
+        lecturesToSchedule.get(1).getCourseId());
+
+        assertEquals(1, Objects.requireNonNull(result.getBody()).size());
+        assertTrue(result.getBody().get(0).isSelectedForOnCampus());
+        assertEquals(lecturesToSchedule.get(1).getRoomName(), result.getBody().get(0).getRoomName());
+
+        verify(lectureRepository, times(1)).findByCourseId(lecturesToSchedule.get(1).getCourseId());
+        verify(roomCommunicator, times(1)).getRoomName(lecturesToSchedule.get(1).getLectureId());
     }
 
     @Test
     void testGetMyPersonalScheduleForCourseStudentAccessDenied()
             throws InterruptedException, ServerErrorException, IOException {
         assertEquals(ResponseEntity.ok(noAccessMessage),
-                calendarController.getMyPersonalScheduleForCourseStudent(wrongRequest,"courseid"));
+                calendarController.getMyPersonalScheduleForCourseStudent(wrongRequest,courses[0].getCourseId()));
     }
 
     @Test
     void testGetMyPersonalScheduleForCourseTeacherSuccess() {
+
     }
 
     @Test
     void testGetMyPersonalScheduleForCourseTeacherAccessDenied()
             throws IOException, InterruptedException {
         assertEquals(ResponseEntity.ok(noAccessMessage),
-                calendarController.getMyPersonalScheduleForCourseTeacher(wrongRequest,"courseid"));
+                calendarController.getMyPersonalScheduleForCourseTeacher(wrongRequest,courses[0].getCourseId()));
     }
 
     @Test
@@ -311,7 +334,7 @@ class CalendarControllerTest {
     void testIndicateAbsenceAccessDenied()
             throws IOException, InterruptedException {
         assertEquals(ResponseEntity.ok(noAccessMessage),
-                calendarController.indicateAbsence(wrongRequest,"userid", "courseid", dates[0]));
+                calendarController.indicateAbsence(wrongRequest,"userid", courses[0].getCourseId(), dates[0]));
     }
 
     @Test

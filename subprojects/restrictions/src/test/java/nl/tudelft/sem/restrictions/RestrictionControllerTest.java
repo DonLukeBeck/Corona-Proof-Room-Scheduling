@@ -74,7 +74,7 @@ class RestrictionControllerTest {
 
         request = Mockito.mock(HttpServletRequest.class);
 
-        //restrictionController = new RestrictionController(restrictionRepository, roomsCommunicator);
+        restrictionController = new RestrictionController(restrictionRepository);
         when(restrictionRepository.findByName(rest1.getName()))
                 .thenReturn(java.util.Optional.ofNullable(rest1));
         when(restrictionRepository.findByName(rest2.getName()))
