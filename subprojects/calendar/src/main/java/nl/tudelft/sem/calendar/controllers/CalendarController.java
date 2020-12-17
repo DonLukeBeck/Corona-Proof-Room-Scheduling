@@ -80,6 +80,7 @@ public class CalendarController {
             // Make API call to retrieve the start time
             LocalTime startTime = LocalTime
                     .ofSecondOfDay(restrictionManagementCommunicator.getStartTime());
+
             // Make API call to retrieve the end time
             LocalTime endTime = LocalTime
                     .ofSecondOfDay(restrictionManagementCommunicator.getEndTime());
