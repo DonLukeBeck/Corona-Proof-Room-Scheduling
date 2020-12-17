@@ -339,14 +339,17 @@ public class CalendarController {
             return ResponseEntity.ok(noAccessMessage);
         }
         try {
-            int lectureId = lectureRepository
-                    .findByDateAndCourseId(date.plusDays(1), courseId).getLectureId();
+            List<Lecture> list = lectureRepository
+                    .findByDateAndCourseId(date.plusDays(1), courseId);
 
-            for (Attendance a :
-                    attendanceRepository.findByLectureIdAndStudentId(lectureId, userId)) {
-                attendanceRepository.delete(a);
-                a.setPhysical(false);
-                attendanceRepository.save(a);
+            for (Lecture l : list) {
+                int lectureId = l.getRoomId();
+                for (Attendance a :
+                        attendanceRepository.findByLectureIdAndStudentId(lectureId, userId)) {
+                    attendanceRepository.delete(a);
+                    a.setPhysical(false);
+                    attendanceRepository.save(a);
+                }
             }
             return ResponseEntity.ok("Indicated absence.");
         } catch (Exception e) {
@@ -378,13 +381,21 @@ public class CalendarController {
             return ResponseEntity.ok(noAccessMessage);
         }
 
-        int lectureId = lectureRepository.findByDateAndCourseId(date.plusDays(1),
-                courseId).getLectureId();
-        List<String> netIds = attendanceRepository
-                        .findByLectureId(lectureId).stream()
-                        .filter(Attendance::getPhysical)
-                        .map(Attendance::getStudentId)
-                        .collect(Collectors.toList());
+        List<Lecture> list = lectureRepository.findByDateAndCourseId(date.plusDays(1),
+                courseId);
+        List<String> netIds = new ArrayList<>();
+
+        for (Lecture l : list) {
+            int lectureId = l.getRoomId();
+            List<String> temp = attendanceRepository
+                    .findByLectureId(lectureId).stream()
+                    .filter(Attendance::getPhysical)
+                    .map(Attendance::getStudentId)
+                    .collect(Collectors.toList());
+            netIds.addAll(temp);
+        }
+
+
 
         return ResponseEntity.ok(netIds);
     }

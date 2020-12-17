@@ -75,7 +75,7 @@ public class LectureController extends Controller {
     }
 
     /**
-     * Helper method to convert a {@link BareLecture} stream into a {@link Lecture} stream.
+     * Helper method to convert a {@link Lecture} stream into a {@link BareLecture} stream.
      *
      * @param lectures a stream of lectures
      *
