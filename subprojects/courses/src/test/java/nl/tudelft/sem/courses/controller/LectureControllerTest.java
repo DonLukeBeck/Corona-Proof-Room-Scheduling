@@ -15,6 +15,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import nl.tudelft.sem.courses.entity.AddCourse;
 import nl.tudelft.sem.courses.entity.AddLecture;
+import nl.tudelft.sem.courses.entity.BareCourse;
+import nl.tudelft.sem.courses.entity.BareLecture;
 import nl.tudelft.sem.courses.entity.Course;
 import nl.tudelft.sem.courses.entity.Enrollment;
 import nl.tudelft.sem.courses.entity.Lecture;
@@ -41,6 +43,7 @@ import org.springframework.test.context.ContextConfiguration;
 public class LectureControllerTest {
 
     private AddCourse addcourse;
+    private BareLecture bareLecture;
     private Course course;
     private AddLecture addlecture;
     private Lecture lecture;
@@ -50,6 +53,8 @@ public class LectureControllerTest {
     private List<String> participants;
     private List<Enrollment> enrollments;
     private List<Lecture> lectures;
+    private List<BareLecture> bareLectures;
+    private LocalDate dt;
 
     private LectureController lectureController;
 
@@ -103,13 +108,20 @@ public class LectureControllerTest {
         localDate = LocalDate.of(2020, 1, 8);
         this.sqlDate = Date.valueOf(localDate);
         this.addlecture = new AddLecture(courseId, sqlDate, 30);
+        this.bareLecture = new BareLecture();
         this.lecture = new Lecture();
         lecture.setDuration(30);
         lecture.setScheduledDate(sqlDate);
         lecture.setCourseId(courseId);
+        bareLecture.setDurationInMinutes(30);
+        bareLecture.setDate(localDate);
+        bareLecture.setCourseId(courseId);
         lectures = new ArrayList<>();
+        bareLectures = new ArrayList<>();
         lectures.add(lecture);
+        bareLectures.add(bareLecture);
         lectureRepository.save(lecture);
+        dt = localDate.minusDays(5);
 
         lectureController =
                 new LectureController(courseRepository, lectureRepository);
@@ -119,7 +131,8 @@ public class LectureControllerTest {
         when(courseRepository.findAllByTeacherId(course.getTeacherId())).thenReturn(List.of(course));
         when(lectureRepository.findByCourseId(course.getCourseId())).thenReturn(lectures);
         when(lectureRepository.findByCourseIdAndScheduledDate(course.getCourseId(), Date.valueOf(localDate.plusDays(1)))).thenReturn(List.of(lecture));
-        
+        when(lectureRepository.findByScheduledDateAfter(dt)).thenReturn(lectures);
+
         /**
         when(request.getHeader("Authorization")).thenReturn("Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJsdWthIiwic2NvcGUiOlt7ImF1dGhvcml0eSI6IlJPTEVfVEVBQ0hFUiJ9XSwiZXhwIjoxNjA4MDQ2MTM2LCJpYXQiOjE2MDgwNDI1MzZ9.1Pn1WnHIsa6YHIGqmnCPogfmvPqwXIjpwuhotzk6SnU"); //????
 
@@ -144,13 +157,11 @@ public class LectureControllerTest {
 
     @Test
     void getLecturesAfterDate() {
-        LocalDate dt = localDate.minusYears(1);
-        System.out.println(lectureController.getLecturesAfterDate(dt));
-        List<Lecture> list = (List<Lecture>) lectureController.getLecturesAfterDate(dt).getBody();
-        for (Lecture l : list) {
+        List<BareLecture> list = (List<BareLecture>) lectureController.getLecturesAfterDate(dt).getBody();
+        for (BareLecture l : list) {
             System.out.println(l);
+            assert(bareLectures.contains(l));
         }
-        assert false;
     }
 
     @Test
