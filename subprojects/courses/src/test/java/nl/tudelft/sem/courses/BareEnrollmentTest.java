@@ -1,12 +1,11 @@
 package nl.tudelft.sem.courses;
 
-import nl.tudelft.sem.courses.entity.BareEnrollment;
-import nl.tudelft.sem.courses.entity.Enrollment;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+
+import nl.tudelft.sem.courses.entity.BareEnrollment;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class BareEnrollmentTest {
     private static BareEnrollment enrollment;
