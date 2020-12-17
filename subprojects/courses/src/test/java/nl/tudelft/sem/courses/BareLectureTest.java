@@ -1,6 +1,6 @@
 package nl.tudelft.sem.courses;
 
-import nl.tudelft.sem.courses.entity.BareLecture;
+import nl.tudelft.sem.shared.entity.BareLecture;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

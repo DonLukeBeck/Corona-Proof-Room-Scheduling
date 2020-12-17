@@ -1,40 +1,31 @@
 package nl.tudelft.sem.courses;
 
 import nl.tudelft.sem.courses.controller.CourseManagementController;
-import nl.tudelft.sem.courses.entity.AddCourse;
-import nl.tudelft.sem.courses.entity.AddLecture;
 import nl.tudelft.sem.courses.entity.Course;
 import nl.tudelft.sem.courses.entity.Enrollment;
 import nl.tudelft.sem.courses.entity.Lecture;
 import nl.tudelft.sem.courses.repository.CourseRepository;
 import nl.tudelft.sem.courses.repository.EnrollmentRepository;
 import nl.tudelft.sem.courses.repository.LectureRepository;
-import nl.tudelft.sem.courses.util.Constants;
 import nl.tudelft.sem.courses.util.JwtValidate;
+import nl.tudelft.sem.shared.entity.AddCourse;
+import nl.tudelft.sem.shared.entity.AddLecture;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.test.context.ContextConfiguration;
 
-import javax.net.ssl.SSLSession;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.net.URI;
 import java.net.http.HttpClient;
-import java.net.http.HttpHeaders;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -145,7 +136,7 @@ public class CourseManagementControllerTest {
     /**
     @Test
     void createNewCourseSuccess() throws IOException, InterruptedException {
-        AddCourse newOne = new AddCourse("CSE1299", "OOPP", "Andy", participants);
+        nl.tudelft.sem.shared.entity.shared.AddCourse newOne = new nl.tudelft.sem.shared.entity.shared.AddCourse("CSE1299", "OOPP", "Andy", participants);
         System.out.println(request.getHeader("Authorization"));
         assertEquals("Saved",
                 courseManagementController.createNewCourse
@@ -213,7 +204,7 @@ public class CourseManagementControllerTest {
 
     @Test
     void planNewLectureSuccess() {
-        assertEquals("Lecture added", courseManagementController.planNewLecture(addlecture));
+        assertEquals("nl.tudelft.sem.shared.entity.Lecture added", courseManagementController.planNewLecture(addlecture));
     }
 
     @Test
@@ -227,7 +218,7 @@ public class CourseManagementControllerTest {
     void cancelLectureSuccess() {
         // the method cancelLecture does not work
         // Uncomment line below if method is fixed
-        assertEquals("Lecture deleted", courseManagementController.cancelLecture(lecture.getCourseId(), localDate));
+        assertEquals("nl.tudelft.sem.shared.entity.Lecture deleted", courseManagementController.cancelLecture(lecture.getCourseId(), localDate));
     }
 
     @Test

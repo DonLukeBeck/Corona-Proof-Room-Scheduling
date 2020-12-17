@@ -1,7 +1,6 @@
-package nl.tudelft.sem.calendar.entities;
+package nl.tudelft.sem.shared.entity;
 
 import java.time.LocalDate;
-import java.util.Date;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

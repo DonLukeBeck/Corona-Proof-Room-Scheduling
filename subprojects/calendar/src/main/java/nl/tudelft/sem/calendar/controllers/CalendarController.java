@@ -13,7 +13,6 @@ import nl.tudelft.sem.calendar.communication.CourseManagementCommunicator;
 import nl.tudelft.sem.calendar.communication.RestrictionManagementCommunicator;
 import nl.tudelft.sem.calendar.communication.RoomManagementCommunicator;
 import nl.tudelft.sem.calendar.entities.Attendance;
-import nl.tudelft.sem.calendar.entities.BareCourse;
 import nl.tudelft.sem.calendar.entities.Lecture;
 import nl.tudelft.sem.calendar.entities.Room;
 import nl.tudelft.sem.calendar.exceptions.ServerErrorException;
@@ -21,6 +20,7 @@ import nl.tudelft.sem.calendar.repositories.AttendanceRepository;
 import nl.tudelft.sem.calendar.repositories.LectureRepository;
 import nl.tudelft.sem.calendar.scheduling.LectureScheduler;
 import nl.tudelft.sem.calendar.util.JwtValidate;
+import nl.tudelft.sem.shared.entity.BareCourse;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,7 +65,7 @@ public class CalendarController {
      * This method will form the main API endpoint for the Scheduling functionality, once the
      * connection face with the other services is determined, it will be implemented to match up.
      *
-     * @return a response entity indicating success or failure.
+     * @return a response nl.tudelft.sem.shared.entity indicating success or failure.
      */
     @PostMapping(path = "/scheduleLectures")
     @ResponseBody

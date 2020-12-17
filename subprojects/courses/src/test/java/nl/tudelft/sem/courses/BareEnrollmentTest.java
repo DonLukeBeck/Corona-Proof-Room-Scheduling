@@ -1,7 +1,6 @@
 package nl.tudelft.sem.courses;
 
-import nl.tudelft.sem.courses.entity.BareEnrollment;
-import nl.tudelft.sem.courses.entity.Enrollment;
+import nl.tudelft.sem.shared.entity.BareEnrollment;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
