@@ -48,14 +48,13 @@ public class UserControllerTest {
 
     private MockMvc mockMvc;
 
-    private String password = "SecurePassword123";
+    private final String netid = "CorrectNetid";
 
-    private String netid = "CorrectNetid";
+    private final String password = "SecurePassword123";
 
-    private String studentRole = "student";
+    private final String loginUri = "/login";
 
-    private String teacherRole = "teacher";
-
+    private final String validateUri = "/validate";
 
     private AuthenticationRequest authenticationRequest;
 
@@ -75,15 +74,15 @@ public class UserControllerTest {
                 encoder.encode(password),
                 "student", false);
         this.authenticationRequest = new AuthenticationRequest(correctUser.getNetid(),
-            "SecurePassword123");
+            password);
         when(userRepository.findByNetid(correctUser.getNetid())).thenReturn(correctUser);
     }
 
 
     @Test
     public void loginCorrect() throws Exception {
-        String uri = "/login";
-        String jwt = mockMvc.perform(post(uri)
+
+        String jwt = mockMvc.perform(post(loginUri)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
             .content(objectMapper.writeValueAsString(authenticationRequest)))
                 .andExpect(status().isOk())
@@ -91,7 +90,7 @@ public class UserControllerTest {
 
         Claims claims = Jwts.parser().setSigningKey(jwtUtil.getSecret()).parseClaimsJws(jwt)
                 .getBody();
-        assertThat(claims.getSubject()).isEqualTo("CorrectNetid");
+        assertThat(claims.getSubject()).isEqualTo(netid);
         ArrayList<LinkedHashMap<String, Object>> scope =  claims.get("scope", ArrayList.class);
         assertTrue(scope.get(0).containsValue("ROLE_STUDENT"));
         var cond = new Condition<LinkedHashMap>(
@@ -103,9 +102,8 @@ public class UserControllerTest {
     @Test
     public void loginFailedPassword() throws Exception {
         authenticationRequest.setPassword("1234");
-
-        String uri = "/login";
-        String jwt = mockMvc.perform(post(uri).contentType(MediaType.APPLICATION_JSON_VALUE)
+        
+        String jwt = mockMvc.perform(post(loginUri).contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(objectMapper.writeValueAsString(authenticationRequest))).andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
 
@@ -116,8 +114,7 @@ public class UserControllerTest {
     public void loginFailedUsername() throws Exception {
         authenticationRequest.setNetid("fail");
 
-        String uri = "/login";
-        String jwt = mockMvc.perform(post(uri).contentType(MediaType.APPLICATION_JSON_VALUE)
+        String jwt = mockMvc.perform(post(loginUri).contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(objectMapper.writeValueAsString(authenticationRequest))).andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
 
@@ -126,48 +123,46 @@ public class UserControllerTest {
 
     @Test
     public void validateCorrectStudent() throws Exception {
-        String uri = "/login";
-        String jwt = mockMvc.perform(post(uri)
+
+        String jwt = mockMvc.perform(post(loginUri)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(objectMapper.writeValueAsString(authenticationRequest)))
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
-
-        String uri2 = "/validate";
-        String JSONtoken = mockMvc.perform(post(uri2).contentType(MediaType.APPLICATION_JSON_VALUE)
+        
+        String JSONtoken = mockMvc.perform(post(validateUri).contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(jwt)).andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
 
         JSONObject obj = new JSONObject(JSONtoken);
         assertThat(obj.getString("role")).isEqualTo("student");
-        assertThat(obj.getString("netid")).isEqualTo("CorrectNetid");
+        assertThat(obj.getString("netid")).isEqualTo(netid);
     }
 
     @Test
     public void validateCorrectTeacher() throws Exception {
 
-        User correctUser = new User("CorrectNetid",
-                encoder.encode("SecurePassword123"),
+        User correctUser = new User(netid,
+                encoder.encode(password),
                 "teacher", false);
         this.authenticationRequest = new AuthenticationRequest(correctUser.getNetid(),
-                "SecurePassword123");
+                password);
         when(userRepository.findByNetid(correctUser.getNetid())).thenReturn(correctUser);
-
-        String uri = "/login";
-        String jwt = mockMvc.perform(post(uri)
+        
+        String jwt = mockMvc.perform(post(loginUri)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(objectMapper.writeValueAsString(authenticationRequest)))
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
 
-        String uri2 = "/validate";
-        String JSONtoken = mockMvc.perform(post(uri2).contentType(MediaType.APPLICATION_JSON_VALUE)
+   
+        String JSONtoken = mockMvc.perform(post(validateUri).contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(jwt)).andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
 
         JSONObject obj = new JSONObject(JSONtoken);
         assertThat(obj.getString("role")).isEqualTo("teacher");
-        assertThat(obj.getString("netid")).isEqualTo("CorrectNetid");
+        assertThat(obj.getString("netid")).isEqualTo(netid);
     }
 
 }
