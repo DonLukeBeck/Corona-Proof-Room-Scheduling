@@ -8,8 +8,6 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @EnableDiscoveryClient
 @SpringBootApplication
-@EntityScan("nl.tudelft.sem.restrictions")
-@EnableJpaRepositories("nl.tudelft.sem.restrictions")
 public class Application {
 
 	public static void main(String[] args) {
