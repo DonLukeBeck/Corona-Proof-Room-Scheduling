@@ -35,7 +35,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping(path = "/calendar")
-
 public class CalendarController {
 
     private transient String teacherRole = "teacher";
