@@ -37,12 +37,22 @@ public class JwtUtil {
         return secret;
     }
 
-    //return netid
+    /**
+     * Method to extract netid from token.
+     *
+     * @param token token to extract netid from
+     * @return the netid extracted from token
+     */
     public String extractNetid(String token) {
         return extractClaim(token, Claims::getSubject);
     }
 
-    //return expiration date
+    /**
+     * Method to extract the expiration date from the token.
+     *
+     * @param token token to extract expiration date from
+     * @return the expiration date extracted from token
+     */
     public Date extractExpiration(String token) {
         return extractClaim(token, Claims::getExpiration);
     }
@@ -56,7 +66,12 @@ public class JwtUtil {
         return Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody();
     }
 
-    //if 1 hour limit is reached
+    /**
+     * Method to verify if the token is expired.
+     *
+     * @param token token to extract expiration date from
+     * @return true if one hour limit is reached and the token expired
+     */
     private Boolean isTokenExpired(String token) {
         return extractExpiration(token).before(new Date());
     }
@@ -74,7 +89,11 @@ public class JwtUtil {
         return createToken(claims, username);
     }
 
-    //create a 1 hour token for the netid on the issued date
+    /**
+     * Create a 1 hour token for the netid on the issued date.
+     *
+     * @return the created token
+     */
     private String createToken(Map<String, Object> claims, String subject) {
         var now = System.currentTimeMillis();
 
@@ -84,7 +103,13 @@ public class JwtUtil {
                 .signWith(SignatureAlgorithm.HS256, secret).setHeaderParam("typ", "JWT").compact();
     }
 
-    //verify if token received is valid
+    /**
+     * Verify if the token received is valid.
+     *
+     * @param token token to be verified
+     * @param userDetails details of the user to verify the token with
+     * @return true if the token is valid
+     */
     public Boolean validateToken(String token, UserDetails userDetails) {
         final String netid = extractNetid(token);
         return (netid.equals(userDetails.getUsername()) && !isTokenExpired(token));

@@ -88,7 +88,7 @@ public class UserControllerTest {
             .andReturn().getResponse().getContentAsString();
 
         JSONObject jwtJson = new JSONObject(jwtJsonString);
-        String jwt = jwtJson.getString("message");
+        String jwt = jwtJson.getString("messageText");
 
         Claims claims = Jwts.parser().setSigningKey(jwtUtil.getSecret()).parseClaimsJws(jwt)
                 .getBody();
@@ -111,7 +111,7 @@ public class UserControllerTest {
                 .andReturn().getResponse().getContentAsString();
 
         JSONObject obj = new JSONObject(jwt);
-        assertThat(obj.getString("message")).isEqualTo("Authentication failure");
+        assertThat(obj.getString("messageText")).isEqualTo("Authentication failure");
     }
 
     @Test
@@ -125,7 +125,7 @@ public class UserControllerTest {
                 .andReturn().getResponse().getContentAsString();
 
         JSONObject obj = new JSONObject(jwt);
-        assertThat(obj.getString("message")).isEqualTo("Authentication failure");
+        assertThat(obj.getString("messageText")).isEqualTo("Authentication failure");
     }
 
     @Test
