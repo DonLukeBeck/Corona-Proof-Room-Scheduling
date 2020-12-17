@@ -9,9 +9,11 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.BeanIds;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -32,18 +34,22 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         return new BCryptPasswordEncoder();
     }
 
+    /**
+     * Add authentication based upon the custom userDetailsService that is passed in.
+     */
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.userDetailsService(userDetailsService);
     }
 
+    /**
+     * This method configures the roles which are authorized to request certain uri.
+     */
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         //authorize requests depending on roles
         http.csrf().disable().authorizeRequests()
                 .antMatchers("/login").permitAll()
-                .antMatchers("/see-schedule").hasAnyRole("STUDENT", "TEACHER")
-                .antMatchers("/create-courses").hasAnyRole("TEACHER")
                 .and().exceptionHandling().and().sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
