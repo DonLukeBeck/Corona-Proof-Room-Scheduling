@@ -1,8 +1,8 @@
 package nl.tudelft.sem.calendar.communication;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import java.io.IOException;
 import java.util.List;
-import com.fasterxml.jackson.core.type.TypeReference;
 import nl.tudelft.sem.calendar.entities.Room;
 import nl.tudelft.sem.calendar.exceptions.ServerErrorException;
 import nl.tudelft.sem.calendar.util.Constants;
@@ -62,10 +62,8 @@ public class RestrictionManagementCommunicator extends Communicator {
 
         var response = getResponse("/restrictions/getStartTime",
                 Constants.RESTRICTION_SERVER_URL);
-
-        int res = objectMapper.readValue(response.body(), new TypeReference<>() { });
-        System.out.println("StartTime: " + res);
-        return res;
+        return objectMapper.readValue(response.body(), new TypeReference<>() {
+        });
     }
 
     /**

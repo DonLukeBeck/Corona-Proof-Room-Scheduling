@@ -59,8 +59,8 @@ public class LectureScheduler {
 
         this.roomList = roomList;
         this.lecturesToSchedule = lecturesToSchedule;
-        this.startTime = startTime.plusHours(1);
-        this.endTime = endTime.plusHours(1);
+        this.startTime = startTime;
+        this.endTime = endTime;
         this.timeGapLengthInMinutes = timeGapLengthInMinutes;
         this.roomAvailability = new LocalTime[roomList.size()];
         this.allParticipants = new HashMap<>();
@@ -93,6 +93,11 @@ public class LectureScheduler {
             List<Lecture> toScheduleThisDay = getSortedLecturesForDay(date, lecturesByDay);
             for (Lecture toBeScheduled : toScheduleThisDay) {
                 int capacity = assignRoom(toBeScheduled, toBeScheduled.getDurationInMinutes());
+
+                // solve a time conversion issue by adding an hour to the time before export
+                toBeScheduled.setStartTime(toBeScheduled.getStartTime().plusHours(1));
+                toBeScheduled.setEndTime(toBeScheduled.getEndTime().plusHours(1));
+
                 // save lecture in database and update it with a version including an id
                 toBeScheduled = lectureRepository.saveAndFlush(toBeScheduled);
 
