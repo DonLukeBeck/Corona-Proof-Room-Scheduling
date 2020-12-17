@@ -17,7 +17,7 @@ public class RoomsCommunicator extends Communicator {
      * @throws InterruptedException an interrupted exception
      * @throws ServerErrorException a server error exception
      */
-    public static List<Room> getAllRooms() throws
+    public List<Room> getAllRooms() throws
             InterruptedException, ServerErrorException, IOException {
         var response = getResponse("/rooms/getAllRooms",
                 Constants.ROOMS_SERVER_URL);
