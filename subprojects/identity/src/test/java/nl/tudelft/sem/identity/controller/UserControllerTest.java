@@ -30,7 +30,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.context.WebApplicationContext;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ContextConfiguration(classes = UserController.class)
 @AutoConfigureMockMvc
@@ -104,21 +103,24 @@ public class UserControllerTest {
         authenticationRequest.setPassword("1234");
         
         String jwt = mockMvc.perform(post(loginUri).contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(objectMapper.writeValueAsString(authenticationRequest))).andExpect(status().isOk())
+                .content(objectMapper.writeValueAsString(authenticationRequest)))
+                .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
 
-        assertEquals("Authentication failure", jwt);
+
     }
 
     @Test
     public void loginFailedUsername() throws Exception {
         authenticationRequest.setNetid("fail");
 
-        String jwt = mockMvc.perform(post(loginUri).contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(objectMapper.writeValueAsString(authenticationRequest))).andExpect(status().isOk())
+        String jwt = mockMvc.perform(post(loginUri)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(objectMapper.writeValueAsString(authenticationRequest)))
+                .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
 
-        assertEquals("Authentication failure", jwt);
+        assertThat(jwt).isEqualTo("Authentication failure");
     }
 
     @Test
@@ -130,11 +132,12 @@ public class UserControllerTest {
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
         
-        String JSONtoken = mockMvc.perform(post(validateUri).contentType(MediaType.APPLICATION_JSON_VALUE)
+        String jsonToken = mockMvc.perform(post(validateUri)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(jwt)).andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
 
-        JSONObject obj = new JSONObject(JSONtoken);
+        JSONObject obj = new JSONObject(jsonToken);
         assertThat(obj.getString("role")).isEqualTo("student");
         assertThat(obj.getString("netid")).isEqualTo(netid);
     }
@@ -156,11 +159,12 @@ public class UserControllerTest {
                 .andReturn().getResponse().getContentAsString();
 
    
-        String JSONtoken = mockMvc.perform(post(validateUri).contentType(MediaType.APPLICATION_JSON_VALUE)
+        String jsonToken = mockMvc.perform(post(validateUri)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(jwt)).andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
 
-        JSONObject obj = new JSONObject(JSONtoken);
+        JSONObject obj = new JSONObject(jsonToken);
         assertThat(obj.getString("role")).isEqualTo("teacher");
         assertThat(obj.getString("netid")).isEqualTo(netid);
     }
