@@ -1,6 +1,5 @@
 package nl.tudelft.sem.courses.entity;
 
-import nl.tudelft.sem.courses.entity.Enrollment;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
