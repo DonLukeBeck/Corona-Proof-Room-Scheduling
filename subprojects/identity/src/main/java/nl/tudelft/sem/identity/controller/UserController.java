@@ -57,7 +57,6 @@ public class UserController {
     @PostMapping("/login")
     public String generateToken(@RequestBody AuthenticationRequest authRequest)
             throws AuthenticationException {
-        // TODO: prevent throwing exceptions on a public API
         try {
             //validate username and password
             authenticationManager.authenticate(
