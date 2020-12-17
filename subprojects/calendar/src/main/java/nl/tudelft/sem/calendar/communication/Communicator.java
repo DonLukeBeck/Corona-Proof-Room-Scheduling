@@ -28,7 +28,6 @@ public abstract class Communicator {
 
         response = client.send(request, HttpResponse.BodyHandlers.ofString());
         if (response.statusCode() != HttpURLConnection.HTTP_OK) {
-            System.out.println(response.statusCode() + " " + HttpURLConnection.HTTP_OK);
             System.out.println(uri + "," + service);
             throw new ServerErrorException();
         }

@@ -4,33 +4,37 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import nl.tudelft.sem.courses.entity.BareEnrollment;
 import nl.tudelft.sem.courses.entity.Enrollment;
-import nl.tudelft.sem.courses.repository.CourseRepository;
 import nl.tudelft.sem.courses.repository.EnrollmentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
-@Controller
+@RestController
 @RequestMapping(path = "/enrollment")
-public class EnrollmentController {
-    @Autowired
-    private transient CourseRepository courseRepository;
+public class EnrollmentController extends Controller {
 
     @Autowired
     private transient EnrollmentRepository enrollmentRepository;
+
+    /**
+     * Instantiates repository needed.
+     */
+    public EnrollmentController(EnrollmentRepository enrollmentRepository) {
+        this.enrollmentRepository = enrollmentRepository;
+    }
 
     /**
      * Get endpoint to retrieve all enrollments.
      *
      * @return A list of {@link BareEnrollment}s
      */
-    @GetMapping("/enrollments")
+    @GetMapping("/getAllEnrollments")
     @ResponseBody
-    public ResponseEntity<?> listEnrollments() {
+    public ResponseEntity<?> getAllEnrollments() {
         return ResponseEntity.ok(bareFromEnrollment(
             enrollmentRepository.findAll().stream()).collect(Collectors.toList()));
     }
@@ -40,9 +44,9 @@ public class EnrollmentController {
      *
      * @return A list of {@link BareEnrollment}s
      */
-    @GetMapping("/course/{courseId}")
+    @GetMapping("/getEnrollmentsByCourse")
     @ResponseBody
-    public ResponseEntity<?> listEnrollmentsByCourse(@PathVariable("courseId") String courseId) {
+    public ResponseEntity<?> getEnrollmentsByCourse(@RequestParam("courseId") String courseId) {
         return ResponseEntity.ok(bareFromEnrollment(enrollmentRepository.findAll().stream()
             .filter(e -> e.getCourseId().equals(courseId))).collect(Collectors.toList()));
     }

@@ -35,6 +35,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping(path = "/calendar")
+
 public class CalendarController {
 
     private transient String teacherRole = "teacher";
@@ -80,7 +81,6 @@ public class CalendarController {
             // Make API call to retrieve the start time
             LocalTime startTime = LocalTime
                     .ofSecondOfDay(restrictionManagementCommunicator.getStartTime());
-
             // Make API call to retrieve the end time
             LocalTime endTime = LocalTime
                     .ofSecondOfDay(restrictionManagementCommunicator.getEndTime());
@@ -333,23 +333,20 @@ public class CalendarController {
                                              String userId, String courseId,
                                              @DateTimeFormat(iso = DateTimeFormat
                                              .ISO.DATE) LocalDate date)
-            throws IOException, InterruptedException {
+            throws IOException, InterruptedException, JSONException {
 
         if (!validateRole(request, studentRole).equals(userId)) {
             return ResponseEntity.ok(noAccessMessage);
         }
         try {
-            List<Lecture> lectures = lectureRepository
-                    .findByDateAndCourseId(date.plusDays(1), courseId);
-            for (Lecture lecture : lectures) {
-                int lectureId = lecture.getLectureId();
+            int lectureId = lectureRepository
+                    .findByDateAndCourseId(date.plusDays(1), courseId).getLectureId();
 
-                for (Attendance a :
-                        attendanceRepository.findByLectureIdAndStudentId(lectureId, userId)) {
-                    attendanceRepository.delete(a);
-                    a.setPhysical(false);
-                    attendanceRepository.save(a);
-                }
+            for (Attendance a :
+                    attendanceRepository.findByLectureIdAndStudentId(lectureId, userId)) {
+                attendanceRepository.delete(a);
+                a.setPhysical(false);
+                attendanceRepository.save(a);
             }
             return ResponseEntity.ok("Indicated absence.");
         } catch (Exception e) {
@@ -381,18 +378,13 @@ public class CalendarController {
             return ResponseEntity.ok(noAccessMessage);
         }
 
-        List<Lecture> lectures = lectureRepository
-                .findByDateAndCourseId(date.plusDays(1), courseId);
-        List<String> netIds = new ArrayList<>();
-        for (Lecture lecture : lectures) {
-            int lectureId = lecture.getLectureId();
-            List<String> tempList = attendanceRepository
-                    .findByLectureId(lectureId).stream()
-                    .filter(Attendance::getPhysical)
-                    .map(Attendance::getStudentId)
-                    .collect(Collectors.toList());
-            netIds.addAll(tempList);
-        }
+        int lectureId = lectureRepository.findByDateAndCourseId(date.plusDays(1),
+                courseId).getLectureId();
+        List<String> netIds = attendanceRepository
+                        .findByLectureId(lectureId).stream()
+                        .filter(Attendance::getPhysical)
+                        .map(Attendance::getStudentId)
+                        .collect(Collectors.toList());
 
         return ResponseEntity.ok(netIds);
     }

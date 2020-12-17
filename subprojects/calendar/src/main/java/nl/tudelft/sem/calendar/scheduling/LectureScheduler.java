@@ -93,11 +93,6 @@ public class LectureScheduler {
             List<Lecture> toScheduleThisDay = getSortedLecturesForDay(date, lecturesByDay);
             for (Lecture toBeScheduled : toScheduleThisDay) {
                 int capacity = assignRoom(toBeScheduled, toBeScheduled.getDurationInMinutes());
-
-                // solve a time conversion issue by adding an hour to the time before export
-                toBeScheduled.setStartTime(toBeScheduled.getStartTime().plusHours(1));
-                toBeScheduled.setEndTime(toBeScheduled.getEndTime().plusHours(1));
-
                 // save lecture in database and update it with a version including an id
                 toBeScheduled = lectureRepository.saveAndFlush(toBeScheduled);
 
