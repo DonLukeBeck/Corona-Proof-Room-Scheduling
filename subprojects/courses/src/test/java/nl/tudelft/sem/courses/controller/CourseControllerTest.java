@@ -1,6 +1,7 @@
 package nl.tudelft.sem.courses.controller;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -93,12 +94,14 @@ public class CourseControllerTest {
         enrollments.add(enrollment);
         participants = new ArrayList<>();
         participants.add(enrollment.getStudentId());
+        enrollmentRepository.save(enrollment);
 
         this.addcourse = new AddCourse(courseId, courseName, teacherId, participants);
         this.course = new Course();
         course.setCourseName(courseName);
         course.setTeacherId(teacherId);
         course.setCourseId(courseId);
+        courseRepository.save(course);
 
         localDate = LocalDate.of(2020, 1, 8);
         this.sqlDate = Date.valueOf(localDate);
@@ -109,6 +112,7 @@ public class CourseControllerTest {
         lecture.setCourseId(courseId);
         lectures = new ArrayList<>();
         lectures.add(lecture);
+        lectureRepository.save(lecture);
 
         courseController =
                 new CourseController(courseRepository, enrollmentRepository);
@@ -149,6 +153,22 @@ public class CourseControllerTest {
     }
      */
 
+    @Test
+    void getAllCoursesSuccess() {
+        assertEquals(courseRepository.findAll(), courseController.getAllCourses().getBody());
+    }
+
+    @Test
+    void getCoursesForTeacherSuccess() {
+        assertEquals(courseRepository.findAllByTeacherId(course.getTeacherId()), courseController.getCoursesForTeacher(course.getTeacherId()).getBody());
+    }
+
+    @Test
+    void getCoursesForTeacherFail() {
+        assertNotEquals(courseRepository.findAllByTeacherId(course.getTeacherId()), courseController.getCoursesForTeacher("RandomTeacherId").getBody());
+    }
+
+
     /**
     @Test
     void createNewCourseFail() throws IOException, InterruptedException {
@@ -157,10 +177,6 @@ public class CourseControllerTest {
                         (request, addcourse));
     }
      */
-
-    //TODO: getAllCourses
-    //TODO: getCoursesForTeacher
-    //TODO: createNewCourse
 
     @Test
     void constructorTest() {

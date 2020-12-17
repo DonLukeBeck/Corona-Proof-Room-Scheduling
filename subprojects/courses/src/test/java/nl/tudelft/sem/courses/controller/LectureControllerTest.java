@@ -53,11 +53,12 @@ public class LectureControllerTest {
 
     private LectureController lectureController;
 
+    /**
     private static HttpClient client;
     private HttpServletRequest request;
     private HttpServletResponse response;
-
     private JwtValidate jwt;
+    */
 
     @MockBean
     CourseRepository courseRepository;
@@ -75,11 +76,13 @@ public class LectureControllerTest {
         String courseName = "OOPP";
         String teacherId = "Andy";
 
+        /**
         this.request = mock(HttpServletRequest.class);
         this.response = mock(HttpServletResponse.class);
         this.client = mock(HttpClient.class);
-        //this.jwt = mock(JwtValidate.class);
-        //this.courseManagementController = mock(CourseManagementController.class);
+        this.jwt = mock(JwtValidate.class);
+        this.courseManagementController = mock(CourseManagementController.class);
+         */
 
         this.enrollment = new Enrollment();
         enrollment.setCourseId(courseId);
@@ -88,12 +91,14 @@ public class LectureControllerTest {
         enrollments.add(enrollment);
         participants = new ArrayList<>();
         participants.add(enrollment.getStudentId());
+        enrollmentRepository.save(enrollment);
 
         this.addcourse = new AddCourse(courseId, courseName, teacherId, participants);
         this.course = new Course();
         course.setCourseName(courseName);
         course.setTeacherId(teacherId);
         course.setCourseId(courseId);
+        courseRepository.save(course);
 
         localDate = LocalDate.of(2020, 1, 8);
         this.sqlDate = Date.valueOf(localDate);
@@ -104,6 +109,7 @@ public class LectureControllerTest {
         lecture.setCourseId(courseId);
         lectures = new ArrayList<>();
         lectures.add(lecture);
+        lectureRepository.save(lecture);
 
         lectureController =
                 new LectureController(courseRepository, lectureRepository);
@@ -113,24 +119,38 @@ public class LectureControllerTest {
         when(courseRepository.findAllByTeacherId(course.getTeacherId())).thenReturn(List.of(course));
         when(lectureRepository.findByCourseId(course.getCourseId())).thenReturn(lectures);
         when(lectureRepository.findByCourseIdAndScheduledDate(course.getCourseId(), Date.valueOf(localDate.plusDays(1)))).thenReturn(List.of(lecture));
+        
+        /**
         when(request.getHeader("Authorization")).thenReturn("Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJsdWthIiwic2NvcGUiOlt7ImF1dGhvcml0eSI6IlJPTEVfVEVBQ0hFUiJ9XSwiZXhwIjoxNjA4MDQ2MTM2LCJpYXQiOjE2MDgwNDI1MzZ9.1Pn1WnHIsa6YHIGqmnCPogfmvPqwXIjpwuhotzk6SnU"); //????
 
         JSONObject obj = new JSONObject();
         obj.put("role", "teacher");
         obj.put("netid", "luka");
 
-        //when(jwt.jwtValidate(request)).thenReturn(obj);
-        //when(courseManagementController.validate(request)).thenReturn(obj);
+        when(jwt.jwtValidate(request)).thenReturn(obj);
+        when(courseManagementController.validate(request)).thenReturn(obj);
+        */
     }
-
-    //TODO: cleanup of setup code above, I dont think everything is necessary there.
-    //TODO: getAllLectures
-    //TODO: getLecturesAfterDate
-    //TODO: bareFromLecture
 
     @Test
     public void constructorNotNull() {
         assertNotNull(lectureController);
+    }
+
+    @Test
+    void getAllLectures() {
+        assertEquals(lectureRepository.findAll(), lectureController.getAllLectures().getBody());
+    }
+
+    @Test
+    void getLecturesAfterDate() {
+        LocalDate dt = localDate.minusYears(1);
+        System.out.println(lectureController.getLecturesAfterDate(dt));
+        List<Lecture> list = (List<Lecture>) lectureController.getLecturesAfterDate(dt).getBody();
+        for (Lecture l : list) {
+            System.out.println(l);
+        }
+        assert false;
     }
 
     @Test
