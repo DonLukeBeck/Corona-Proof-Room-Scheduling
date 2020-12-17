@@ -2,20 +2,15 @@ package nl.tudelft.sem.courses.controller;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
-import java.net.http.HttpClient;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import nl.tudelft.sem.courses.entity.AddCourse;
 import nl.tudelft.sem.courses.entity.AddLecture;
-import nl.tudelft.sem.courses.entity.BareCourse;
 import nl.tudelft.sem.courses.entity.BareLecture;
 import nl.tudelft.sem.courses.entity.Course;
 import nl.tudelft.sem.courses.entity.Enrollment;
@@ -24,9 +19,7 @@ import nl.tudelft.sem.courses.entity.Message;
 import nl.tudelft.sem.courses.repository.CourseRepository;
 import nl.tudelft.sem.courses.repository.EnrollmentRepository;
 import nl.tudelft.sem.courses.repository.LectureRepository;
-import nl.tudelft.sem.courses.util.JwtValidate;
 import org.json.JSONException;
-import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -55,6 +48,7 @@ public class LectureControllerTest {
     private List<Lecture> lectures;
     private List<BareLecture> bareLectures;
     private LocalDate dt;
+    private Date sqldt;
 
     private LectureController lectureController;
 
@@ -122,6 +116,7 @@ public class LectureControllerTest {
         bareLectures.add(bareLecture);
         lectureRepository.save(lecture);
         dt = localDate.minusDays(5);
+        sqldt = Date.valueOf(dt);
 
         lectureController =
                 new LectureController(courseRepository, lectureRepository);
@@ -131,7 +126,7 @@ public class LectureControllerTest {
         when(courseRepository.findAllByTeacherId(course.getTeacherId())).thenReturn(List.of(course));
         when(lectureRepository.findByCourseId(course.getCourseId())).thenReturn(lectures);
         when(lectureRepository.findByCourseIdAndScheduledDate(course.getCourseId(), Date.valueOf(localDate.plusDays(1)))).thenReturn(List.of(lecture));
-        when(lectureRepository.findByScheduledDateAfter(dt)).thenReturn(lectures);
+        when(lectureRepository.findByScheduledDateAfter(sqldt)).thenReturn(lectures);
 
         /**
         when(request.getHeader("Authorization")).thenReturn("Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJsdWthIiwic2NvcGUiOlt7ImF1dGhvcml0eSI6IlJPTEVfVEVBQ0hFUiJ9XSwiZXhwIjoxNjA4MDQ2MTM2LCJpYXQiOjE2MDgwNDI1MzZ9.1Pn1WnHIsa6YHIGqmnCPogfmvPqwXIjpwuhotzk6SnU"); //????

@@ -18,6 +18,6 @@ public interface LectureRepository extends JpaRepository<Lecture, Integer>,
     //         nativeQuery = true)
     List<Lecture> findByCourseIdAndScheduledDate(String courseId, Date date);
 
-    List<Lecture> findByScheduledDateAfter(LocalDate date);
+    List<Lecture> findByScheduledDateAfter(Date date);
 
 }

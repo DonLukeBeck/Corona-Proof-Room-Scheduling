@@ -65,7 +65,8 @@ public class LectureController extends Controller {
     @ResponseBody
     public ResponseEntity<?> getLecturesAfterDate(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
-        return ResponseEntity.ok(bareFromLecture(lectureRepository.findByScheduledDateAfter(date).stream()).collect(Collectors.toList()));
+        Date sqlDate = Date.valueOf(date);
+        return ResponseEntity.ok(bareFromLecture(lectureRepository.findByScheduledDateAfter(sqlDate).stream()).collect(Collectors.toList()));
         /**
         return ResponseEntity.ok(bareFromLecture(lectureRepository.findAll().stream()
             .filter(l -> date.isBefore(l.getScheduledDate().toLocalDate())))
