@@ -2,6 +2,7 @@ package nl.tudelft.sem.identity.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import nl.tudelft.sem.identity.entity.AuthenticationRequest;
+import nl.tudelft.sem.identity.entity.Message;
 import nl.tudelft.sem.identity.entity.TokenInfo;
 import nl.tudelft.sem.identity.util.JwtUtil;
 import nl.tudelft.sem.identity.util.JwtValidate;
@@ -55,7 +56,7 @@ public class UserController {
      * @throws AuthenticationException if authentication fails
      */
     @PostMapping("/login")
-    public String generateToken(@RequestBody AuthenticationRequest authRequest)
+    public Message generateToken(@RequestBody AuthenticationRequest authRequest)
             throws AuthenticationException {
         try {
             //validate username and password
@@ -66,14 +67,14 @@ public class UserController {
         } catch (AuthenticationServiceException ex) {
             // service failure
             log.info("Inside login of UserController");
-            return "Service failure";
+            return new Message("Service failure");
 
         } catch (AuthenticationException ex) {
             //authentication failure
             log.info("Inside login of UserController");
-            return "Authentication failure";
+            return new Message("Authentication failure");
         }
         //generate web token if authentication successful
-        return jwtUtil.generateToken(authRequest.getNetid());
+        return new Message(jwtUtil.generateToken(authRequest.getNetid()));
     }
 }
