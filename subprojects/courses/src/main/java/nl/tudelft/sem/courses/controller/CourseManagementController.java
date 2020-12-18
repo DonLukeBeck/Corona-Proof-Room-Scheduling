@@ -21,6 +21,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -46,7 +47,7 @@ public class CourseManagementController {
     @Autowired
     private transient LectureRepository lectureRepository;
 
-    private transient String errorMessage = "Error";
+    private transient String errorMessage = "{\"message\": \"Error\"}";
     private transient JwtValidate jwtValidate = new JwtValidate();
 
     /**
@@ -114,22 +115,25 @@ public class CourseManagementController {
      * Adds a new course with provided parameters.
      */
     @PostMapping(path = "/createNewCourse") // Map ONLY POST Requests
-    public String createNewCourse(HttpServletRequest request, @RequestBody AddCourse addCourse)
+    public ResponseEntity<?> createNewCourse(HttpServletRequest request, @RequestBody AddCourse addCourse)
             throws IOException, InterruptedException, JSONException {
 
         JSONObject jwtInfo = validate(request);
         try {
             if (!jwtInfo.getString("role").equals("teacher")) {
-                return "You are not allowed to create a course. Please contact administrator.";
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body(
+                    stringToJsonMessage("You are not allowed to create a course. Please contact administrator."));
             }
         } catch (Exception e) {
-            return "You are not allowed to create a course. Please contact administrator.";
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(
+                stringToJsonMessage("You are not allowed to create a course. Please contact administrator."));
         }
 
         Course r = courseRepository.findByCourseId(addCourse.getCourseId());
         try {
             if (r.getCourseId().equals(addCourse.getCourseId())) {
-                return "Already Exists";
+                return ResponseEntity.status(HttpStatus.CONFLICT).body(
+                    stringToJsonMessage("Already Exists"));
             }
             return null;
         } catch (Exception e) {
@@ -145,7 +149,7 @@ public class CourseManagementController {
             course.setCourseId(addCourse.getCourseId());
             course.setTeacherId(addCourse.getTeacherId());
             courseRepository.save(course);
-            return "Saved";
+            return ResponseEntity.ok(stringToJsonMessage("Saved"));
         }
     }
 
@@ -161,7 +165,7 @@ public class CourseManagementController {
 
         if (r.getCourseId().equals(courseId)) {
             courseRepository.delete(r);
-            return "Deleted";
+            return stringToJsonMessage("Course Deleted");
         }
 
         return errorMessage;
@@ -200,7 +204,7 @@ public class CourseManagementController {
         if (course == null) {
             return errorMessage;
         }
-        return course.getCourseId();
+        return stringToJsonMessage(course.getCourseId());
     }
 
     /**
@@ -217,9 +221,10 @@ public class CourseManagementController {
             lecture.setDuration(addLecture.getDurationInMinutes());
             lecture.setScheduledDate(addLecture.getDate());
             lectureRepository.save(lecture);
-            return "Lecture added";
+            return stringToJsonMessage("Lecture added");
         } else {
-            return "The course with id " + addLecture.getCourseId() + " does not exist.";
+            return stringToJsonMessage("The course with id " + addLecture.getCourseId() +
+                " does not exist.");
         }
     }
 
@@ -236,7 +241,11 @@ public class CourseManagementController {
             return errorMessage;
         }
         lectureRepository.delete(lecture);
-        return "Lecture deleted";
+        return stringToJsonMessage("Lecture deleted");
+    }
+
+    private String stringToJsonMessage(String s) {
+        return "{\"message\": \"" + s + "\"}";
     }
 
 }

@@ -1,5 +1,6 @@
 package nl.tudelft.sem.courses;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.mock;
@@ -48,7 +49,7 @@ public class CourseManagementControllerTest {
     private List<String> participants;
     private List<Enrollment> enrollments;
     private List<Lecture> lectures;
-    private String errorMessage = "Error";
+    private String errorMessage = "{\"message\": \"Error\"}";
 
     private CourseManagementController courseManagementController;
 
@@ -157,14 +158,13 @@ public class CourseManagementControllerTest {
 
     @Test
     void deleteCourseSuccess() {
-        assertEquals("Deleted",
-                courseManagementController.deleteCourse(course.getCourseId()));
+        assertThat(courseManagementController.deleteCourse(course.getCourseId()))
+            .contains("Deleted");
     }
 
     @Test
     void deleteCourseFail() {
-        assertEquals(errorMessage,
-                courseManagementController.deleteCourse("RandomNumber"));
+        assertEquals(errorMessage, courseManagementController.deleteCourse("RandomNumber"));
     }
 
     @Test
@@ -198,8 +198,8 @@ public class CourseManagementControllerTest {
 
     @Test
     void getCourseIdForTeacherSuccess() {
-        assertEquals(course.getCourseId(), courseManagementController
-                .getCourseIdForTeacher(course.getTeacherId()));
+        assertThat(courseManagementController.getCourseIdForTeacher(course.getTeacherId()))
+            .contains(course.getCourseId());
     }
 
     @Test
@@ -210,34 +210,32 @@ public class CourseManagementControllerTest {
 
     @Test
     void planNewLectureSuccess() {
-        assertEquals("Lecture added", courseManagementController.planNewLecture(addlecture));
+        assertThat(courseManagementController.planNewLecture(addlecture)).contains("Lecture added");
     }
 
     @Test
     void planNewLectureFail() {
         addlecture.setCourseId("randomCourseIdFail");
-        assertEquals("The course with id randomCourseIdFail does not exist.",
-                courseManagementController.planNewLecture(addlecture));
-        assertEquals("The course with id " + addlecture.getCourseId() + " does not exist.",
-                courseManagementController.planNewLecture(addlecture));
+        assertThat(courseManagementController.planNewLecture(addlecture))
+            .contains("The course with id " + addlecture.getCourseId() + " does not exist.");
     }
 
     @Test
     void cancelLectureSuccess() {
         // the method cancelLecture does not work
         // Uncomment line below if method is fixed
-        assertEquals("Lecture deleted", courseManagementController
-                .cancelLecture(lecture.getCourseId(), localDate));
+        assertThat(courseManagementController.cancelLecture(lecture.getCourseId(), localDate))
+            .contains("Lecture deleted");
     }
 
     @Test
     void cancelLectureFail() {
-        assertEquals(errorMessage, courseManagementController
-                .cancelLecture("randomCourseIdFail", localDate));
+        assertThat(courseManagementController.cancelLecture("randomCourseIdFail", localDate))
+            .contains(errorMessage);
 
         localDate = LocalDate.of(1985, 1, 8);
 
-        assertEquals(errorMessage, courseManagementController
-                .cancelLecture(lecture.getCourseId(), localDate));
+        assertThat(courseManagementController.cancelLecture(lecture.getCourseId(), localDate))
+            .contains(errorMessage);
     }
 }
