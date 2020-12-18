@@ -1,4 +1,4 @@
-package nl.tudelft.sem.restrictions;
+package nl.tudelft.sem.template;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

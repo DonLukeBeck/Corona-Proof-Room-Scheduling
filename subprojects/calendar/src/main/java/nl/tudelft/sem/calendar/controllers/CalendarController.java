@@ -333,7 +333,7 @@ public class CalendarController {
                                              String userId, String courseId,
                                              @DateTimeFormat(iso = DateTimeFormat
                                              .ISO.DATE) LocalDate date)
-            throws IOException, InterruptedException {
+            throws IOException, InterruptedException, JSONException {
 
         if (!validateRole(request, studentRole).equals(userId)) {
             return ResponseEntity.ok(noAccessMessage);

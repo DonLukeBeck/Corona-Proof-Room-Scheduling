@@ -6,11 +6,9 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import javax.servlet.http.HttpServletRequest;
-import nl.tudelft.sem.restrictions.communication.JwtValidate;
 import nl.tudelft.sem.restrictions.communication.RoomsCommunicator;
 import nl.tudelft.sem.restrictions.communication.ServerErrorException;
-import org.json.JSONException;
-import org.json.JSONObject;
+import nl.tudelft.sem.restrictions.communication.Validate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -34,15 +32,20 @@ public class RestrictionController {
     @Autowired
     private transient RoomsCommunicator roomsCommunicator;
 
+    @Autowired
+    private transient Validate validate;
+
     /**
      * Initializes the repository that is being used.
      *
      * @param restrictionRepository the repository that will be used
      */
     public RestrictionController(RestrictionRepository restrictionRepository,
-                                 RoomsCommunicator roomsCommunicator) {
+                                 RoomsCommunicator roomsCommunicator,
+                                 Validate validate) {
         this.restrictionRepository = restrictionRepository;
         this.roomsCommunicator = roomsCommunicator;
+        this.validate = validate;
     }
 
     /**
@@ -100,7 +103,7 @@ public class RestrictionController {
                                                     boolean bigOrSmallRoom,
                                                     float maxPercentageAllowed) throws IOException,
                                                     InterruptedException {
-        String validation = validateRole(request, teacherRole);
+        String validation = validate.validateRole(request, teacherRole);
         if (validation.equals(noAccessMessage)) {
             return ResponseEntity.ok(noAccessMessage);
         }
@@ -124,7 +127,7 @@ public class RestrictionController {
     public ResponseEntity<?> setMinSeatsBig(HttpServletRequest request,
                                             float numberOfSeats) throws IOException,
                                             InterruptedException {
-        String validation = validateRole(request, teacherRole);
+        String validation = validate.validateRole(request, teacherRole);
         if (validation.equals(noAccessMessage)) {
             return ResponseEntity.ok(noAccessMessage);
         }
@@ -142,7 +145,7 @@ public class RestrictionController {
     public ResponseEntity<?> setTimeGapLength(HttpServletRequest request,
                                               float gapTimeInMinutes) throws IOException,
                                               InterruptedException {
-        String validation = validateRole(request, teacherRole);
+        String validation = validate.validateRole(request, teacherRole);
         if (validation.equals(noAccessMessage)) {
             return ResponseEntity.ok(noAccessMessage);
         }
@@ -193,13 +196,12 @@ public class RestrictionController {
     @PostMapping(path = "/setStartTime") // Map ONLY POST Requests
     @ResponseBody
     public ResponseEntity<?> setStartTime(HttpServletRequest request,
-                                          LocalTime startTime) throws IOException,
-                                          InterruptedException {
-        String validation = validateRole(request, teacherRole);
+                                          LocalTime startTime)
+            throws IOException, InterruptedException {
+        String validation = validate.validateRole(request, teacherRole);
         if (validation.equals(noAccessMessage)) {
             return ResponseEntity.ok(noAccessMessage);
         }
-
         return ResponseEntity.ok(addNewRestriction("startTime", (float) startTime.toSecondOfDay()));
     }
 
@@ -214,7 +216,7 @@ public class RestrictionController {
     public ResponseEntity<?> setEndTime(HttpServletRequest request,
                                         LocalTime endTime) throws IOException,
                                         InterruptedException {
-        String validation = validateRole(request, teacherRole);
+        String validation = validate.validateRole(request, teacherRole);
         if (validation.equals(noAccessMessage)) {
             return ResponseEntity.ok(noAccessMessage);
         }
@@ -265,26 +267,6 @@ public class RestrictionController {
         return ResponseEntity.ok(it);
     }
 
-    /**
-     * Helper method to validate the role of a user.
-     *
-     * @param request the request containing jwt token information
-     * @param role the desired role
-     *
-     * @return an error message if the user hasn't got the desired role, else its netId.
-     */
-    public String validateRole(HttpServletRequest request, String role)
-            throws JSONException, IOException, InterruptedException {
 
-        JSONObject jwtInfo = JwtValidate.jwtValidate(request);
-        try {
-            if (!jwtInfo.getString("role").equals(role)) {
-                return noAccessMessage;
-            }
-        } catch (Exception e) {
-            return noAccessMessage;
-        }
-        return jwtInfo.getString("netid");
-    }
 }
 

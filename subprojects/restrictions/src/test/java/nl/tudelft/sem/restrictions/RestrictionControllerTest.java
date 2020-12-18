@@ -13,6 +13,8 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import javax.servlet.http.HttpServletRequest;
 import nl.tudelft.sem.restrictions.communication.RoomsCommunicator;
+import nl.tudelft.sem.restrictions.communication.ServerErrorException;
+import nl.tudelft.sem.restrictions.communication.Validate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -38,13 +40,14 @@ class RestrictionControllerTest {
     private Room room2;
     private Room room3;
     private Room room4;
+    private transient String noAccessMessage =
+            "You are not allowed to view this page. Please contact administrator.";
 
     private List<Room> allRooms;
     private ResponseEntity<?> ae;
+    private ResponseEntity<?> fb;
     private HttpServletRequest request;
-
-    @InjectMocks
-    private RestrictionController restrictionController;
+    private HttpServletRequest wrongRequest;
 
     @MockBean
     RoomsCommunicator roomsCommunicator;
@@ -52,12 +55,19 @@ class RestrictionControllerTest {
     @MockBean
     RestrictionRepository restrictionRepository;
 
+    @MockBean
+    Validate validate;
+
+    @InjectMocks
+    private RestrictionController restrictionController;
+
     /**
      * The initial setup before each test.
      */
     @BeforeEach
     void setUp() throws IOException, InterruptedException {
         ae = ResponseEntity.ok("Already Exists");
+        fb = ResponseEntity.ok(noAccessMessage);
         this.rest1 = new Restriction();
         this.rest1.setValue(1.0f);
         this.rest1.setName("test");
@@ -73,8 +83,10 @@ class RestrictionControllerTest {
         this.rest4 = new Restriction("test4", 4000.0f);
 
         request = Mockito.mock(HttpServletRequest.class);
+        wrongRequest = Mockito.mock(HttpServletRequest.class);
 
-        restrictionController = new RestrictionController(restrictionRepository, roomsCommunicator);
+        restrictionController = new RestrictionController(restrictionRepository,
+                roomsCommunicator, validate);
         when(restrictionRepository.findByName(rest1.getName()))
                 .thenReturn(java.util.Optional.ofNullable(rest1));
         when(restrictionRepository.findByName(rest2.getName()))
@@ -91,8 +103,10 @@ class RestrictionControllerTest {
                 .thenReturn(java.util.Optional.ofNullable(rest3));
         when(restrictionRepository.findByName("endTime"))
                 .thenReturn(java.util.Optional.ofNullable(rest4));
-        //        when(restrictionController.validateRole(request,"teacher"))
-        //                .thenReturn("netid");
+        when(validate.validateRole(request, "teacher"))
+                .thenReturn("netid");
+        when(validate.validateRole(wrongRequest, "teacher"))
+                .thenReturn(noAccessMessage);
     }
 
     @Test
@@ -146,25 +160,29 @@ class RestrictionControllerTest {
                 () -> restrictionController.getRestrictionVal("aaa"));
     }
 
-    //    @Test
-    //    void setCapacityRestriction() throws IOException, InterruptedException {
-    //        assertEquals(ae, restrictionController.setCapacityRestriction(request, true, 1.0f));
-    //    }
-    //
-    //    @Test
-    //    void setCapacityRestriction2() throws IOException, InterruptedException {
-    //        assertEquals(ae, restrictionController.setCapacityRestriction(request,false, 2.0f));
-    //    }
-    //
-    //    @Test
-    //    void setMinSeatsBig() throws IOException, InterruptedException {
-    //        assertEquals(ae, restrictionController.setMinSeatsBig(request, 2.0f));
-    //    }
-    //
-    //    @Test
-    //    void setTimeGapLength() throws IOException, InterruptedException {
-    //        assertEquals(ae, restrictionController.setTimeGapLength(request,1.0f));
-    //    }
+    @Test
+    void setCapacityRestriction() throws IOException, InterruptedException {
+        assertEquals(ae, restrictionController.setCapacityRestriction(request, true, 1.0f));
+        assertEquals(fb, restrictionController.setCapacityRestriction(wrongRequest, true, 1.0f));
+    }
+
+    @Test
+    void setCapacityRestriction2() throws IOException, InterruptedException {
+        assertEquals(ae, restrictionController.setCapacityRestriction(request, false, 2.0f));
+        assertEquals(fb, restrictionController.setCapacityRestriction(wrongRequest, false, 2.0f));
+    }
+
+    @Test
+    void setMinSeatsBig() throws IOException, InterruptedException {
+        assertEquals(ae, restrictionController.setMinSeatsBig(request, 2.0f));
+        assertEquals(fb, restrictionController.setMinSeatsBig(wrongRequest, 2.0f));
+    }
+
+    @Test
+    void setTimeGapLength() throws IOException, InterruptedException {
+        assertEquals(ae, restrictionController.setTimeGapLength(request, 1.0f));
+        assertEquals(fb, restrictionController.setTimeGapLength(wrongRequest, 1.0f));
+    }
 
     @Test
     void getCapacityRestriction() {
@@ -186,19 +204,23 @@ class RestrictionControllerTest {
         assertEquals(ResponseEntity.ok(1), restrictionController.getTimeGapLength());
     }
 
-    //    @Test
-    //    void setStartTime() throws IOException, InterruptedException {
-    //        LocalTime st = LocalTime.ofSecondOfDay(1000);
-    //        assertEquals(ResponseEntity.ok("Updated"),
-    //        restrictionController.setStartTime(request, st));
-    //    }
-    //
-    //    @Test
-    //    void setEndTime() throws IOException, InterruptedException {
-    //        LocalTime et = LocalTime.ofSecondOfDay(3000);
-    //        assertEquals(ResponseEntity.ok("Updated"),
-    //        restrictionController.setEndTime(request, et));
-    //    }
+    @Test
+    void setStartTime() throws IOException, InterruptedException {
+        LocalTime st = LocalTime.ofSecondOfDay(1000);
+        assertEquals(ResponseEntity.ok("Updated"),
+                restrictionController.setStartTime(request, st));
+        assertEquals(fb,
+                restrictionController.setStartTime(wrongRequest, st));
+    }
+
+    @Test
+    void setEndTime() throws IOException, InterruptedException {
+        LocalTime et = LocalTime.ofSecondOfDay(3000);
+        assertEquals(ResponseEntity.ok("Updated"),
+                restrictionController.setEndTime(request, et));
+        assertEquals(fb,
+                restrictionController.setEndTime(wrongRequest, et));
+    }
 
     @Test
     void getStartTime() {
@@ -210,15 +232,22 @@ class RestrictionControllerTest {
         assertEquals(ResponseEntity.ok(4000), restrictionController.getEndTime());
     }
 
-    //    @Test
-    //    void getRoomsAdjusted() throws InterruptedException, ServerErrorException, IOException {
-    //        Room room6 = new Room(1, "DW-1", 20);
-    //        Room room7 = new Room(2, "DW-2", 60);
-    //        Room room8 = new Room(3, "DW-3", 90);
-    //        Room room9 = new Room(4, "DW-4", 120);
-    //        List<Room> it = Arrays.asList(room6, room7, room8, room9);
-    //
-    //        assertEquals(ResponseEntity.ok(it), restrictionController.
-    //        getAllRoomsWithAdjustedCapacity());
-    //    }
+    @Test
+    void getRoomsAdjusted() throws InterruptedException, ServerErrorException, IOException {
+        when(roomsCommunicator.getAllRooms()).thenReturn(allRooms);
+        when(restrictionRepository.findByName("minSeatsBig"))
+                .thenReturn(java.util.Optional.of(new Restriction("", 200.0f)));
+        when(restrictionRepository.findByName("bigRoomMaxPercentage"))
+                .thenReturn(java.util.Optional.of(new Restriction("", 30.0f)));
+        when(restrictionRepository.findByName("smallRoomMaxPercentage"))
+                .thenReturn(java.util.Optional.of(new Restriction("", 20.0f)));
+        Room room6 = new Room(1, "DW-1", 20);
+        Room room7 = new Room(2, "DW-2", 60);
+        Room room8 = new Room(3, "DW-3", 90);
+        Room room9 = new Room(4, "DW-4", 120);
+        List<Room> it = Arrays.asList(room6, room7, room8, room9);
+
+        assertEquals(ResponseEntity.ok(it), restrictionController
+                .getAllRoomsWithAdjustedCapacity());
+    }
 }
