@@ -13,7 +13,7 @@ import nl.tudelft.sem.calendar.communication.CourseCommunicator;
 import nl.tudelft.sem.calendar.communication.RestrictionCommunicator;
 import nl.tudelft.sem.calendar.communication.RoomCommunicator;
 import nl.tudelft.sem.calendar.entities.Attendance;
-import nl.tudelft.sem.calendar.entities.BareCourse;
+import nl.tudelft.sem.shared.entity.BareCourse;
 import nl.tudelft.sem.calendar.entities.Lecture;
 import nl.tudelft.sem.calendar.entities.Room;
 import nl.tudelft.sem.calendar.exceptions.ServerErrorException;
