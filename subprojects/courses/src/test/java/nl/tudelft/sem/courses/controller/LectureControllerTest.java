@@ -1,3 +1,4 @@
+
 package nl.tudelft.sem.courses.controller;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -9,11 +10,7 @@ import java.sql.Date;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-
-import nl.tudelft.sem.courses.util.Validate;
-import nl.tudelft.sem.shared.entity.AddCourse;
-import nl.tudelft.sem.shared.entity.AddLecture;
-import nl.tudelft.sem.shared.entity.BareLecture;
+import javax.servlet.http.HttpServletRequest;
 import nl.tudelft.sem.courses.entity.Course;
 import nl.tudelft.sem.courses.entity.Enrollment;
 import nl.tudelft.sem.courses.entity.Lecture;
@@ -21,6 +18,9 @@ import nl.tudelft.sem.courses.entity.Message;
 import nl.tudelft.sem.courses.repository.CourseRepository;
 import nl.tudelft.sem.courses.repository.EnrollmentRepository;
 import nl.tudelft.sem.courses.repository.LectureRepository;
+import nl.tudelft.sem.courses.util.Validate;
+import nl.tudelft.sem.shared.entity.AddLecture;
+import nl.tudelft.sem.shared.entity.BareLecture;
 import org.json.JSONException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -31,16 +31,15 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ContextConfiguration;
 
-import javax.servlet.http.HttpServletRequest;
-
 @ContextConfiguration(classes = LectureController.class)
 @AutoConfigureMockMvc
 @WebMvcTest
 // This class doesn't ever need to be serialized, so neither do it's members
 @SuppressWarnings("PMD.BeanMembersShouldSerialize")
 public class LectureControllerTest {
+    private transient String noAccessMessage =
+            "You are not allowed to view this page. Please contact administrator.";
 
-    private transient String noAccessMessage = "You are not allowed to view this page. Please contact administrator.";
     private AddLecture addlecture;
     private Lecture lecture;
     private LocalDate localDate;
@@ -48,6 +47,7 @@ public class LectureControllerTest {
     private LocalDate dt;
     private HttpServletRequest request;
     private HttpServletRequest wrongRequest;
+
     private LectureController lectureController;
 
     @MockBean
@@ -93,6 +93,7 @@ public class LectureControllerTest {
         this.lecture = new Lecture();
         lecture.setDuration(30);
         lecture.setScheduledDate(sqlDate);
+        lecture.setCourseId(courseId);
         bareLecture.setDurationInMinutes(30);
         bareLecture.setDate(localDate);
         bareLecture.setCourseId(courseId);
@@ -115,9 +116,11 @@ public class LectureControllerTest {
         when(lectureRepository.findByCourseIdAndScheduledDate(course.getCourseId(),
                 Date.valueOf(localDate.plusDays(1)))).thenReturn(List.of(lecture));
         when(lectureRepository.findByScheduledDateAfter(sqldt)).thenReturn(lectures);
-        when(validate.validateRole(request, "teacher")).thenReturn("netid");
-        when(validate.validateRole(wrongRequest, "teacher")).thenReturn(noAccessMessage);;
 
+        when(validate.validateRole(request, "teacher"))
+                .thenReturn("netid");
+        when(validate.validateRole(wrongRequest, "teacher"))
+                .thenReturn(noAccessMessage);
     }
 
     @Test
@@ -135,7 +138,8 @@ public class LectureControllerTest {
 
     @Test
     void getLecturesAfterDate() {
-        List<BareLecture> list = (List<BareLecture>) lectureController.getLecturesAfterDate(dt).getBody();
+        List<BareLecture> list =
+                (List<BareLecture>) lectureController.getLecturesAfterDate(dt).getBody();
         for (BareLecture l : list) {
             System.out.println(l);
             assert(bareLectures.contains(l));
@@ -149,17 +153,18 @@ public class LectureControllerTest {
     }
 
     @Test
+    void planNewLectureAccessDenied() throws JSONException, IOException, InterruptedException {
+        assertEquals(ResponseEntity.ok(new Message(noAccessMessage)),
+                lectureController.planNewLecture(wrongRequest, addlecture));
+    }
+
+
+    @Test
     void planNewLectureFail() throws JSONException, IOException, InterruptedException {
         addlecture.setCourseId("randomCourseIdFail");
         assertEquals(ResponseEntity.ok(new Message(
                 "The course with id " + addlecture.getCourseId()
                         + " does not exist.")), lectureController.planNewLecture(request, addlecture));
-    }
-
-    @Test
-    void planNewLectureAccessDenied() throws JSONException, IOException, InterruptedException {
-        assertEquals(ResponseEntity.ok(new Message(noAccessMessage)),
-                lectureController.planNewLecture(wrongRequest, addlecture));
     }
 
     @Test
@@ -173,10 +178,11 @@ public class LectureControllerTest {
         assertEquals(ResponseEntity.ok(new Message(noAccessMessage)),
                 lectureController.cancelLecture(wrongRequest, lecture.getCourseId(), localDate));
     }
+
     @Test
     void cancelLectureFail() throws JSONException, IOException, InterruptedException {
         assertEquals(ResponseEntity.notFound().build(),
-                lectureController.cancelLecture(request, "randomCourseIdFail", localDate));
+                lectureController.cancelLecture(request,"randomCourseIdFail", localDate));
         localDate = LocalDate.of(1985, 1, 8);
         assertEquals(ResponseEntity.notFound().build(),
                 lectureController.cancelLecture(request, lecture.getCourseId(), localDate));

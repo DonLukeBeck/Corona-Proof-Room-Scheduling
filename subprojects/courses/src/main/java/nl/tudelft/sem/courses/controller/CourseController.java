@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
-
-import nl.tudelft.sem.courses.util.Validate;
 import nl.tudelft.sem.shared.entity.AddCourse;
 import nl.tudelft.sem.shared.entity.BareCourse;
 import nl.tudelft.sem.courses.entity.Course;
@@ -13,6 +11,7 @@ import nl.tudelft.sem.courses.entity.Enrollment;
 import nl.tudelft.sem.courses.entity.Message;
 import nl.tudelft.sem.courses.repository.CourseRepository;
 import nl.tudelft.sem.courses.repository.EnrollmentRepository;
+import nl.tudelft.sem.courses.util.Validate;
 import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -32,16 +31,15 @@ public class CourseController {
 
     @Autowired
     private transient CourseRepository courseRepository;
-
     @Autowired
     private transient EnrollmentRepository enrollmentRepository;
-
     @Autowired
     private transient Validate validate;
 
     private transient String teacherRole = "teacher";
-    protected transient String noAccessMessage = "You are not allowed to view this page. Please contact administrator.";
 
+    protected transient String noAccessMessage =
+            "You are not allowed to view this page. Please contact administrator.";
 
     /**
      * Instantiates repository needed.
@@ -60,16 +58,15 @@ public class CourseController {
     public CourseRepository getCourseRepository() {
         return courseRepository;
     }
-
     public EnrollmentRepository getEnrollmentRepository() {
         return enrollmentRepository;
     }
 
     /**
-         * Get endpoint to retrieve all courses.
-         *
-         * @return A list of {@link BareCourse}s
-         */
+     * Get endpoint to retrieve all courses.
+     *
+     * @return A list of {@link BareCourse}s
+     */
     @GetMapping("/getAllCourses")
     @ResponseBody
     public ResponseEntity<?> getAllCourses() {
@@ -80,7 +77,6 @@ public class CourseController {
      * Retrieves a course list based on teacher id.
      *
      * @param teacherId id of the teacher
-     *
      * @return A list of {@link Course}s
      */
     @GetMapping("/getCoursesForTeacher")
@@ -96,8 +92,8 @@ public class CourseController {
     /**
      * Adds a new course with provided parameters.
      *
+     * @param request an {@link HttpServletRequest} containing validation information
      * @param addCourse the course to add
-     *
      * @return an indication of whether the operation succeeded or not.
      */
     @PostMapping(path = "/createNewCourse") // Map ONLY POST Requests
@@ -135,36 +131,36 @@ public class CourseController {
 
     /**
      * Deletes a new course with provided parameters.
+     *
+     * @param courseId the Id of the course to delete
+     * @param request an {@link HttpServletRequest} containing validation information
+     * @return an indication of whether the operation succeeded or not.
      */
     @DeleteMapping(path = "/deleteCourse") // Map ONLY POST Requests
-    public ResponseEntity<?> deleteCourse(HttpServletRequest request, @RequestParam String courseId) throws JSONException, IOException, InterruptedException {
+    public ResponseEntity<?> deleteCourse(HttpServletRequest request,
+                                          @RequestParam String courseId) throws JSONException, IOException, InterruptedException {
+
         String validation = validate.validateRole(request, teacherRole);
         if (validation.equals(noAccessMessage)) {
             return ResponseEntity.ok(new Message(noAccessMessage));
         }
 
-            Course r = courseRepository.findByCourseId(courseId);
-            if (r == null) {
-                return ResponseEntity.notFound().build();
-            }
-            courseRepository.delete(r);
-            return ResponseEntity.ok(new Message("Course deleted."));
+        Course r = courseRepository.findByCourseId(courseId);
+        if (r == null) {
+            return ResponseEntity.notFound().build();
+        }
+        courseRepository.delete(r);
+        return ResponseEntity.ok(new Message("Course deleted."));
     }
 
     /**
      * Returns a course with provided parameters.
      *
-     *
      * @param courseId the Id of the course to delete
+     * @return the course if found, else a 404
      */
     @GetMapping(path = "/getCourse") // Map ONLY POST Requests
-    public ResponseEntity<?> getCourse(HttpServletRequest request, @RequestParam String courseId)
-            throws JSONException, IOException, InterruptedException {
-
-        String validation = validate.validateRole(request, teacherRole);
-        if (validation.equals(noAccessMessage)) {
-            return ResponseEntity.ok(new Message(noAccessMessage));
-        }
+    public ResponseEntity<?> getCourse(@RequestParam String courseId) {
         Course r = courseRepository.findByCourseId(courseId);
         if (r == null) {
             return ResponseEntity.notFound().build();
@@ -174,6 +170,9 @@ public class CourseController {
 
     /**
      * Returns a list of participants with provided parameters.
+     *
+     * @param courseId the Id of the course to retrieve the participants for
+     * @return a list of course participants
      */
     @GetMapping(path = "/getCourseParticipants") // Map ONLY Get Requests
     public ResponseEntity<?> getCourseParticipants(@RequestParam String courseId) {
