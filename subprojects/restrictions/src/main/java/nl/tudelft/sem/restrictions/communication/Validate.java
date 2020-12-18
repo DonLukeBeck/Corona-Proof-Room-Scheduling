@@ -11,6 +11,7 @@ public class Validate {
 
     static String noAccessMessage =
         "You are not allowed to view this page. Please contact administrator.";
+
     /**
      * Helper method to validate the role of a user.
      *

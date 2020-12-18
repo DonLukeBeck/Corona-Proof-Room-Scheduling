@@ -69,12 +69,14 @@ public class UserController {
         } catch (AuthenticationServiceException ex) {
             // service failure
             log.info("Inside login of UserController");
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new StringMessage("Service failure"));
+            return ResponseEntity.status(HttpStatus
+                    .INTERNAL_SERVER_ERROR).body(new StringMessage("Service failure"));
 
         } catch (AuthenticationException ex) {
             //authentication failure
             log.info("Inside login of UserController");
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new StringMessage("Authentication failure"));
+            return ResponseEntity.status(HttpStatus
+                    .FORBIDDEN).body(new StringMessage("Authentication failure"));
         }
         //generate web token if authentication successful
         return ResponseEntity.ok(new StringMessage(jwtUtil.generateToken(authRequest.getNetid())));

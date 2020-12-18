@@ -93,6 +93,8 @@ public class LectureScheduler {
             List<Lecture> toScheduleThisDay = getSortedLecturesForDay(date, lecturesByDay);
             for (Lecture toBeScheduled : toScheduleThisDay) {
 
+                //checkstyle complains about the distance between the variable and its first usage
+                //however, we cannot use it after the calls below because the method will fail
                 int capacity = assignRoom(toBeScheduled, toBeScheduled.getDurationInMinutes());
 
                 // solve a time conversion issue by adding an hour to the time before export

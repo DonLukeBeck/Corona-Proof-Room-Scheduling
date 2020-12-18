@@ -9,12 +9,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.servlet.http.HttpServletRequest;
-import nl.tudelft.sem.shared.entity.AddLecture;
-import nl.tudelft.sem.shared.entity.BareLecture;
 import nl.tudelft.sem.courses.entity.Lecture;
 import nl.tudelft.sem.courses.repository.CourseRepository;
 import nl.tudelft.sem.courses.repository.LectureRepository;
 import nl.tudelft.sem.courses.util.Validate;
+import nl.tudelft.sem.shared.entity.AddLecture;
+import nl.tudelft.sem.shared.entity.BareLecture;
 import nl.tudelft.sem.shared.entity.StringMessage;
 import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,6 +58,7 @@ public class LectureController {
 
     /**
      * Getter for the course repository.
+     *
      * @return the course repository
      */
     public CourseRepository getCourseRepository() {
@@ -66,6 +67,7 @@ public class LectureController {
 
     /**
      * Getter for the lecture repository.
+     *
      * @return the lecture repository
      */
     public LectureRepository getLectureRepository() {
@@ -74,6 +76,7 @@ public class LectureController {
 
     /**
      * Getter for the validate object.
+     *
      * @return the validate object
      */
     public Validate getValidate() {
@@ -160,7 +163,8 @@ public class LectureController {
      */
     @DeleteMapping(path = "/cancelLecture") // Map ONLY POST Requests
     public ResponseEntity<?> cancelLecture(HttpServletRequest request,
-                                           @RequestParam String courseId, @RequestParam @DateTimeFormat(
+                                           @RequestParam String courseId,
+                                           @RequestParam @DateTimeFormat(
             iso = DateTimeFormat.ISO.DATE) LocalDate date) throws JSONException, IOException,
             InterruptedException {
 
@@ -176,7 +180,7 @@ public class LectureController {
         if (lectures.size() == 0) {
             return ResponseEntity.notFound().build();
         }
-        for(Lecture l : lectures){
+        for (Lecture l : lectures) {
             lectureRepository.delete(l);
         }
         return ResponseEntity.ok(new StringMessage("Lecture(s) cancelled."));

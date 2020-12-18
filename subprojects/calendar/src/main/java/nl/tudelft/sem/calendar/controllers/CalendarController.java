@@ -15,15 +15,15 @@ import nl.tudelft.sem.calendar.communication.CourseCommunicator;
 import nl.tudelft.sem.calendar.communication.RestrictionCommunicator;
 import nl.tudelft.sem.calendar.communication.RoomCommunicator;
 import nl.tudelft.sem.calendar.entities.Attendance;
-import nl.tudelft.sem.calendar.util.JwtValidate;
-import nl.tudelft.sem.shared.entity.BareCourse;
 import nl.tudelft.sem.calendar.entities.Lecture;
 import nl.tudelft.sem.calendar.entities.Room;
 import nl.tudelft.sem.calendar.exceptions.ServerErrorException;
 import nl.tudelft.sem.calendar.repositories.AttendanceRepository;
 import nl.tudelft.sem.calendar.repositories.LectureRepository;
 import nl.tudelft.sem.calendar.scheduling.LectureScheduler;
+import nl.tudelft.sem.calendar.util.JwtValidate;
 import nl.tudelft.sem.calendar.util.Validate;
+import nl.tudelft.sem.shared.entity.BareCourse;
 import nl.tudelft.sem.shared.entity.StringMessage;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -71,6 +71,7 @@ public class CalendarController {
 
     /**
      * Constructor used for testing to inject mockable dependencies.
+     *
      * @param lectureScheduler the lecture scheduler
      * @param attendanceRepository the attendance repository
      * @param lectureRepository the lecture repository

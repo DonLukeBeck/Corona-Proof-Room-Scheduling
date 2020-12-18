@@ -1,11 +1,8 @@
 package nl.tudelft.sem.calendar.util;
 
-import org.json.JSONException;
+import javax.servlet.http.HttpServletRequest;
 import org.json.JSONObject;
 import org.springframework.stereotype.Service;
-
-import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
 
 @Service
 public class Validate {

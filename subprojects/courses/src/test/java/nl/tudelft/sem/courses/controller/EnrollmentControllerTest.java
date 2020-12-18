@@ -46,9 +46,8 @@ public class EnrollmentControllerTest {
      */
     @BeforeEach
     void setUp() throws JSONException {
+
         String courseId = "CSE1200";
-        String courseName = "OOPP";
-        String teacherId = "Andy";
 
         Enrollment enrollment = new Enrollment();
         enrollment.setCourseId(courseId);
@@ -59,6 +58,9 @@ public class EnrollmentControllerTest {
         participants.add(enrollment.getStudentId());
         enrollmentRepository.save(enrollment);
 
+        String courseName = "OOPP";
+        String teacherId = "Andy";
+
         this.course = new Course();
         course.setCourseName(courseName);
         course.setTeacherId(teacherId);
@@ -67,11 +69,11 @@ public class EnrollmentControllerTest {
 
         LocalDate localDate = LocalDate.of(2020, 1, 8);
         Date sqlDate = Date.valueOf(localDate);
-        BareLecture bareLecture = new BareLecture();
         Lecture lecture = new Lecture();
         lecture.setDuration(30);
         lecture.setScheduledDate(sqlDate);
         lecture.setCourseId(courseId);
+        BareLecture bareLecture = new BareLecture();
         bareLecture.setDurationInMinutes(30);
         bareLecture.setDate(localDate);
         bareLecture.setCourseId(courseId);
@@ -80,8 +82,6 @@ public class EnrollmentControllerTest {
         lectures.add(lecture);
         bareLectures.add(bareLecture);
         lectureRepository.save(lecture);
-        LocalDate dt = localDate.minusDays(5);
-        Date sqldt = Date.valueOf(dt);
 
         enrollmentController =
                 new EnrollmentController(enrollmentRepository);
@@ -93,6 +93,8 @@ public class EnrollmentControllerTest {
         when(lectureRepository.findByCourseId(course.getCourseId())).thenReturn(lectures);
         when(lectureRepository.findByCourseIdAndScheduledDate(course.getCourseId(),
                 Date.valueOf(localDate.plusDays(1)))).thenReturn(List.of(lecture));
+        LocalDate dt = localDate.minusDays(5);
+        Date sqldt = Date.valueOf(dt);
         when(lectureRepository.findByScheduledDateAfter(sqldt)).thenReturn(lectures);
     }
 

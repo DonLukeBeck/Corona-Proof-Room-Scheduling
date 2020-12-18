@@ -118,17 +118,20 @@ class RestrictionControllerTest {
 
     @Test
     public void addNewRestrictionSuccess() {
-        assertEquals(new StringMessage("Saved"), restrictionController.addNewRestriction("name", 3.0f));
+        assertEquals(new StringMessage("Saved"), restrictionController
+                .addNewRestriction("name", 3.0f));
     }
 
     @Test
     public void addNewRestrictionSuccess1() {
-        assertEquals(new StringMessage("Updated"), restrictionController.addNewRestriction("test", 4.0f));
+        assertEquals(new StringMessage("Updated"), restrictionController
+                .addNewRestriction("test", 4.0f));
     }
 
     @Test
     public void addNewRestrictionSuccess2() {
-        assertEquals(new StringMessage("Already Exists"), restrictionController.addNewRestriction("test2", 2.0f));
+        assertEquals(new StringMessage("Already Exists"), restrictionController
+                .addNewRestriction("test2", 2.0f));
     }
 
     @Test

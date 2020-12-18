@@ -153,8 +153,8 @@ public class RestrictionController {
     @PostMapping(path = "/setTimeGapLength") // Map ONLY POST Requests
     @ResponseBody
     public ResponseEntity<?> setTimeGapLength(HttpServletRequest request,
-                                              @RequestBody float gapTimeInMinutes) throws IOException,
-                                              InterruptedException {
+                                              @RequestBody float gapTimeInMinutes)
+                                              throws IOException, InterruptedException {
         String validation = validate.validateRole(request, teacherRole);
         if (validation.equals(noAccessMessage)) {
             return ResponseEntity.ok(new StringMessage(noAccessMessage));
