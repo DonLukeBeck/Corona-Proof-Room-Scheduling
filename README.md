@@ -10,7 +10,7 @@ Alexandru Bobe, Can Parlar, Luca Becheanu, Matthijs de Goede, Merdan Durmuş, Ti
 To run the main server:  
 `gradle bootRun`  
 To generate the jar files:  
-`gradle :service:bootJar`  
+`gradle :[service]:bootJar`  
 Which can be found in:   
 `subprojects/[service]/libs/[service]-[version].jar`  
 
