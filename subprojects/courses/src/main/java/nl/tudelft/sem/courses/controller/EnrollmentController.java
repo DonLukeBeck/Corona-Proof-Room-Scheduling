@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping(path = "/enrollment")
-public class EnrollmentController extends Controller {
+public class EnrollmentController {
 
     @Autowired
     private transient EnrollmentRepository enrollmentRepository;
@@ -42,6 +42,7 @@ public class EnrollmentController extends Controller {
     /**
      * Get endpoint to retrieve all enrollments from a specific course.
      *
+     * @param courseId the id of the course to get the enrollments for
      * @return A list of {@link BareEnrollment}s
      */
     @GetMapping("/getEnrollmentsByCourse")
@@ -51,6 +52,11 @@ public class EnrollmentController extends Controller {
             .filter(e -> e.getCourseId().equals(courseId))).collect(Collectors.toList()));
     }
 
+    /**
+     * Helper method to prepare a stream of Enrollments to be sent over the network.
+     * @param s the stream of enrollments
+     * @return a stream of bare enrollments
+     */
     private Stream<BareEnrollment> bareFromEnrollment(Stream<Enrollment> s) {
         return s.map(e -> new BareEnrollment(e.getCourseId(), e.getStudentId()));
     }
