@@ -211,7 +211,7 @@ public class CourseManagementControllerTest {
 
     @Test
     void planNewLectureSuccess() {
-        assertEquals("Lecture added", courseManagementController.planNewLecture(addlecture));
+        assertEquals("nl.tudelft.sem.shared.entity.Lecture added", courseManagementController.planNewLecture(addlecture));
     }
 
     @Test
@@ -227,7 +227,7 @@ public class CourseManagementControllerTest {
     void cancelLectureSuccess() {
         // the method cancelLecture does not work
         // Uncomment line below if method is fixed
-        assertEquals("Lecture deleted", courseManagementController
+        assertEquals("nl.tudelft.sem.shared.entity.Lecture deleted", courseManagementController
                 .cancelLecture(lecture.getCourseId(), localDate));
     }
 
