@@ -39,7 +39,8 @@ import org.springframework.test.context.ContextConfiguration;
 @SuppressWarnings("PMD.BeanMembersShouldSerialize")
 public class LectureControllerTest {
     private transient StringMessage noAccessMessage =
-            new StringMessage("You are not allowed to view this page. Please contact administrator.");
+            new StringMessage("You are not allowed to view this page."
+                    + " Please contact administrator.");
 
     private AddLecture addlecture;
     private Lecture lecture;
@@ -66,9 +67,6 @@ public class LectureControllerTest {
     @BeforeEach
     void setUp() throws JSONException, IOException, InterruptedException {
         String courseId = "CSE1200";
-        String courseName = "OOPP";
-        String teacherId = "Andy";
-
         Enrollment enrollment = new Enrollment();
         enrollment.setCourseId(courseId);
         enrollment.setStudentId("Henry");
@@ -77,6 +75,9 @@ public class LectureControllerTest {
         List<String> participants = new ArrayList<>();
         participants.add(enrollment.getStudentId());
         enrollmentRepository.save(enrollment);
+
+        String courseName = "OOPP";
+        String teacherId = "Andy";
 
         Course course = new Course();
         course.setCourseName(courseName);
@@ -90,11 +91,11 @@ public class LectureControllerTest {
         localDate = LocalDate.of(2020, 1, 8);
         Date sqlDate = Date.valueOf(localDate);
         this.addlecture = new AddLecture(courseId, sqlDate, 30);
-        BareLecture bareLecture = new BareLecture();
         this.lecture = new Lecture();
         lecture.setDuration(30);
         lecture.setScheduledDate(sqlDate);
         lecture.setCourseId(courseId);
+        BareLecture bareLecture = new BareLecture();
         bareLecture.setDurationInMinutes(30);
         bareLecture.setDate(localDate);
         bareLecture.setCourseId(courseId);
@@ -103,19 +104,19 @@ public class LectureControllerTest {
         lectures.add(lecture);
         bareLectures.add(bareLecture);
         lectureRepository.save(lecture);
-        dt = localDate.minusDays(5);
-        Date sqldt = Date.valueOf(dt);
 
         lectureController =
                 new LectureController(courseRepository, lectureRepository, validate);
 
         when(courseRepository.findByCourseId(course.getCourseId())).thenReturn(course);
         when(courseRepository.findByCourseName(course.getCourseName())).thenReturn(course);
-        when(courseRepository.findAllByTeacherId(course.getTeacherId())).
-                thenReturn(List.of(course));
+        when(courseRepository.findAllByTeacherId(course.getTeacherId()))
+                .thenReturn(List.of(course));
         when(lectureRepository.findByCourseId(course.getCourseId())).thenReturn(lectures);
         when(lectureRepository.findByCourseIdAndScheduledDate(course.getCourseId(),
                 Date.valueOf(localDate.plusDays(1)))).thenReturn(List.of(lecture));
+        dt = localDate.minusDays(5);
+        Date sqldt = Date.valueOf(dt);
         when(lectureRepository.findByScheduledDateAfter(sqldt)).thenReturn(lectures);
 
         when(validate.validateRole(request, "teacher"))
@@ -142,7 +143,7 @@ public class LectureControllerTest {
         List<BareLecture> list =
                 (List<BareLecture>) lectureController.getLecturesAfterDate(dt).getBody();
         for (BareLecture l : list) {
-            assert(bareLectures.contains(l));
+            assert (bareLectures.contains(l));
         }
     }
 
@@ -164,7 +165,8 @@ public class LectureControllerTest {
         addlecture.setCourseId("randomCourseIdFail");
         assertEquals(ResponseEntity.ok(new StringMessage(
                 "The course with id " + addlecture.getCourseId()
-                        + " does not exist.")), lectureController.planNewLecture(request, addlecture));
+                        + " does not exist.")), lectureController
+                .planNewLecture(request, addlecture));
     }
 
     @Test
@@ -182,7 +184,7 @@ public class LectureControllerTest {
     @Test
     void cancelLectureFail() throws JSONException, IOException, InterruptedException {
         assertEquals(ResponseEntity.notFound().build(),
-                lectureController.cancelLecture(request,"randomCourseIdFail", localDate));
+                lectureController.cancelLecture(request, "randomCourseIdFail", localDate));
         localDate = LocalDate.of(1985, 1, 8);
         assertEquals(ResponseEntity.notFound().build(),
                 lectureController.cancelLecture(request, lecture.getCourseId(), localDate));

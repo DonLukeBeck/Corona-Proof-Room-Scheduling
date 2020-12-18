@@ -1,4 +1,4 @@
-package nl.tudelft.sem.courses;
+package nl.tudelft.sem.courses.entity;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -7,8 +7,6 @@ import nl.tudelft.sem.shared.entity.BareEnrollment;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class BareEnrollmentTest {
     private static BareEnrollment enrollment;

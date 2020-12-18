@@ -2,9 +2,9 @@ package nl.tudelft.sem.courses.controller;
 
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import nl.tudelft.sem.shared.entity.BareEnrollment;
 import nl.tudelft.sem.courses.entity.Enrollment;
 import nl.tudelft.sem.courses.repository.EnrollmentRepository;
+import nl.tudelft.sem.shared.entity.BareEnrollment;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -54,6 +54,7 @@ public class EnrollmentController {
 
     /**
      * Helper method to prepare a stream of Enrollments to be sent over the network.
+     *
      * @param s the stream of enrollments
      * @return a stream of bare enrollments
      */

@@ -38,7 +38,8 @@ import org.springframework.test.context.ContextConfiguration;
 @SuppressWarnings("PMD.BeanMembersShouldSerialize")
 public class CourseControllerTest {
     private transient StringMessage noAccessMessage =
-            new StringMessage("You are not allowed to view this page. Please contact administrator.");
+            new StringMessage("You are not allowed to view this page."
+                   + " Please contact administrator.");
 
     private AddCourse addcourse;
     private Course course;
@@ -64,10 +65,8 @@ public class CourseControllerTest {
      */
     @BeforeEach
     void setUp() throws IOException, InterruptedException, JSONException {
-        String courseId = "CSE1200";
-        String courseName = "OOPP";
-        String teacherId = "Andy";
 
+        String courseId = "CSE1200";
         this.enrollment = new Enrollment();
         enrollment.setCourseId(courseId);
         enrollment.setStudentId("Henry");
@@ -76,6 +75,9 @@ public class CourseControllerTest {
         participants = new ArrayList<>();
         participants.add(enrollment.getStudentId());
         enrollmentRepository.save(enrollment);
+
+        String courseName = "OOPP";
+        String teacherId = "Andy";
 
         this.addcourse = new AddCourse(courseId, courseName, teacherId, participants);
         this.course = new Course();
@@ -129,8 +131,7 @@ public class CourseControllerTest {
                 "CSE1299", "OOPP", "Andy", participants);
 
         assertEquals(ResponseEntity.ok(new StringMessage("Course created.")),
-                courseController.createNewCourse
-                        (request, newOne));
+                courseController.createNewCourse(request, newOne));
     }
 
     @Test
@@ -183,13 +184,13 @@ public class CourseControllerTest {
     @Test
     void deleteCourseAccessDenied() throws JSONException, IOException, InterruptedException {
         assertEquals(ResponseEntity.status(HttpStatus.FORBIDDEN).body(noAccessMessage),
-                courseController.deleteCourse(wrongRequest,course.getCourseId()));
+                courseController.deleteCourse(wrongRequest, course.getCourseId()));
     }
 
     @Test
     void deleteCourseNotExistent() throws JSONException, IOException, InterruptedException {
         assertEquals(ResponseEntity.notFound().build(),
-                courseController.deleteCourse(request,"RandomNumber"));
+                courseController.deleteCourse(request, "RandomNumber"));
     }
 
     @Test

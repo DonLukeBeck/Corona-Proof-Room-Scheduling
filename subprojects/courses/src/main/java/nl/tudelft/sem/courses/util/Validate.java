@@ -1,4 +1,5 @@
 package nl.tudelft.sem.courses.util;
+
 import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import org.json.JSONException;

@@ -4,13 +4,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
-import nl.tudelft.sem.shared.entity.AddCourse;
-import nl.tudelft.sem.shared.entity.BareCourse;
 import nl.tudelft.sem.courses.entity.Course;
 import nl.tudelft.sem.courses.entity.Enrollment;
 import nl.tudelft.sem.courses.repository.CourseRepository;
 import nl.tudelft.sem.courses.repository.EnrollmentRepository;
 import nl.tudelft.sem.courses.util.Validate;
+import nl.tudelft.sem.shared.entity.AddCourse;
+import nl.tudelft.sem.shared.entity.BareCourse;
 import nl.tudelft.sem.shared.entity.StringMessage;
 import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,6 +59,7 @@ public class CourseController {
     public CourseRepository getCourseRepository() {
         return courseRepository;
     }
+
     public EnrollmentRepository getEnrollmentRepository() {
         return enrollmentRepository;
     }
@@ -139,7 +140,8 @@ public class CourseController {
      */
     @DeleteMapping(path = "/deleteCourse") // Map ONLY POST Requests
     public ResponseEntity<?> deleteCourse(HttpServletRequest request,
-                                          @RequestParam String courseId) throws JSONException, IOException, InterruptedException {
+                                          @RequestParam String courseId)
+            throws JSONException, IOException, InterruptedException {
 
         String validation = validate.validateRole(request, teacherRole);
         if (validation.equals(noAccessMessage.getMessage())) {
