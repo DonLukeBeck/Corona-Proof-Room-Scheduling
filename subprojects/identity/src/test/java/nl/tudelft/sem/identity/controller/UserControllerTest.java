@@ -88,7 +88,7 @@ public class UserControllerTest {
             .andReturn().getResponse().getContentAsString();
 
         JSONObject jwtJson = new JSONObject(jwtJsonString);
-        String jwt = jwtJson.getString("messageText");
+        String jwt = jwtJson.getString("message");
 
         Claims claims = Jwts.parser().setSigningKey(jwtUtil.getSecret()).parseClaimsJws(jwt)
                 .getBody();
@@ -107,11 +107,11 @@ public class UserControllerTest {
         
         String jwt = mockMvc.perform(post(loginUri).contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(objectMapper.writeValueAsString(authenticationRequest)))
-                .andExpect(status().isOk())
+                .andExpect(status().isForbidden())
                 .andReturn().getResponse().getContentAsString();
 
         JSONObject obj = new JSONObject(jwt);
-        assertThat(obj.getString("messageText")).isEqualTo("Authentication failure");
+        assertThat(obj.getString("message")).isEqualTo("Authentication failure");
     }
 
     @Test
@@ -121,11 +121,11 @@ public class UserControllerTest {
         String jwt = mockMvc.perform(post(loginUri)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(objectMapper.writeValueAsString(authenticationRequest)))
-                .andExpect(status().isOk())
+                .andExpect(status().isForbidden())
                 .andReturn().getResponse().getContentAsString();
 
         JSONObject obj = new JSONObject(jwt);
-        assertThat(obj.getString("messageText")).isEqualTo("Authentication failure");
+        assertThat(obj.getString("message")).isEqualTo("Authentication failure");
     }
 
     @Test

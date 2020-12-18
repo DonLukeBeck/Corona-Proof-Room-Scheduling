@@ -20,7 +20,7 @@ import nl.tudelft.sem.courses.repository.LectureRepository;
 import nl.tudelft.sem.courses.util.Validate;
 import nl.tudelft.sem.shared.entity.AddLecture;
 import nl.tudelft.sem.shared.entity.BareLecture;
-import nl.tudelft.sem.shared.entity.Message;
+import nl.tudelft.sem.shared.entity.StringMessage;
 import org.json.JSONException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,6 +28,7 @@ import org.mockito.Mockito;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ContextConfiguration;
 
@@ -37,8 +38,8 @@ import org.springframework.test.context.ContextConfiguration;
 // This class doesn't ever need to be serialized, so neither do it's members
 @SuppressWarnings("PMD.BeanMembersShouldSerialize")
 public class LectureControllerTest {
-    private transient String noAccessMessage =
-            "You are not allowed to view this page. Please contact administrator.";
+    private transient StringMessage noAccessMessage =
+            new StringMessage("You are not allowed to view this page. Please contact administrator.");
 
     private AddLecture addlecture;
     private Lecture lecture;
@@ -120,7 +121,7 @@ public class LectureControllerTest {
         when(validate.validateRole(request, "teacher"))
                 .thenReturn("netid");
         when(validate.validateRole(wrongRequest, "teacher"))
-                .thenReturn(noAccessMessage);
+                .thenReturn(noAccessMessage.getMessage());
     }
 
     @Test
@@ -147,13 +148,13 @@ public class LectureControllerTest {
 
     @Test
     void planNewLectureSuccess() throws JSONException, IOException, InterruptedException {
-        assertEquals(ResponseEntity.ok(new Message("Lecture planned.")),
+        assertEquals(ResponseEntity.ok(new StringMessage("Lecture planned.")),
                 lectureController.planNewLecture(request, addlecture));
     }
 
     @Test
     void planNewLectureAccessDenied() throws JSONException, IOException, InterruptedException {
-        assertEquals(ResponseEntity.ok(new Message(noAccessMessage)),
+        assertEquals(ResponseEntity.status(HttpStatus.FORBIDDEN).body(noAccessMessage),
                 lectureController.planNewLecture(wrongRequest, addlecture));
     }
 
@@ -161,20 +162,20 @@ public class LectureControllerTest {
     @Test
     void planNewLectureFail() throws JSONException, IOException, InterruptedException {
         addlecture.setCourseId("randomCourseIdFail");
-        assertEquals(ResponseEntity.ok(new Message(
+        assertEquals(ResponseEntity.ok(new StringMessage(
                 "The course with id " + addlecture.getCourseId()
                         + " does not exist.")), lectureController.planNewLecture(request, addlecture));
     }
 
     @Test
     void cancelLectureSuccess() throws JSONException, IOException, InterruptedException {
-        assertEquals(ResponseEntity.ok(new Message("Lecture(s) cancelled.")),
+        assertEquals(ResponseEntity.ok(new StringMessage("Lecture(s) cancelled.")),
                 lectureController.cancelLecture(request, lecture.getCourseId(), localDate));
     }
 
     @Test
     void cancelLectureAccessDenied() throws JSONException, IOException, InterruptedException {
-        assertEquals(ResponseEntity.ok(new Message(noAccessMessage)),
+        assertEquals(ResponseEntity.status(HttpStatus.FORBIDDEN).body(noAccessMessage),
                 lectureController.cancelLecture(wrongRequest, lecture.getCourseId(), localDate));
     }
 

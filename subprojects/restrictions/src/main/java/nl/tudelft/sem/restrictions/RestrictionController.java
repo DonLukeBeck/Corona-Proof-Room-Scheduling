@@ -9,6 +9,8 @@ import javax.servlet.http.HttpServletRequest;
 import nl.tudelft.sem.restrictions.communication.RoomsCommunicator;
 import nl.tudelft.sem.restrictions.communication.ServerErrorException;
 import nl.tudelft.sem.restrictions.communication.Validate;
+import nl.tudelft.sem.shared.entity.IntValue;
+import nl.tudelft.sem.shared.entity.StringMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -55,25 +57,25 @@ public class RestrictionController {
      * @param value of the restriction (float)
      * @return message containing the action that has been done
      */
-    public String addNewRestriction(String name, float value) {
+    public StringMessage addNewRestriction(String name, float value) {
         Optional<Restriction> r = restrictionRepository.findByName(name);
         if (r.isPresent()) {
             if (r.get().getValue() == value) {
-                return "Already Exists";
+                return new StringMessage("Already Exists");
             } else {
                 restrictionRepository.delete(r.get());
                 Restriction rn = new Restriction();
                 rn.setName(name);
                 rn.setValue(value);
                 restrictionRepository.save(rn);
-                return "Updated";
+                return new StringMessage("Updated");
             }
         }
         Restriction rn = new Restriction();
         rn.setName(name);
         rn.setValue(value);
         restrictionRepository.save(rn);
-        return "Saved";
+        return new StringMessage("Saved");
     }
 
     /**
@@ -105,7 +107,7 @@ public class RestrictionController {
                                                     InterruptedException {
         String validation = validate.validateRole(request, teacherRole);
         if (validation.equals(noAccessMessage)) {
-            return ResponseEntity.ok(noAccessMessage);
+            return ResponseEntity.ok(new StringMessage(noAccessMessage));
         }
         if (bigOrSmallRoom) {
             return ResponseEntity.ok(
@@ -129,7 +131,7 @@ public class RestrictionController {
                                             InterruptedException {
         String validation = validate.validateRole(request, teacherRole);
         if (validation.equals(noAccessMessage)) {
-            return ResponseEntity.ok(noAccessMessage);
+            return ResponseEntity.ok(new StringMessage(noAccessMessage));
         }
         return ResponseEntity.ok(addNewRestriction("minSeatsBig", numberOfSeats));
     }
@@ -147,7 +149,7 @@ public class RestrictionController {
                                               InterruptedException {
         String validation = validate.validateRole(request, teacherRole);
         if (validation.equals(noAccessMessage)) {
-            return ResponseEntity.ok(noAccessMessage);
+            return ResponseEntity.ok(new StringMessage(noAccessMessage));
         }
 
         return ResponseEntity.ok(addNewRestriction("gapTimeInMinutes", gapTimeInMinutes));
@@ -159,11 +161,11 @@ public class RestrictionController {
      * @param bigOrSmallRoom boolean representing if the parameter is for big (1) or small (0) rooms
      * @return a string containing the success or error message
      */
-    public int getCapacityRestriction(boolean bigOrSmallRoom) {
+    public IntValue getCapacityRestriction(boolean bigOrSmallRoom) {
         if (bigOrSmallRoom) {
-            return (int) getRestrictionVal("bigRoomMaxPercentage");
+            return new IntValue((int) getRestrictionVal("bigRoomMaxPercentage"));
         } else {
-            return (int) getRestrictionVal("smallRoomMaxPercentage");
+            return new IntValue((int) getRestrictionVal("smallRoomMaxPercentage"));
         }
     }
 
@@ -184,7 +186,7 @@ public class RestrictionController {
     @GetMapping(path = "/getTimeGapLength") // Map ONLY POST Requests
     @ResponseBody
     public ResponseEntity<?> getTimeGapLength() {
-        return ResponseEntity.ok((int) getRestrictionVal("gapTimeInMinutes"));
+        return ResponseEntity.ok(new IntValue((int) getRestrictionVal("gapTimeInMinutes")));
     }
 
     /**
@@ -200,7 +202,7 @@ public class RestrictionController {
             throws IOException, InterruptedException {
         String validation = validate.validateRole(request, teacherRole);
         if (validation.equals(noAccessMessage)) {
-            return ResponseEntity.ok(noAccessMessage);
+            return ResponseEntity.ok(new StringMessage(noAccessMessage));
         }
         return ResponseEntity.ok(addNewRestriction("startTime", (float) startTime.toSecondOfDay()));
     }
@@ -218,7 +220,7 @@ public class RestrictionController {
                                         InterruptedException {
         String validation = validate.validateRole(request, teacherRole);
         if (validation.equals(noAccessMessage)) {
-            return ResponseEntity.ok(noAccessMessage);
+            return ResponseEntity.ok(new StringMessage(noAccessMessage));
         }
 
         return ResponseEntity.ok(addNewRestriction("endTime", (float) endTime.toSecondOfDay()));
@@ -232,7 +234,7 @@ public class RestrictionController {
     @GetMapping(path = "/getStartTime") // Map ONLY POST Requests
     @ResponseBody
     public ResponseEntity<?> getStartTime() {
-        return ResponseEntity.ok((int) getRestrictionVal("startTime"));
+        return ResponseEntity.ok(new IntValue((int) getRestrictionVal("startTime")));
     }
 
     /**
@@ -243,7 +245,7 @@ public class RestrictionController {
     @GetMapping(path = "/getEndTime") // Map ONLY POST Requests
     @ResponseBody
     public ResponseEntity<?> getEndTime() {
-        return ResponseEntity.ok((int) getRestrictionVal("endTime"));
+        return ResponseEntity.ok(new IntValue((int) getRestrictionVal("endTime")));
     }
 
     /**
@@ -259,14 +261,12 @@ public class RestrictionController {
         for (Room r : it) {
             int cap = r.getCapacity();
             if (cap >= getMinSeatsBig()) {
-                r.setCapacity((int) (cap * (getCapacityRestriction(true) / 100.0)));
+                r.setCapacity((int) (cap * (getCapacityRestriction(true).getValue() / 100.0)));
             } else {
-                r.setCapacity((int) (cap * (getCapacityRestriction(false) / 100.0)));
+                r.setCapacity((int) (cap * (getCapacityRestriction(false).getValue() / 100.0)));
             }
         }
         return ResponseEntity.ok(it);
     }
-
-
 }
 

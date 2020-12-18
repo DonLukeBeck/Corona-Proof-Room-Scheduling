@@ -68,7 +68,6 @@ public class CourseCommunicator extends  Communicator {
     public Course courseFromId(String courseId)
         throws IOException, InterruptedException, ServerErrorException {
         var resp = objectMapper.readValue(getResponse(
-
             "/course/getCourse?courseId=" + courseId, Constants.COURSE_SERVER_URL).body(),
                 new TypeReference<BareCourse>(){});
         var enrollments = objectMapper.readValue(getResponse(

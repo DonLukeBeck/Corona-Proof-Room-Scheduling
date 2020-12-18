@@ -13,6 +13,7 @@ import nl.tudelft.sem.calendar.communication.CourseCommunicator;
 import nl.tudelft.sem.calendar.communication.RestrictionCommunicator;
 import nl.tudelft.sem.calendar.communication.RoomCommunicator;
 import nl.tudelft.sem.calendar.entities.Attendance;
+import nl.tudelft.sem.calendar.util.JwtValidate;
 import nl.tudelft.sem.shared.entity.BareCourse;
 import nl.tudelft.sem.calendar.entities.Lecture;
 import nl.tudelft.sem.calendar.entities.Room;
@@ -21,6 +22,9 @@ import nl.tudelft.sem.calendar.repositories.AttendanceRepository;
 import nl.tudelft.sem.calendar.repositories.LectureRepository;
 import nl.tudelft.sem.calendar.scheduling.LectureScheduler;
 import nl.tudelft.sem.calendar.util.Validate;
+import nl.tudelft.sem.shared.entity.StringMessage;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -38,8 +42,8 @@ public class CalendarController {
 
     private transient String teacherRole = "teacher";
     private transient String studentRole = "student";
-    private transient String noAccessMessage =
-            "You are not allowed to view this page. Please contact administrator.";
+    private transient StringMessage noAccessMessage =
+        new StringMessage("You are not allowed to view this page. Please contact administrator.");
 
     @Autowired
     private transient LectureScheduler lectureScheduler;
@@ -98,11 +102,11 @@ public class CalendarController {
     @PostMapping(path = "/scheduleLectures")
     @ResponseBody
     public ResponseEntity<?> scheduleLectures(HttpServletRequest request)
-            throws InterruptedException, IOException {
+            throws JSONException, InterruptedException, IOException {
 
         String validation = validate.validateRole(request, teacherRole);
-        if (validation.equals(noAccessMessage)) {
-            return ResponseEntity.ok(noAccessMessage);
+        if (validation.equals(noAccessMessage.getMessage())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(noAccessMessage);
         }
 
         try {
@@ -127,11 +131,10 @@ public class CalendarController {
             // Schedule the lecture
             lectureScheduler.scheduleAllLectures();
 
-
-            return ResponseEntity.ok("Successfully scheduled lectures.");
+            return ResponseEntity.ok(new StringMessage("Successfully scheduled lectures."));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Internal server error.");
+                    .body(new StringMessage("Internal server error."));
         }
     }
 
@@ -151,8 +154,8 @@ public class CalendarController {
             throws IOException, InterruptedException, ServerErrorException {
 
         String validation = validate.validateRole(request, studentRole);
-        if (validation.equals(noAccessMessage)) {
-            return ResponseEntity.ok(noAccessMessage);
+        if (validation.equals(noAccessMessage.getMessage())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(noAccessMessage);
         }
 
         List<Lecture> lectures = new ArrayList<>();
@@ -184,7 +187,7 @@ public class CalendarController {
             throws IOException, InterruptedException, ServerErrorException {
 
         String validation = validate.validateRole(request, teacherRole);
-        if (validation.equals(noAccessMessage)) {
+        if (validation.equals(noAccessMessage.getMessage())) {
             return ResponseEntity.ok(noAccessMessage);
         }
 
@@ -222,7 +225,7 @@ public class CalendarController {
             throws IOException, InterruptedException, ServerErrorException {
 
         String validation = validate.validateRole(request, studentRole);
-        if (validation.equals(noAccessMessage)) {
+        if (validation.equals(noAccessMessage.getMessage())) {
             return ResponseEntity.ok(noAccessMessage);
         }
 
@@ -258,7 +261,7 @@ public class CalendarController {
             throws IOException, InterruptedException, ServerErrorException {
 
         String validation = validate.validateRole(request, teacherRole);
-        if (validation.equals(noAccessMessage)) {
+        if (validation.equals(noAccessMessage.getMessage())) {
             return ResponseEntity.ok(noAccessMessage);
         }
 
@@ -297,7 +300,7 @@ public class CalendarController {
             throws IOException, InterruptedException, ServerErrorException {
 
         String validation = validate.validateRole(request, studentRole);
-        if (validation.equals(noAccessMessage)) {
+        if (validation.equals(noAccessMessage.getMessage())) {
             return ResponseEntity.ok(noAccessMessage);
         }
 
@@ -333,7 +336,7 @@ public class CalendarController {
 
         String validation = validate.validateRole(request, teacherRole);
 
-        if (validation.equals(noAccessMessage)) {
+        if (validation.equals(noAccessMessage.getMessage())) {
             return ResponseEntity.ok(noAccessMessage);
         }
 
@@ -380,10 +383,10 @@ public class CalendarController {
                     attendanceRepository.save(a);
                 }
             }
-            return ResponseEntity.ok("Indicated absence.");
+            return ResponseEntity.ok(new StringMessage("Indicated absence."));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Could not indicated absence.");
+                    .body(new StringMessage("Could not indicated absence."));
         }
     }
 
@@ -406,7 +409,7 @@ public class CalendarController {
 
         String validation = validate.validateRole(request, teacherRole);
 
-        if (validation.equals(noAccessMessage)) {
+        if (validation.equals(noAccessMessage.getMessage())) {
             return ResponseEntity.ok(noAccessMessage);
         }
 
@@ -443,5 +446,25 @@ public class CalendarController {
             result.put(a.getLectureId(), a.getPhysical());
         }
         return result;
+    }
+
+    /**
+     * Helper method to validate the role of a user.
+     *
+     * @param request the request containing jwt token information
+     * @param role the desired role
+     *
+     * @return an error message if the user hasn't got the desired role, else its netId.
+     */
+    public String validateRole(HttpServletRequest request, String role) {
+        try {
+            JSONObject jwtInfo = JwtValidate.jwtValidate(request);
+            if (!jwtInfo.getString("role").equals(role)) {
+                return noAccessMessage.getMessage();
+            }
+            return jwtInfo.getString("netid");
+        } catch (Exception e) {
+            return noAccessMessage.getMessage();
+        }
     }
 }

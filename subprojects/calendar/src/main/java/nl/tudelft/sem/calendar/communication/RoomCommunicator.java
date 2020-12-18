@@ -1,8 +1,10 @@
 package nl.tudelft.sem.calendar.communication;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import java.io.IOException;
 import nl.tudelft.sem.calendar.exceptions.ServerErrorException;
 import nl.tudelft.sem.calendar.util.Constants;
+import nl.tudelft.sem.shared.entity.StringMessage;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -23,7 +25,8 @@ public class RoomCommunicator extends Communicator {
         var response = getResponse("/rooms/getRoomName?roomId=" + roomId,
                 Constants.ROOMS_SERVER_URL);
 
-        return response.body();
+        return objectMapper.readValue(response.body(), new TypeReference<StringMessage>() {})
+            .getMessage();
     }
 
 

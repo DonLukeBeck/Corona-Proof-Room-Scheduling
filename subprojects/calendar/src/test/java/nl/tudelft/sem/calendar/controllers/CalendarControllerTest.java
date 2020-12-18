@@ -1,5 +1,6 @@
 package nl.tudelft.sem.calendar.controllers;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
@@ -7,6 +8,10 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -29,6 +34,7 @@ import nl.tudelft.sem.calendar.repositories.AttendanceRepository;
 import nl.tudelft.sem.calendar.repositories.LectureRepository;
 import nl.tudelft.sem.calendar.scheduling.LectureScheduler;
 import nl.tudelft.sem.calendar.util.Validate;
+import nl.tudelft.sem.shared.entity.StringMessage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -59,8 +65,10 @@ class CalendarControllerTest {
     private int endTimeSec;
     private LocalTime endTime;
     private int timeGapLength;
-    private transient String noAccessMessage =
-            "You are not allowed to view this page. Please contact administrator.";
+    private transient StringMessage noAccessMessage =
+        new StringMessage("You are not allowed to view this page. Please contact administrator.");
+    public ObjectMapper objectMapper =
+        new ObjectMapper().registerModule(new JavaTimeModule());
 
     // Mocks
     @MockBean
@@ -165,9 +173,9 @@ class CalendarControllerTest {
         when(validate.validateRole(teacherRequest, "teacher"))
                 .thenReturn(netIds[3]);
         when(validate.validateRole(wrongRequest, "teacher"))
-                .thenReturn(noAccessMessage);
+                .thenReturn(noAccessMessage.getMessage());
         when(validate.validateRole(wrongRequest, "student"))
-                .thenReturn(noAccessMessage);
+                .thenReturn(noAccessMessage.getMessage());
 
         when(attendanceRepository.findByStudentId(netIds[1])).thenReturn(attendances.subList(1, 3));
 
@@ -197,8 +205,8 @@ class CalendarControllerTest {
     void testScheduleLecturesSuccess()
             throws InterruptedException, ServerErrorException, IOException {
 
-        assertEquals(ResponseEntity.ok("Successfully scheduled lectures."),
-                calendarController.scheduleLectures(teacherRequest));
+        assertThat(calendarController.scheduleLectures(teacherRequest).getBody())
+            .isEqualTo(new StringMessage("Successfully scheduled lectures."));
 
         verify(restrictionCommunicator, times(1)).getStartTime();
         verify(restrictionCommunicator, times(1)).getEndTime();
@@ -218,34 +226,32 @@ class CalendarControllerTest {
             ServerErrorException {
         doThrow(new IOException()).when(restrictionCommunicator)
                 .getAllRoomsWithAdjustedCapacity();
-        assertEquals(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body("Internal server error."), calendarController
-                .scheduleLectures(teacherRequest));
+        assertThat(calendarController.scheduleLectures(teacherRequest).getStatusCode())
+            .isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @Test
     void testScheduleLecturesAccessDenied()
             throws IOException, InterruptedException {
-        assertEquals(ResponseEntity.ok(noAccessMessage),
-                calendarController.scheduleLectures(wrongRequest));
+        assertThat(calendarController.scheduleLectures(wrongRequest).getBody())
+            .isEqualTo(noAccessMessage);
     }
 
     @Test
     void testGetMyPersonalScheduleStudentSuccess()
             throws InterruptedException, ServerErrorException, IOException {
 
-        ResponseEntity<List<Lecture>> result =
-        (ResponseEntity<List<Lecture>>) calendarController
-                .getMyPersonalScheduleStudent(studentRequest);
-        assertEquals(2, Objects.requireNonNull(result.getBody()).size());
+        List<Lecture> result = (List<Lecture>) calendarController
+            .getMyPersonalScheduleStudent(studentRequest).getBody();
+        assertEquals(2, Objects.requireNonNull(result).size());
 
-        assertTrue(result.getBody().get(1).isSelectedForOnCampus());
-        assertFalse(result.getBody().get(0).isSelectedForOnCampus());
+        assertTrue(result.get(1).isSelectedForOnCampus());
+        assertFalse(result.get(0).isSelectedForOnCampus());
 
         assertEquals(lecturesToSchedule.get(0).getRoomName(),
-                result.getBody().get(0).getRoomName());
+                result.get(0).getRoomName());
         assertEquals(lecturesToSchedule.get(1).getRoomName() ,
-                result.getBody().get(1).getRoomName());
+                result.get(1).getRoomName());
 
         verify(lectureRepository, times(1))
                 .findByLectureId(lecturesToSchedule.get(0).getLectureId());
@@ -260,8 +266,8 @@ class CalendarControllerTest {
     @Test
     void testGetMyPersonalScheduleStudentAccessDenied()
             throws InterruptedException, ServerErrorException, IOException {
-        assertEquals(ResponseEntity.ok(noAccessMessage),
-                calendarController.getMyPersonalScheduleStudent(wrongRequest));
+        assertThat(calendarController.getMyPersonalScheduleStudent(wrongRequest).getStatusCode())
+            .isEqualTo(HttpStatus.FORBIDDEN);
     }
 
     @Test
@@ -330,15 +336,13 @@ class CalendarControllerTest {
     void testGetMyPersonalScheduleForCourseStudentSuccess()
             throws InterruptedException, ServerErrorException, IOException {
 
-        ResponseEntity<List<Lecture>> result =
-        (ResponseEntity<List<Lecture>>) calendarController
-                .getMyPersonalScheduleForCourseStudent(studentRequest,
-                        lecturesToSchedule.get(1).getCourseId());
+        List<Lecture> response = (List<Lecture>) calendarController.getMyPersonalScheduleForCourseStudent(studentRequest,
+            lecturesToSchedule.get(1).getCourseId()).getBody();
 
-        assertEquals(1, Objects.requireNonNull(result.getBody()).size());
-        assertTrue(result.getBody().get(0).isSelectedForOnCampus());
+        assertEquals(1, Objects.requireNonNull(response).size());
+        assertTrue(response.get(0).isSelectedForOnCampus());
         assertEquals(lecturesToSchedule.get(1).getRoomName(),
-                result.getBody().get(0).getRoomName());
+                response.get(0).getRoomName());
 
         verify(lectureRepository, times(1)).findByCourseId(
                 lecturesToSchedule.get(1).getCourseId());
@@ -373,9 +377,8 @@ class CalendarControllerTest {
 
     @Test
     void testIndicateAbsenceSuccess() throws IOException, InterruptedException {
-        assertEquals(ResponseEntity.ok("Indicated absence."),
-                calendarController.indicateAbsence(
-                        studentRequest, netIds[1], courses[0].getCourseId(), dates[0]));
+        assertThat(calendarController.indicateAbsence(studentRequest, netIds[1],
+            courses[0].getCourseId(), dates[0]).getBody()).isEqualTo(new StringMessage("Indicated absence."));
 
         verify(lectureRepository, times(1))
                 .findByDateAndCourseId(dates[0].plusDays(1), courses[0].getCourseId());

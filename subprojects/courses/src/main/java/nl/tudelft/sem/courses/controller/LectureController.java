@@ -15,10 +15,11 @@ import nl.tudelft.sem.courses.entity.Lecture;
 import nl.tudelft.sem.courses.repository.CourseRepository;
 import nl.tudelft.sem.courses.repository.LectureRepository;
 import nl.tudelft.sem.courses.util.Validate;
-import nl.tudelft.sem.shared.entity.Message;
+import nl.tudelft.sem.shared.entity.StringMessage;
 import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -42,8 +43,8 @@ public class LectureController {
 
     private transient String teacherRole = "teacher";
 
-    protected transient String noAccessMessage =
-            "You are not allowed to view this page. Please contact administrator.";
+    protected transient StringMessage noAccessMessage =
+        new StringMessage("You are not allowed to view this page. Please contact administrator.");
 
     /**
      * Instantiates repository needed.
@@ -133,8 +134,8 @@ public class LectureController {
             throws JSONException, IOException, InterruptedException {
 
         String validation = validate.validateRole(request, teacherRole);
-        if (validation.equals(noAccessMessage)) {
-            return ResponseEntity.ok(new Message(noAccessMessage));
+        if (validation.equals(noAccessMessage.getMessage())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(noAccessMessage);
         }
 
         if (courseRepository.findByCourseId(addLecture.getCourseId()) != null) {
@@ -143,9 +144,9 @@ public class LectureController {
             lecture.setDuration(addLecture.getDurationInMinutes());
             lecture.setScheduledDate(addLecture.getDate());
             lectureRepository.save(lecture);
-            return ResponseEntity.ok(new Message("Lecture planned."));
+            return ResponseEntity.ok(new StringMessage("Lecture planned."));
         } else {
-            return ResponseEntity.ok(new Message("The course with id "
+            return ResponseEntity.ok(new StringMessage("The course with id "
                     + addLecture.getCourseId() + " does not exist."));
         }
     }
@@ -164,8 +165,8 @@ public class LectureController {
             InterruptedException {
 
         String validation = validate.validateRole(request, teacherRole);
-        if (validation.equals(noAccessMessage)) {
-            return ResponseEntity.ok(new Message(noAccessMessage));
+        if (validation.equals(noAccessMessage.getMessage())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(noAccessMessage);
         }
 
         // We need to add one day since Spring of MariaDB or something matches against one day off
@@ -178,6 +179,6 @@ public class LectureController {
         for(Lecture l : lectures){
             lectureRepository.delete(l);
         }
-        return ResponseEntity.ok(new Message("Lecture(s) cancelled."));
+        return ResponseEntity.ok(new StringMessage("Lecture(s) cancelled."));
     }
 }

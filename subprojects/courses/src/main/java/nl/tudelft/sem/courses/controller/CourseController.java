@@ -11,9 +11,10 @@ import nl.tudelft.sem.courses.entity.Enrollment;
 import nl.tudelft.sem.courses.repository.CourseRepository;
 import nl.tudelft.sem.courses.repository.EnrollmentRepository;
 import nl.tudelft.sem.courses.util.Validate;
-import nl.tudelft.sem.shared.entity.Message;
+import nl.tudelft.sem.shared.entity.StringMessage;
 import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -38,8 +39,8 @@ public class CourseController {
 
     private transient String teacherRole = "teacher";
 
-    protected transient String noAccessMessage =
-            "You are not allowed to view this page. Please contact administrator.";
+    protected transient StringMessage noAccessMessage =
+        new StringMessage("You are not allowed to view this page. Please contact administrator.");
 
     /**
      * Instantiates repository needed.
@@ -102,14 +103,14 @@ public class CourseController {
             throws IOException, InterruptedException, JSONException {
 
         String validation = validate.validateRole(request, teacherRole);
-        if (validation.equals(noAccessMessage)) {
-            return ResponseEntity.ok(new Message(noAccessMessage));
+        if (validation.equals(noAccessMessage.getMessage())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(noAccessMessage);
         }
 
         Course r = courseRepository.findByCourseId(addCourse.getCourseId());
         try {
             if (r.getCourseId().equals(addCourse.getCourseId())) {
-                return ResponseEntity.ok(new Message("Course already exists."));
+                return ResponseEntity.ok(new StringMessage("Course already exists."));
             }
             return ResponseEntity.notFound().build();
         } catch (Exception e) {
@@ -125,7 +126,7 @@ public class CourseController {
             course.setCourseId(addCourse.getCourseId());
             course.setTeacherId(addCourse.getTeacherId());
             courseRepository.save(course);
-            return ResponseEntity.ok(new Message("Course created."));
+            return ResponseEntity.ok(new StringMessage("Course created."));
         }
     }
 
@@ -141,8 +142,8 @@ public class CourseController {
                                           @RequestParam String courseId) throws JSONException, IOException, InterruptedException {
 
         String validation = validate.validateRole(request, teacherRole);
-        if (validation.equals(noAccessMessage)) {
-            return ResponseEntity.ok(new Message(noAccessMessage));
+        if (validation.equals(noAccessMessage.getMessage())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(noAccessMessage);
         }
 
         Course r = courseRepository.findByCourseId(courseId);
@@ -150,7 +151,7 @@ public class CourseController {
             return ResponseEntity.notFound().build();
         }
         courseRepository.delete(r);
-        return ResponseEntity.ok(new Message("Course deleted."));
+        return ResponseEntity.ok(new StringMessage("Course deleted."));
     }
 
     /**

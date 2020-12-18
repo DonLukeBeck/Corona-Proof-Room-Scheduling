@@ -19,7 +19,7 @@ import nl.tudelft.sem.courses.repository.EnrollmentRepository;
 import nl.tudelft.sem.courses.repository.LectureRepository;
 import nl.tudelft.sem.courses.util.Validate;
 import nl.tudelft.sem.shared.entity.AddCourse;
-import nl.tudelft.sem.shared.entity.Message;
+import nl.tudelft.sem.shared.entity.StringMessage;
 import org.json.JSONException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -27,6 +27,7 @@ import org.mockito.Mockito;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ContextConfiguration;
 
@@ -36,8 +37,8 @@ import org.springframework.test.context.ContextConfiguration;
 // This class doesn't ever need to be serialized, so neither do it's members
 @SuppressWarnings("PMD.BeanMembersShouldSerialize")
 public class CourseControllerTest {
-    private transient String noAccessMessage =
-            "You are not allowed to view this page. Please contact administrator.";
+    private transient StringMessage noAccessMessage =
+            new StringMessage("You are not allowed to view this page. Please contact administrator.");
 
     private AddCourse addcourse;
     private Course course;
@@ -111,7 +112,7 @@ public class CourseControllerTest {
         when(validate.validateRole(request, "teacher"))
                 .thenReturn("netid");
         when(validate.validateRole(wrongRequest, "teacher"))
-                .thenReturn(noAccessMessage);
+                .thenReturn(noAccessMessage.getMessage());
 
         courseController =
                 new CourseController(courseRepository, enrollmentRepository, validate);
@@ -127,7 +128,7 @@ public class CourseControllerTest {
         AddCourse newOne = new AddCourse(
                 "CSE1299", "OOPP", "Andy", participants);
 
-        assertEquals(ResponseEntity.ok(new Message("Course created.")),
+        assertEquals(ResponseEntity.ok(new StringMessage("Course created.")),
                 courseController.createNewCourse
                         (request, newOne));
     }
@@ -137,13 +138,13 @@ public class CourseControllerTest {
         AddCourse newOne = new AddCourse(
                 "CSE1299", "OOPP", "Andy", participants);
 
-        assertEquals(ResponseEntity.ok(new Message(noAccessMessage)),
+        assertEquals(ResponseEntity.status(HttpStatus.FORBIDDEN).body(noAccessMessage),
                 courseController.createNewCourse(wrongRequest, newOne));
     }
 
     @Test
     void createNewCourseAlreadyExists() throws IOException, InterruptedException {
-        assertEquals(ResponseEntity.ok(new Message("Course already exists.")),
+        assertEquals(ResponseEntity.ok(new StringMessage("Course already exists.")),
                 courseController.createNewCourse(request, addcourse));
     }
 
@@ -175,13 +176,13 @@ public class CourseControllerTest {
 
     @Test
     void deleteCourseSuccess() throws JSONException, IOException, InterruptedException {
-        assertEquals(ResponseEntity.ok(new Message("Course deleted.")),
+        assertEquals(ResponseEntity.ok(new StringMessage("Course deleted.")),
                 courseController.deleteCourse(request, course.getCourseId()));
     }
 
     @Test
     void deleteCourseAccessDenied() throws JSONException, IOException, InterruptedException {
-        assertEquals(ResponseEntity.ok(new Message(noAccessMessage)),
+        assertEquals(ResponseEntity.status(HttpStatus.FORBIDDEN).body(noAccessMessage),
                 courseController.deleteCourse(wrongRequest,course.getCourseId()));
     }
 
