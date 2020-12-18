@@ -164,14 +164,18 @@ class RestrictionControllerTest {
 
     @Test
     void setCapacityRestriction() throws IOException, InterruptedException {
-        assertEquals(ae, restrictionController.setCapacityRestriction(request, true, 1.0f));
-        assertEquals(fb, restrictionController.setCapacityRestriction(wrongRequest, true, 1.0f));
+        RestrictionController.SetCapacityRestrictionContext context =
+            new RestrictionController.SetCapacityRestrictionContext(true, 1.0f);
+        assertEquals(ae, restrictionController.setCapacityRestriction(request, context));
+        assertEquals(fb, restrictionController.setCapacityRestriction(wrongRequest, context));
     }
 
     @Test
     void setCapacityRestriction2() throws IOException, InterruptedException {
-        assertEquals(ae, restrictionController.setCapacityRestriction(request, false, 2.0f));
-        assertEquals(fb, restrictionController.setCapacityRestriction(wrongRequest, false, 2.0f));
+        RestrictionController.SetCapacityRestrictionContext context =
+            new RestrictionController.SetCapacityRestrictionContext(false, 2.0f);
+        assertEquals(ae, restrictionController.setCapacityRestriction(request, context));
+        assertEquals(fb, restrictionController.setCapacityRestriction(wrongRequest, context));
     }
 
     @Test
@@ -208,20 +212,18 @@ class RestrictionControllerTest {
 
     @Test
     void setStartTime() throws IOException, InterruptedException {
-        LocalTime st = LocalTime.ofSecondOfDay(1000);
         assertEquals(ResponseEntity.ok(new StringMessage("Updated")),
-                restrictionController.setStartTime(request, st));
+                restrictionController.setStartTime(request, 1000));
         assertEquals(fb,
-                restrictionController.setStartTime(wrongRequest, st));
+                restrictionController.setStartTime(wrongRequest, 1000));
     }
 
     @Test
     void setEndTime() throws IOException, InterruptedException {
-        LocalTime et = LocalTime.ofSecondOfDay(3000);
         assertEquals(ResponseEntity.ok(new StringMessage("Updated")),
-                restrictionController.setEndTime(request, et));
+                restrictionController.setEndTime(request, 3000));
         assertEquals(fb,
-                restrictionController.setEndTime(wrongRequest, et));
+                restrictionController.setEndTime(wrongRequest, 3000));
     }
 
     @Test

@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import javax.servlet.http.HttpServletRequest;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import nl.tudelft.sem.restrictions.communication.RoomsCommunicator;
 import nl.tudelft.sem.restrictions.communication.ServerErrorException;
 import nl.tudelft.sem.restrictions.communication.Validate;
@@ -15,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -95,27 +98,32 @@ public class RestrictionController {
     /**
      * This function sets the capacity restrictions for big and small rooms.
      *
-     * @param bigOrSmallRoom boolean representing if the parameter is for big (1) or small (0) rooms
-     * @param maxPercentageAllowed max percentage allowed to be used in a room
+     * @param context the {@link SetCapacityRestrictionContext} to create the restriction
      * @return a string containing the success or error message
      */
     @PostMapping(path = "/setCapacityRestriction") // Map ONLY POST Requests
     @ResponseBody
     public ResponseEntity<?> setCapacityRestriction(HttpServletRequest request,
-                                                    boolean bigOrSmallRoom,
-                                                    float maxPercentageAllowed) throws IOException,
-                                                    InterruptedException {
+                                                @RequestBody SetCapacityRestrictionContext context)
+            throws IOException, InterruptedException {
         String validation = validate.validateRole(request, teacherRole);
         if (validation.equals(noAccessMessage)) {
             return ResponseEntity.ok(new StringMessage(noAccessMessage));
         }
-        if (bigOrSmallRoom) {
+        if (context.isBigRoom()) {
             return ResponseEntity.ok(
-                    addNewRestriction("bigRoomMaxPercentage", maxPercentageAllowed));
+                    addNewRestriction("bigRoomMaxPercentage", context.getMaxPercentageAllowed()));
         } else {
             return ResponseEntity.ok(
-                    addNewRestriction("smallRoomMaxPercentage", maxPercentageAllowed));
+                    addNewRestriction("smallRoomMaxPercentage", context.getMaxPercentageAllowed()));
         }
+    }
+
+    @Data
+    @AllArgsConstructor
+    public static class SetCapacityRestrictionContext {
+        boolean isBigRoom;
+        float maxPercentageAllowed;
     }
 
     /**
@@ -127,7 +135,7 @@ public class RestrictionController {
     @PostMapping(path = "/setMinSeatsBig") // Map ONLY POST Requests
     @ResponseBody
     public ResponseEntity<?> setMinSeatsBig(HttpServletRequest request,
-                                            float numberOfSeats) throws IOException,
+                                            @RequestBody float numberOfSeats) throws IOException,
                                             InterruptedException {
         String validation = validate.validateRole(request, teacherRole);
         if (validation.equals(noAccessMessage)) {
@@ -145,7 +153,7 @@ public class RestrictionController {
     @PostMapping(path = "/setTimeGapLength") // Map ONLY POST Requests
     @ResponseBody
     public ResponseEntity<?> setTimeGapLength(HttpServletRequest request,
-                                              float gapTimeInMinutes) throws IOException,
+                                              @RequestBody float gapTimeInMinutes) throws IOException,
                                               InterruptedException {
         String validation = validate.validateRole(request, teacherRole);
         if (validation.equals(noAccessMessage)) {
@@ -192,38 +200,38 @@ public class RestrictionController {
     /**
      * Sets the start time of the university.
      *
-     * @param startTime as a localtime
+     * @param startTime the amount of seconds since midnight
      * @return a string containing the success or error message
      */
     @PostMapping(path = "/setStartTime") // Map ONLY POST Requests
     @ResponseBody
     public ResponseEntity<?> setStartTime(HttpServletRequest request,
-                                          LocalTime startTime)
+                                          @RequestBody int startTime)
             throws IOException, InterruptedException {
         String validation = validate.validateRole(request, teacherRole);
         if (validation.equals(noAccessMessage)) {
             return ResponseEntity.ok(new StringMessage(noAccessMessage));
         }
-        return ResponseEntity.ok(addNewRestriction("startTime", (float) startTime.toSecondOfDay()));
+        return ResponseEntity.ok(addNewRestriction("startTime", (float) startTime));
     }
 
     /**
      * Sets the end time of the university.
      *
-     * @param endTime as a localtime
+     * @param endTime the amount of seconds since midnight
      * @return a string containing the success or error message
      */
     @PostMapping(path = "/setEndTime") // Map ONLY POST Requests
     @ResponseBody
     public ResponseEntity<?> setEndTime(HttpServletRequest request,
-                                        LocalTime endTime) throws IOException,
+                                        @RequestBody int endTime) throws IOException,
                                         InterruptedException {
         String validation = validate.validateRole(request, teacherRole);
         if (validation.equals(noAccessMessage)) {
             return ResponseEntity.ok(new StringMessage(noAccessMessage));
         }
 
-        return ResponseEntity.ok(addNewRestriction("endTime", (float) endTime.toSecondOfDay()));
+        return ResponseEntity.ok(addNewRestriction("endTime", (float) endTime));
     }
 
     /**
