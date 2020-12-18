@@ -137,17 +137,14 @@ public class LectureController {
             return ResponseEntity.ok(new Message(noAccessMessage));
         }
 
-        System.out.println("1");
         if (courseRepository.findByCourseId(addLecture.getCourseId()) != null) {
             Lecture lecture = new Lecture();
             lecture.setCourseId(addLecture.getCourseId());
             lecture.setDuration(addLecture.getDurationInMinutes());
             lecture.setScheduledDate(addLecture.getDate());
-            System.out.println("2");
             lectureRepository.save(lecture);
             return ResponseEntity.ok(new Message("Lecture planned."));
         } else {
-            System.out.println("3");
             return ResponseEntity.ok(new Message("The course with id "
                     + addLecture.getCourseId() + " does not exist."));
         }

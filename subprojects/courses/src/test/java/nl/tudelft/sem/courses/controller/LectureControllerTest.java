@@ -141,7 +141,6 @@ public class LectureControllerTest {
         List<BareLecture> list =
                 (List<BareLecture>) lectureController.getLecturesAfterDate(dt).getBody();
         for (BareLecture l : list) {
-            System.out.println(l);
             assert(bareLectures.contains(l));
         }
     }
