@@ -15,8 +15,8 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import nl.tudelft.sem.courses.controller.CourseManagementController;
-import nl.tudelft.sem.courses.entity.AddCourse;
-import nl.tudelft.sem.courses.entity.AddLecture;
+import nl.tudelft.sem.shared.entity.AddCourse;
+import nl.tudelft.sem.shared.entity.AddLecture;
 import nl.tudelft.sem.courses.entity.Course;
 import nl.tudelft.sem.courses.entity.Enrollment;
 import nl.tudelft.sem.courses.entity.Lecture;
@@ -24,6 +24,7 @@ import nl.tudelft.sem.courses.repository.CourseRepository;
 import nl.tudelft.sem.courses.repository.EnrollmentRepository;
 import nl.tudelft.sem.courses.repository.LectureRepository;
 import nl.tudelft.sem.courses.util.JwtValidate;
+import nl.tudelft.sem.shared.entity.AddCourse;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -210,7 +211,7 @@ public class CourseManagementControllerTest {
 
     @Test
     void planNewLectureSuccess() {
-        assertThat(courseManagementController.planNewLecture(addlecture)).contains("Lecture added");
+        assertThat(courseManagementController.planNewLecture(addlecture)).contains("nl.tudelft.sem.shared.entity.Lecture added");
     }
 
     @Test
@@ -225,7 +226,7 @@ public class CourseManagementControllerTest {
         // the method cancelLecture does not work
         // Uncomment line below if method is fixed
         assertThat(courseManagementController.cancelLecture(lecture.getCourseId(), localDate))
-            .contains("Lecture deleted");
+            .contains("nl.tudelft.sem.shared.entity.Lecture deleted");
     }
 
     @Test

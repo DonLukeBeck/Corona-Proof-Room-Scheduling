@@ -3,13 +3,9 @@ package nl.tudelft.sem.courses.controller;
 import java.io.IOException;
 import java.sql.Date;
 import java.time.LocalDate;
-import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
-import nl.tudelft.sem.courses.entity.AddCourse;
-import nl.tudelft.sem.courses.entity.AddLecture;
-import nl.tudelft.sem.courses.entity.BareCourse;
 import nl.tudelft.sem.courses.entity.Course;
 import nl.tudelft.sem.courses.entity.Enrollment;
 import nl.tudelft.sem.courses.entity.Lecture;
@@ -17,6 +13,9 @@ import nl.tudelft.sem.courses.repository.CourseRepository;
 import nl.tudelft.sem.courses.repository.EnrollmentRepository;
 import nl.tudelft.sem.courses.repository.LectureRepository;
 import nl.tudelft.sem.courses.util.JwtValidate;
+import nl.tudelft.sem.shared.entity.AddCourse;
+import nl.tudelft.sem.shared.entity.AddLecture;
+import nl.tudelft.sem.shared.entity.BareCourse;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,7 +61,7 @@ public class CourseManagementController {
     }
 
     public JSONObject validate(HttpServletRequest request)
-            throws IOException, InterruptedException {
+            throws IOException, InterruptedException, JSONException {
         JSONObject jwtInfo = jwtValidate.jwtValidate(request);
         return jwtInfo;
     }
@@ -221,7 +220,7 @@ public class CourseManagementController {
             lecture.setDuration(addLecture.getDurationInMinutes());
             lecture.setScheduledDate(addLecture.getDate());
             lectureRepository.save(lecture);
-            return stringToJsonMessage("Lecture added");
+            return stringToJsonMessage("nl.tudelft.sem.shared.entity.Lecture added");
         } else {
             return stringToJsonMessage("The course with id " + addLecture.getCourseId() +
                 " does not exist.");
@@ -241,7 +240,7 @@ public class CourseManagementController {
             return errorMessage;
         }
         lectureRepository.delete(lecture);
-        return stringToJsonMessage("Lecture deleted");
+        return stringToJsonMessage("nl.tudelft.sem.shared.entity.Lecture deleted");
     }
 
     private String stringToJsonMessage(String s) {

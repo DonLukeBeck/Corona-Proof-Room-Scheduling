@@ -40,6 +40,8 @@ ext {
 	set('springCloudVersion', "Hoxton.SR1")
 }
 
+evaluationDependsOn(':shared')
+
 dependencies {
 	implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client:2.0.1.RELEASE'
 	implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-server:2.0.1.RELEASE'
@@ -69,6 +71,8 @@ dependencies {
 	compile 'mysql:mysql-connector-java:5.1.+'
 	compile group: 'mysql', name: 'mysql-connector-java', version: '5.1.6'
 	compile group: 'com.jwebmp', name: 'json', version: '0.63.0.54'
+
+	implementation project(':shared')
 }
 
 dependencyManagement {

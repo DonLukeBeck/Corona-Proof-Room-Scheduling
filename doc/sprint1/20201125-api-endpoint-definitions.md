@@ -3,12 +3,12 @@
 ## Identity Service
 String createToken(String netId, String password)  
 
-## Course Management Service
+## nl.tudelft.sem.shared.entity.Course Management Service
 * createNewCourse(int courseId, String name, int teacherId, List<User> participants)
 * deleteCourse(int courseId)
 * planNewLecture(int courseId, int durationInMinutes, Date date)
 * cancelLecture(int courseId, Date date)
-* Course getCourse(int courseId)
+* nl.tudelft.sem.shared.entity.Course getCourse(int courseId)
 * List<String> getCourseParticipants(int courseId) 
 
 ## Restriction Management Service
@@ -27,8 +27,8 @@ String createToken(String netId, String password)
 * Room getRoom(int roomId)
 
 ## Calendar Scheduling Service
-* List<Lecture> schedulePlannedLectures(List<LectureRequest> toBeScheduledLectures)
-* List<Lecture> getMyPersonalSchedule(int userId)
-* List<Lecture> getMyPersonalScheduleForDay(int userId, Date date)
-* List<Lecture> getMyPersonalScheduleForCourse(int userId, int courseId)
+* List<nl.tudelft.sem.shared.entity.Lecture> schedulePlannedLectures(List<LectureRequest> toBeScheduledLectures)
+* List<nl.tudelft.sem.shared.entity.Lecture> getMyPersonalSchedule(int userId)
+* List<nl.tudelft.sem.shared.entity.Lecture> getMyPersonalScheduleForDay(int userId, Date date)
+* List<nl.tudelft.sem.shared.entity.Lecture> getMyPersonalScheduleForCourse(int userId, int courseId)
 * indicateAbsence(int userId, courseId, Date date)

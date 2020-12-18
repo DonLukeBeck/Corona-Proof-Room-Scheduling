@@ -1,4 +1,4 @@
-package nl.tudelft.sem.courses.entity;
+package nl.tudelft.sem.shared.entity;
 
 import java.util.List;
 import lombok.AllArgsConstructor;
