@@ -98,6 +98,7 @@ public class CalendarController {
             // Schedule the lecture
             lectureScheduler.scheduleAllLectures();
 
+
             return ResponseEntity.ok("Successfully scheduled lectures.");
         } catch (Exception e) {
             System.out.println(e.toString());

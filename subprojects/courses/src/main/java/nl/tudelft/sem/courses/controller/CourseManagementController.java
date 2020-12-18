@@ -194,12 +194,16 @@ public class CourseManagementController {
      * Returns the courseId given the teacher's ID.
      */
     @GetMapping(path = "/getCourseIdForTeacher") // Map ONLY Get Requests
-    public String getCourseIdForTeacher(@RequestParam String teacherId) {
-        Course course = courseRepository.findByTeacherId(teacherId);
-        if (course == null) {
-            return errorMessage;
+    public List<String> getCourseIdForTeacher(@RequestParam String teacherId) {
+        List<Course> course = courseRepository.findAllByTeacherId(teacherId);
+        List<String> result = new ArrayList<>();
+        if (course.size() == 0) {
+            return null;
         }
-        return course.getCourseId();
+        for (Course c : course) {
+            result.add(c.getCourseId());
+        }
+        return result;
     }
 
     /**
@@ -230,11 +234,13 @@ public class CourseManagementController {
             iso = DateTimeFormat.ISO.DATE) LocalDate date) {
         // We need to add one day since Spring of MariaDB or something matches against one day off
         Date sqlDate = Date.valueOf(date.plusDays(1));
-        Lecture lecture = lectureRepository.findByCourseIdAndScheduledDate(courseId, sqlDate);
-        if (lecture == null) {
+        List<Lecture> lectures = lectureRepository.findByCourseIdAndScheduledDate(courseId, sqlDate);
+        if (lectures == null) {
             return errorMessage;
         }
-        lectureRepository.delete(lecture);
+        for (Lecture l : lectures) {
+            lectureRepository.delete(l);
+        }
         return "nl.tudelft.sem.shared.entity.Lecture deleted";
     }
 

@@ -1,8 +1,8 @@
 package nl.tudelft.sem.courses.controller;
 
-import nl.tudelft.sem.courses.entity.AddCourse;
-import nl.tudelft.sem.courses.entity.AddLecture;
-import nl.tudelft.sem.courses.entity.BareLecture;
+import nl.tudelft.sem.shared.entity.AddCourse;
+import nl.tudelft.sem.shared.entity.AddLecture;
+import nl.tudelft.sem.shared.entity.BareLecture;
 import nl.tudelft.sem.courses.entity.Course;
 import nl.tudelft.sem.courses.entity.Enrollment;
 import nl.tudelft.sem.courses.entity.Lecture;

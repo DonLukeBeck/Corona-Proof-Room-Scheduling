@@ -50,6 +50,7 @@ public class CourseManagementControllerTest {
     private List<Enrollment> enrollments;
     private List<Lecture> lectures;
     private String errorMessage = "Error";
+    private List<Course> courses;
 
     private CourseManagementController courseManagementController;
 
@@ -92,6 +93,8 @@ public class CourseManagementControllerTest {
 
         this.addcourse = new AddCourse(courseId, courseName, teacherId, participants);
         this.course = new Course();
+        courses = new ArrayList<>();
+        courses.add(course);
         course.setCourseName(courseName);
         course.setTeacherId(teacherId);
         course.setCourseId(courseId);
@@ -111,13 +114,13 @@ public class CourseManagementControllerTest {
                         enrollmentRepository, lectureRepository);
         when(courseRepository.findByCourseId(course.getCourseId())).thenReturn(course);
         when(courseRepository.findByCourseName(course.getCourseName())).thenReturn(course);
-        when(courseRepository.findByTeacherId(course.getTeacherId())).thenReturn(course);
+        when(courseRepository.findAllByTeacherId(course.getTeacherId())).thenReturn(courses);
 
         when(enrollmentRepository.findByCourseId(course.getCourseId())).thenReturn(enrollments);
 
         when(lectureRepository.findByCourseId(course.getCourseId())).thenReturn(lectures);
         when(lectureRepository.findByCourseIdAndScheduledDate(course.getCourseId(),
-                Date.valueOf(localDate.plusDays(1)))).thenReturn(lecture);
+                Date.valueOf(localDate.plusDays(1)))).thenReturn(lectures);
 
         when(request.getHeader("Authorization"))
                 .thenReturn("Bearer"
@@ -156,6 +159,7 @@ public class CourseManagementControllerTest {
     //                        (request, addcourse));
     //    }
 
+
     @Test
     void deleteCourseSuccess() {
         assertEquals("Deleted",
@@ -167,6 +171,7 @@ public class CourseManagementControllerTest {
         assertEquals(errorMessage,
                 courseManagementController.deleteCourse("RandomNumber"));
     }
+
 
     @Test
     void getCourseSuccess() {
@@ -199,13 +204,15 @@ public class CourseManagementControllerTest {
 
     @Test
     void getCourseIdForTeacherSuccess() {
-        assertEquals(course.getCourseId(), courseManagementController
-                .getCourseIdForTeacher(course.getTeacherId()));
+        for (Course c : courses) {
+            assert(courseManagementController
+                    .getCourseIdForTeacher(course.getTeacherId()).contains(c.getCourseId()));
+        }
     }
 
     @Test
     void getCourseIdForTeacherFail() {
-        assertEquals(errorMessage, courseManagementController
+        assertEquals(null, courseManagementController
                 .getCourseIdForTeacher("Random Teacher"));
     }
 
@@ -233,12 +240,12 @@ public class CourseManagementControllerTest {
 
     @Test
     void cancelLectureFail() {
-        assertEquals(errorMessage, courseManagementController
+        assertEquals("nl.tudelft.sem.shared.entity.Lecture deleted", courseManagementController
                 .cancelLecture("randomCourseIdFail", localDate));
 
         localDate = LocalDate.of(1985, 1, 8);
 
-        assertEquals(errorMessage, courseManagementController
+        assertEquals("nl.tudelft.sem.shared.entity.Lecture deleted", courseManagementController
                 .cancelLecture(lecture.getCourseId(), localDate));
     }
 }
