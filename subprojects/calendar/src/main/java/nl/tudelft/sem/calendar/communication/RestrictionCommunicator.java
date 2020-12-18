@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 
 
 @Service
-public class RestrictionManagementCommunicator extends Communicator {
+public class RestrictionCommunicator extends Communicator {
 
     /**
      * Returns all rooms with adjusted capacity.
