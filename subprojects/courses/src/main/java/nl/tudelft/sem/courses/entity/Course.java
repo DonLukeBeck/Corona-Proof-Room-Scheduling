@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "Course")
+@Table(name = "nl.tudelft.sem.shared.entity.Course")
 public class Course {
     @Id
     @Column(name = "course_id")
