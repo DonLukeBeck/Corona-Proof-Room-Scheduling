@@ -1,0 +1,1659 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>op29-sem57-postman-requests</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/monokai-sublime.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+    <script>
+        hljs.configure({
+            tabReplace: '    ',
+        });
+        hljs.initHighlightingOnLoad();
+    </script>
+    <style>body {
+    position: relative;
+}
+
+h1 {
+    margin-top: 5px;
+}
+
+h1, h2, h3, h4 {
+    color: #2b2b2b;
+}
+
+h2:after {
+    content: ' ';
+}
+
+h5 {
+    font-weight: bold;
+}
+
+h1 a, h2 a, h3 a, h4 a, h5 a, h6 a {
+    display: none;
+    position: absolute;
+    margin-left: 8px;
+}
+
+h1:hover a, h2:hover a, h3:hover a, h4:hover a, h5:hover a, h6:hover a {
+    color: #a5a5a5;
+    display: initial;
+}
+
+.nav.nav-tabs > li > a {
+    padding-top: 4px;
+    padding-bottom: 4px;
+}
+
+.tab-content {
+    padding-top: 8px;
+}
+
+.table {
+    margin-bottom: 8px;
+}
+
+pre {
+    border-radius: 0px;
+    border: none;
+}
+
+pre code {
+    margin: -9.5px;
+}
+
+.request {
+    margin-top: 12px;
+    margin-bottom: 24px;
+}
+
+.response-text-sample {
+    padding: 0px !important;
+}
+
+.response-text-sample pre {
+    margin-bottom: 0px;
+}
+
+
+#sidebar-wrapper {
+    z-index: 1000;
+    position: fixed;
+    left: 250px;
+    width: 250px;
+    height: 100%;
+    margin-left: -250px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    background: #2b2b2b;
+    padding-top: 20px;
+}
+
+#sidebar-wrapper ul {
+    width: 250px;
+}
+
+#sidebar-wrapper ul li {
+    margin-right: 10px;
+}
+
+#sidebar-wrapper ul li a:hover {
+    background: inherit;
+    text-decoration: none;
+}
+
+#sidebar-wrapper ul li a {
+    display: block;
+    color: #ECF0F1;
+    padding: 6px 15px;
+}
+
+#sidebar-wrapper ul li ul {
+    padding-left: 25px;
+}
+
+#sidebar-wrapper ul li ul li a {
+    padding: 1px 0px;
+}
+
+#sidebar-wrapper ul li a:hover,
+#sidebar-wrapper ul li a:focus {
+    color: #e0c46c;
+    border-right: solid 1px #e0c46c;
+}
+
+#sidebar-wrapper ul li.active > a {
+    color: #e0c46c;
+    border-right: solid 3px #e0c46c;
+}
+
+#sidebar-wrapper ul li:not(.active) ul {
+    display: none;
+}
+
+#page-content-wrapper {
+    width: 100%;
+    position: absolute;
+    padding: 15px 15px 15px 250px;
+}
+</style>
+</head>
+<body data-spy="scroll" data-target=".scrollspy">
+<div id="sidebar-wrapper">
+    <div class="scrollspy">
+    <ul id="main-menu" data-spy="affix" class="nav">
+        <li>
+            <a href="#doc-general-notes">General notes</a>
+        </li>
+        
+        <li>
+            <a href="#doc-api-detail">API detail</a>
+        </li>
+        
+        
+        
+        <li>
+            <a href="#folder-identity-service">Identity Service</a>
+            <ul>
+                
+                <li>
+                    <a href="#request-identity-service-login-student">Login (Student)</a>
+                </li>
+                
+                <li>
+                    <a href="#request-identity-service-login-teacher">Login (Teacher)</a>
+                </li>
+                
+                <li>
+                    <a href="#request-identity-service-validate-token">Validate token</a>
+                </li>
+                
+            </ul>
+        </li>
+        
+        
+        <li>
+            <a href="#folder-calendar-service">Calendar Service</a>
+            <ul>
+                
+                <li>
+                    <a href="#request-calendar-service-schedule-lectures-teacher">Schedule lectures (Teacher)</a>
+                </li>
+                
+                <li>
+                    <a href="#request-calendar-service-get-entire-personal-schedule-student">Get entire personal schedule (Student)</a>
+                </li>
+                
+                <li>
+                    <a href="#request-calendar-service-get-entire-personal-schedule-teacher">Get entire personal schedule (Teacher)</a>
+                </li>
+                
+                <li>
+                    <a href="#request-calendar-service-get-entire-personal-schedule-for-a-specific-day-student">Get entire personal schedule for a specific day (Student)</a>
+                </li>
+                
+                <li>
+                    <a href="#request-calendar-service-get-entire-personal-schedule-for-a-specific-day-teacher">Get entire personal schedule for a specific day (Teacher)</a>
+                </li>
+                
+                <li>
+                    <a href="#request-calendar-service-get-entire-personal-schedule-for-a-specific-course-student">Get entire personal schedule for a specific course (Student)</a>
+                </li>
+                
+                <li>
+                    <a href="#request-calendar-service-get-entire-personal-schedule-for-a-specific-course-teacher">Get entire personal schedule for a specific course (Teacher)</a>
+                </li>
+                
+                <li>
+                    <a href="#request-calendar-service-indicate-absence-student">Indicate absence (Student)</a>
+                </li>
+                
+                <li>
+                    <a href="#request-calendar-service-get-all-the-physical-attendants-for-a-lecture-teacher">Get all the physical attendants for a lecture (Teacher)</a>
+                </li>
+                
+            </ul>
+        </li>
+        
+        
+        <li>
+            <a href="#folder-course-service">Course Service</a>
+            <ul>
+                
+                <li>
+                    <a href="#request-course-service-create-a-new-course-teacher">Create a new course (Teacher)</a>
+                </li>
+                
+                <li>
+                    <a href="#request-course-service-plan-a-new-lecture-teacher">Plan a new lecture (Teacher)</a>
+                </li>
+                
+                <li>
+                    <a href="#request-course-service-get-all-courses-teacher">Get all courses (Teacher)</a>
+                </li>
+                
+                <li>
+                    <a href="#request-course-service-get-course-by-id-teacher">Get course by id (Teacher)</a>
+                </li>
+                
+                <li>
+                    <a href="#request-course-service-get-courses-that-teacher-teaches-teacher">Get courses that teacher teaches (Teacher)</a>
+                </li>
+                
+                <li>
+                    <a href="#request-course-service-get-all-course-participants-teacher">Get all course participants (Teacher)</a>
+                </li>
+                
+                <li>
+                    <a href="#request-course-service-get-all-enrollments-teacher">Get all enrollments (Teacher)</a>
+                </li>
+                
+                <li>
+                    <a href="#request-course-service-get-enrollments-for-a-specific-course-teacher">Get enrollments for a specific course (Teacher)</a>
+                </li>
+                
+                <li>
+                    <a href="#request-course-service-get-all-requested-lectures-teacher">Get all requested lectures (Teacher)</a>
+                </li>
+                
+                <li>
+                    <a href="#request-course-service-get-all-requested-lectures-after-a-specific-date-teacher">Get all requested lectures after a specific date (Teacher)</a>
+                </li>
+                
+                <li>
+                    <a href="#request-course-service-cancel-a-lecture-teacher">Cancel a lecture (Teacher)</a>
+                </li>
+                
+                <li>
+                    <a href="#request-course-service-delete-a-course-teacher">Delete a course (Teacher)</a>
+                </li>
+                
+            </ul>
+        </li>
+        
+        
+        <li>
+            <a href="#folder-restrictions-service">Restrictions Service</a>
+            <ul>
+                
+                <li>
+                    <a href="#request-restrictions-service-set-the-capacity-restriction-of-rooms-teacher">Set the capacity restriction of rooms (Teacher)</a>
+                </li>
+                
+                <li>
+                    <a href="#request-restrictions-service-set-the-minimum-number-of-seats-for-a-big-room-teacher">Set the minimum number of seats for a big room (Teacher)</a>
+                </li>
+                
+                <li>
+                    <a href="#request-restrictions-service-set-the-time-gap-between-any-two-lectures-teacher">Set the time gap between any two lectures (Teacher)</a>
+                </li>
+                
+                <li>
+                    <a href="#request-restrictions-service-get-the-time-gap-between-any-two-lectures-teacher-copy">Get the time gap between any two lectures (Teacher) Copy</a>
+                </li>
+                
+                <li>
+                    <a href="#request-restrictions-service-set-start-time-for-scheduling-teacher">Set start time for scheduling (Teacher)</a>
+                </li>
+                
+                <li>
+                    <a href="#request-restrictions-service-set-end-time-for-scheduling-teacher">Set end time for scheduling (Teacher)</a>
+                </li>
+                
+                <li>
+                    <a href="#request-restrictions-service-get-start-time-for-scheduling-teacher">Get start time for scheduling (Teacher)</a>
+                </li>
+                
+                <li>
+                    <a href="#request-restrictions-service-get-end-time-for-scheduling-teacher">Get end time for scheduling (Teacher)</a>
+                </li>
+                
+                <li>
+                    <a href="#request-restrictions-service-get-all-rooms-with-adjusted-capacity-teacher">Get all rooms with adjusted capacity (Teacher)</a>
+                </li>
+                
+            </ul>
+        </li>
+        
+        
+        <li>
+            <a href="#folder-room-service">Room Service</a>
+            <ul>
+                
+                <li>
+                    <a href="#request-room-service-add-a-new-room-system">Add a new room (System)</a>
+                </li>
+                
+                <li>
+                    <a href="#request-room-service-delete-a-room-system">Delete a room (System)</a>
+                </li>
+                
+                <li>
+                    <a href="#request-room-service-get-all-rooms-teacher">Get all rooms (Teacher)</a>
+                </li>
+                
+                <li>
+                    <a href="#request-room-service-get-room-name-for-a-particular-room-id-teacher">Get room name for a particular room Id (Teacher)</a>
+                </li>
+                
+            </ul>
+        </li>
+        
+    </ul>
+</div>
+
+</div>
+<div id="page-content-wrapper">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-12">
+                <h1>op29-sem57-postman-requests</h1>
+
+                <h2 id="doc-general-notes">
+                    General notes
+                    <a href="#doc-general-notes"><i class="glyphicon glyphicon-link"></i></a>
+                </h2>
+
+                <p>Using Postman, calls to all the API endpoints, and their responses can be tested.
+In this document, we specify the API endpoints of the application and how they can be called to verify whether they work as expected or not.</p>
+
+
+                
+
+                <h2 id="doc-api-detail">
+                    API detail
+                    <a href="#doc-api-detail"><i class="glyphicon glyphicon-link"></i></a>
+                </h2>
+
+                
+
+
+                
+                
+                <div class="endpoints-group">
+                    <h3 id="folder-identity-service">
+                        Identity Service
+                        <a href="#folder-identity-service"><i class="glyphicon glyphicon-link"></i></a>
+                    </h3>
+
+                    <div><p>The identity service takes care of authorization and authentication of the users.</p>
+</div>
+
+                    
+                    
+                    <div class="request">
+
+                        <h4 id="request-identity-service-login-student">
+                            Login (Student)
+                            <a href="#request-identity-service-login-student"><i class="glyphicon glyphicon-link"></i></a>
+                        </h4>
+
+                        <div></div>
+
+                        <div>
+                            <ul class="nav nav-tabs" role="tablist">
+                                <li role="presentation" class="active"><a href="#request-identity-service-login-student-example-curl" data-toggle="tab">Curl</a></li>
+                                <li role="presentation"><a href="#request-identity-service-login-student-example-http" data-toggle="tab">HTTP</a></li>
+                            </ul>
+                            <div class="tab-content">
+                                <div class="tab-pane active" id="request-identity-service-login-student-example-curl">
+                                    <pre><code class="hljs curl">curl -X POST -d '{
+    "netid":"{{testStudentNetId}}",
+    "password":"{{testStudentPassword}}"
+}' "http://localhost:8083/login"</code></pre>
+                                </div>
+                                <div class="tab-pane" id="request-identity-service-login-student-example-http">
+                                    <pre><code class="hljs http">POST /login HTTP/1.1
+Host: localhost:8083
+
+{
+    "netid":"{{testStudentNetId}}",
+    "password":"{{testStudentPassword}}"
+}</code></pre>
+                                </div>
+                            </div>
+                        </div>
+
+                        
+
+                        <hr>
+                    </div>
+                    
+                    
+                    <div class="request">
+
+                        <h4 id="request-identity-service-login-teacher">
+                            Login (Teacher)
+                            <a href="#request-identity-service-login-teacher"><i class="glyphicon glyphicon-link"></i></a>
+                        </h4>
+
+                        <div></div>
+
+                        <div>
+                            <ul class="nav nav-tabs" role="tablist">
+                                <li role="presentation" class="active"><a href="#request-identity-service-login-teacher-example-curl" data-toggle="tab">Curl</a></li>
+                                <li role="presentation"><a href="#request-identity-service-login-teacher-example-http" data-toggle="tab">HTTP</a></li>
+                            </ul>
+                            <div class="tab-content">
+                                <div class="tab-pane active" id="request-identity-service-login-teacher-example-curl">
+                                    <pre><code class="hljs curl">curl -X POST -d '{
+    "netid":"{{testTeacherNetId}}",
+    "password":"{{testTeacherPassword}}"
+}' "http://localhost:8083/login"</code></pre>
+                                </div>
+                                <div class="tab-pane" id="request-identity-service-login-teacher-example-http">
+                                    <pre><code class="hljs http">POST /login HTTP/1.1
+Host: localhost:8083
+
+{
+    "netid":"{{testTeacherNetId}}",
+    "password":"{{testTeacherPassword}}"
+}</code></pre>
+                                </div>
+                            </div>
+                        </div>
+
+                        
+
+                        <hr>
+                    </div>
+                    
+                    
+                    <div class="request">
+
+                        <h4 id="request-identity-service-validate-token">
+                            Validate token
+                            <a href="#request-identity-service-validate-token"><i class="glyphicon glyphicon-link"></i></a>
+                        </h4>
+
+                        <div></div>
+
+                        <div>
+                            <ul class="nav nav-tabs" role="tablist">
+                                <li role="presentation" class="active"><a href="#request-identity-service-validate-token-example-curl" data-toggle="tab">Curl</a></li>
+                                <li role="presentation"><a href="#request-identity-service-validate-token-example-http" data-toggle="tab">HTTP</a></li>
+                            </ul>
+                            <div class="tab-content">
+                                <div class="tab-pane active" id="request-identity-service-validate-token-example-curl">
+                                    <pre><code class="hljs curl">curl -X POST -d '{{testTeacherToken}}' "http://localhost:8083/validate"</code></pre>
+                                </div>
+                                <div class="tab-pane" id="request-identity-service-validate-token-example-http">
+                                    <pre><code class="hljs http">POST /validate HTTP/1.1
+Host: localhost:8083
+
+{{testTeacherToken}}</code></pre>
+                                </div>
+                            </div>
+                        </div>
+
+                        
+
+                        <hr>
+                    </div>
+                    
+
+                </div>
+                
+                
+                <div class="endpoints-group">
+                    <h3 id="folder-calendar-service">
+                        Calendar Service
+                        <a href="#folder-calendar-service"><i class="glyphicon glyphicon-link"></i></a>
+                    </h3>
+
+                    <div><p>The Calendar Service takes care of the scheduling of lectures and the retrieval of lecture schedules.</p>
+</div>
+
+                    
+                    
+                    <div class="request">
+
+                        <h4 id="request-calendar-service-schedule-lectures-teacher">
+                            Schedule lectures (Teacher)
+                            <a href="#request-calendar-service-schedule-lectures-teacher"><i class="glyphicon glyphicon-link"></i></a>
+                        </h4>
+
+                        <div></div>
+
+                        <div>
+                            <ul class="nav nav-tabs" role="tablist">
+                                <li role="presentation" class="active"><a href="#request-calendar-service-schedule-lectures-teacher-example-curl" data-toggle="tab">Curl</a></li>
+                                <li role="presentation"><a href="#request-calendar-service-schedule-lectures-teacher-example-http" data-toggle="tab">HTTP</a></li>
+                            </ul>
+                            <div class="tab-content">
+                                <div class="tab-pane active" id="request-calendar-service-schedule-lectures-teacher-example-curl">
+                                    <pre><code class="hljs curl">curl -X POST "http://localhost:8081/calendar/scheduleLectures"</code></pre>
+                                </div>
+                                <div class="tab-pane" id="request-calendar-service-schedule-lectures-teacher-example-http">
+                                    <pre><code class="hljs http">POST /calendar/scheduleLectures HTTP/1.1
+Host: localhost:8081</code></pre>
+                                </div>
+                            </div>
+                        </div>
+
+                        
+
+                        <hr>
+                    </div>
+                    
+                    
+                    <div class="request">
+
+                        <h4 id="request-calendar-service-get-entire-personal-schedule-student">
+                            Get entire personal schedule (Student)
+                            <a href="#request-calendar-service-get-entire-personal-schedule-student"><i class="glyphicon glyphicon-link"></i></a>
+                        </h4>
+
+                        <div></div>
+
+                        <div>
+                            <ul class="nav nav-tabs" role="tablist">
+                                <li role="presentation" class="active"><a href="#request-calendar-service-get-entire-personal-schedule-student-example-curl" data-toggle="tab">Curl</a></li>
+                                <li role="presentation"><a href="#request-calendar-service-get-entire-personal-schedule-student-example-http" data-toggle="tab">HTTP</a></li>
+                            </ul>
+                            <div class="tab-content">
+                                <div class="tab-pane active" id="request-calendar-service-get-entire-personal-schedule-student-example-curl">
+                                    <pre><code class="hljs curl">curl -X GET "http://localhost:8081/calendar/getMyPersonalScheduleStudent"</code></pre>
+                                </div>
+                                <div class="tab-pane" id="request-calendar-service-get-entire-personal-schedule-student-example-http">
+                                    <pre><code class="hljs http">GET /calendar/getMyPersonalScheduleStudent HTTP/1.1
+Host: localhost:8081</code></pre>
+                                </div>
+                            </div>
+                        </div>
+
+                        
+
+                        <hr>
+                    </div>
+                    
+                    
+                    <div class="request">
+
+                        <h4 id="request-calendar-service-get-entire-personal-schedule-teacher">
+                            Get entire personal schedule (Teacher)
+                            <a href="#request-calendar-service-get-entire-personal-schedule-teacher"><i class="glyphicon glyphicon-link"></i></a>
+                        </h4>
+
+                        <div></div>
+
+                        <div>
+                            <ul class="nav nav-tabs" role="tablist">
+                                <li role="presentation" class="active"><a href="#request-calendar-service-get-entire-personal-schedule-teacher-example-curl" data-toggle="tab">Curl</a></li>
+                                <li role="presentation"><a href="#request-calendar-service-get-entire-personal-schedule-teacher-example-http" data-toggle="tab">HTTP</a></li>
+                            </ul>
+                            <div class="tab-content">
+                                <div class="tab-pane active" id="request-calendar-service-get-entire-personal-schedule-teacher-example-curl">
+                                    <pre><code class="hljs curl">curl -X GET "http://localhost:8081/calendar/getMyPersonalScheduleTeacher"</code></pre>
+                                </div>
+                                <div class="tab-pane" id="request-calendar-service-get-entire-personal-schedule-teacher-example-http">
+                                    <pre><code class="hljs http">GET /calendar/getMyPersonalScheduleTeacher HTTP/1.1
+Host: localhost:8081</code></pre>
+                                </div>
+                            </div>
+                        </div>
+
+                        
+
+                        <hr>
+                    </div>
+                    
+                    
+                    <div class="request">
+
+                        <h4 id="request-calendar-service-get-entire-personal-schedule-for-a-specific-day-student">
+                            Get entire personal schedule for a specific day (Student)
+                            <a href="#request-calendar-service-get-entire-personal-schedule-for-a-specific-day-student"><i class="glyphicon glyphicon-link"></i></a>
+                        </h4>
+
+                        <div></div>
+
+                        <div>
+                            <ul class="nav nav-tabs" role="tablist">
+                                <li role="presentation" class="active"><a href="#request-calendar-service-get-entire-personal-schedule-for-a-specific-day-student-example-curl" data-toggle="tab">Curl</a></li>
+                                <li role="presentation"><a href="#request-calendar-service-get-entire-personal-schedule-for-a-specific-day-student-example-http" data-toggle="tab">HTTP</a></li>
+                            </ul>
+                            <div class="tab-content">
+                                <div class="tab-pane active" id="request-calendar-service-get-entire-personal-schedule-for-a-specific-day-student-example-curl">
+                                    <pre><code class="hljs curl">curl -X GET "http://localhost:8081/calendar/getMyPersonalScheduleForDayStudent?date={{testDate}}"</code></pre>
+                                </div>
+                                <div class="tab-pane" id="request-calendar-service-get-entire-personal-schedule-for-a-specific-day-student-example-http">
+                                    <pre><code class="hljs http">GET /calendar/getMyPersonalScheduleForDayStudent?date={{testDate}} HTTP/1.1
+Host: localhost:8081</code></pre>
+                                </div>
+                            </div>
+                        </div>
+
+                        
+
+                        <hr>
+                    </div>
+                    
+                    
+                    <div class="request">
+
+                        <h4 id="request-calendar-service-get-entire-personal-schedule-for-a-specific-day-teacher">
+                            Get entire personal schedule for a specific day (Teacher)
+                            <a href="#request-calendar-service-get-entire-personal-schedule-for-a-specific-day-teacher"><i class="glyphicon glyphicon-link"></i></a>
+                        </h4>
+
+                        <div></div>
+
+                        <div>
+                            <ul class="nav nav-tabs" role="tablist">
+                                <li role="presentation" class="active"><a href="#request-calendar-service-get-entire-personal-schedule-for-a-specific-day-teacher-example-curl" data-toggle="tab">Curl</a></li>
+                                <li role="presentation"><a href="#request-calendar-service-get-entire-personal-schedule-for-a-specific-day-teacher-example-http" data-toggle="tab">HTTP</a></li>
+                            </ul>
+                            <div class="tab-content">
+                                <div class="tab-pane active" id="request-calendar-service-get-entire-personal-schedule-for-a-specific-day-teacher-example-curl">
+                                    <pre><code class="hljs curl">curl -X GET "http://localhost:8081/calendar/getMyPersonalScheduleForDayTeacher?date={{testDate}}"</code></pre>
+                                </div>
+                                <div class="tab-pane" id="request-calendar-service-get-entire-personal-schedule-for-a-specific-day-teacher-example-http">
+                                    <pre><code class="hljs http">GET /calendar/getMyPersonalScheduleForDayTeacher?date={{testDate}} HTTP/1.1
+Host: localhost:8081</code></pre>
+                                </div>
+                            </div>
+                        </div>
+
+                        
+
+                        <hr>
+                    </div>
+                    
+                    
+                    <div class="request">
+
+                        <h4 id="request-calendar-service-get-entire-personal-schedule-for-a-specific-course-student">
+                            Get entire personal schedule for a specific course (Student)
+                            <a href="#request-calendar-service-get-entire-personal-schedule-for-a-specific-course-student"><i class="glyphicon glyphicon-link"></i></a>
+                        </h4>
+
+                        <div></div>
+
+                        <div>
+                            <ul class="nav nav-tabs" role="tablist">
+                                <li role="presentation" class="active"><a href="#request-calendar-service-get-entire-personal-schedule-for-a-specific-course-student-example-curl" data-toggle="tab">Curl</a></li>
+                                <li role="presentation"><a href="#request-calendar-service-get-entire-personal-schedule-for-a-specific-course-student-example-http" data-toggle="tab">HTTP</a></li>
+                            </ul>
+                            <div class="tab-content">
+                                <div class="tab-pane active" id="request-calendar-service-get-entire-personal-schedule-for-a-specific-course-student-example-curl">
+                                    <pre><code class="hljs curl">curl -X GET "http://localhost:8081/calendar/getMyPersonalScheduleForCourseStudent?courseId={{testCourseId}}"</code></pre>
+                                </div>
+                                <div class="tab-pane" id="request-calendar-service-get-entire-personal-schedule-for-a-specific-course-student-example-http">
+                                    <pre><code class="hljs http">GET /calendar/getMyPersonalScheduleForCourseStudent?courseId={{testCourseId}} HTTP/1.1
+Host: localhost:8081</code></pre>
+                                </div>
+                            </div>
+                        </div>
+
+                        
+
+                        <hr>
+                    </div>
+                    
+                    
+                    <div class="request">
+
+                        <h4 id="request-calendar-service-get-entire-personal-schedule-for-a-specific-course-teacher">
+                            Get entire personal schedule for a specific course (Teacher)
+                            <a href="#request-calendar-service-get-entire-personal-schedule-for-a-specific-course-teacher"><i class="glyphicon glyphicon-link"></i></a>
+                        </h4>
+
+                        <div></div>
+
+                        <div>
+                            <ul class="nav nav-tabs" role="tablist">
+                                <li role="presentation" class="active"><a href="#request-calendar-service-get-entire-personal-schedule-for-a-specific-course-teacher-example-curl" data-toggle="tab">Curl</a></li>
+                                <li role="presentation"><a href="#request-calendar-service-get-entire-personal-schedule-for-a-specific-course-teacher-example-http" data-toggle="tab">HTTP</a></li>
+                            </ul>
+                            <div class="tab-content">
+                                <div class="tab-pane active" id="request-calendar-service-get-entire-personal-schedule-for-a-specific-course-teacher-example-curl">
+                                    <pre><code class="hljs curl">curl -X GET "http://localhost:8081/calendar/getMyPersonalScheduleForCourseTeacher?courseId={{testCourseId}}"</code></pre>
+                                </div>
+                                <div class="tab-pane" id="request-calendar-service-get-entire-personal-schedule-for-a-specific-course-teacher-example-http">
+                                    <pre><code class="hljs http">GET /calendar/getMyPersonalScheduleForCourseTeacher?courseId={{testCourseId}} HTTP/1.1
+Host: localhost:8081</code></pre>
+                                </div>
+                            </div>
+                        </div>
+
+                        
+
+                        <hr>
+                    </div>
+                    
+                    
+                    <div class="request">
+
+                        <h4 id="request-calendar-service-indicate-absence-student">
+                            Indicate absence (Student)
+                            <a href="#request-calendar-service-indicate-absence-student"><i class="glyphicon glyphicon-link"></i></a>
+                        </h4>
+
+                        <div></div>
+
+                        <div>
+                            <ul class="nav nav-tabs" role="tablist">
+                                <li role="presentation" class="active"><a href="#request-calendar-service-indicate-absence-student-example-curl" data-toggle="tab">Curl</a></li>
+                                <li role="presentation"><a href="#request-calendar-service-indicate-absence-student-example-http" data-toggle="tab">HTTP</a></li>
+                            </ul>
+                            <div class="tab-content">
+                                <div class="tab-pane active" id="request-calendar-service-indicate-absence-student-example-curl">
+                                    <pre><code class="hljs curl">curl -X POST "http://localhost:8081/calendar/indicateAbsence?userId={{testStudentNetId}}&courseId={{testCourseId}}&date={{testDate}}"</code></pre>
+                                </div>
+                                <div class="tab-pane" id="request-calendar-service-indicate-absence-student-example-http">
+                                    <pre><code class="hljs http">POST /calendar/indicateAbsence?userId={{testStudentNetId}}&courseId={{testCourseId}}&date={{testDate}} HTTP/1.1
+Host: localhost:8081</code></pre>
+                                </div>
+                            </div>
+                        </div>
+
+                        
+
+                        <hr>
+                    </div>
+                    
+                    
+                    <div class="request">
+
+                        <h4 id="request-calendar-service-get-all-the-physical-attendants-for-a-lecture-teacher">
+                            Get all the physical attendants for a lecture (Teacher)
+                            <a href="#request-calendar-service-get-all-the-physical-attendants-for-a-lecture-teacher"><i class="glyphicon glyphicon-link"></i></a>
+                        </h4>
+
+                        <div></div>
+
+                        <div>
+                            <ul class="nav nav-tabs" role="tablist">
+                                <li role="presentation" class="active"><a href="#request-calendar-service-get-all-the-physical-attendants-for-a-lecture-teacher-example-curl" data-toggle="tab">Curl</a></li>
+                                <li role="presentation"><a href="#request-calendar-service-get-all-the-physical-attendants-for-a-lecture-teacher-example-http" data-toggle="tab">HTTP</a></li>
+                            </ul>
+                            <div class="tab-content">
+                                <div class="tab-pane active" id="request-calendar-service-get-all-the-physical-attendants-for-a-lecture-teacher-example-curl">
+                                    <pre><code class="hljs curl">curl -X GET "http://localhost:8081/calendar/getPhysicalAttendantsForLecture?courseId={{testCourseId}}&date={{testDate}}"</code></pre>
+                                </div>
+                                <div class="tab-pane" id="request-calendar-service-get-all-the-physical-attendants-for-a-lecture-teacher-example-http">
+                                    <pre><code class="hljs http">GET /calendar/getPhysicalAttendantsForLecture?courseId={{testCourseId}}&date={{testDate}} HTTP/1.1
+Host: localhost:8081</code></pre>
+                                </div>
+                            </div>
+                        </div>
+
+                        
+
+                        <hr>
+                    </div>
+                    
+
+                </div>
+                
+                
+                <div class="endpoints-group">
+                    <h3 id="folder-course-service">
+                        Course Service
+                        <a href="#folder-course-service"><i class="glyphicon glyphicon-link"></i></a>
+                    </h3>
+
+                    <div><p>The Course Service takes care of all course related matters.</p>
+</div>
+
+                    
+                    
+                    <div class="request">
+
+                        <h4 id="request-course-service-create-a-new-course-teacher">
+                            Create a new course (Teacher)
+                            <a href="#request-course-service-create-a-new-course-teacher"><i class="glyphicon glyphicon-link"></i></a>
+                        </h4>
+
+                        <div></div>
+
+                        <div>
+                            <ul class="nav nav-tabs" role="tablist">
+                                <li role="presentation" class="active"><a href="#request-course-service-create-a-new-course-teacher-example-curl" data-toggle="tab">Curl</a></li>
+                                <li role="presentation"><a href="#request-course-service-create-a-new-course-teacher-example-http" data-toggle="tab">HTTP</a></li>
+                            </ul>
+                            <div class="tab-content">
+                                <div class="tab-pane active" id="request-course-service-create-a-new-course-teacher-example-curl">
+                                    <pre><code class="hljs curl">curl -X POST -d '{
+    "courseId":"{{testCourseId}}",
+    "courseName":"{{testCourseName}}",
+    "teacherId":"{{testTeacherNetId}}",
+    "participants": ["{{testStudentNetId}}", "{{testStudentNetId2}}", "{{testStudentNetId3}}"]
+}' "http://localhost:8585/course/createNewCourse"</code></pre>
+                                </div>
+                                <div class="tab-pane" id="request-course-service-create-a-new-course-teacher-example-http">
+                                    <pre><code class="hljs http">POST /course/createNewCourse HTTP/1.1
+Host: localhost:8585
+
+{
+    "courseId":"{{testCourseId}}",
+    "courseName":"{{testCourseName}}",
+    "teacherId":"{{testTeacherNetId}}",
+    "participants": ["{{testStudentNetId}}", "{{testStudentNetId2}}", "{{testStudentNetId3}}"]
+}</code></pre>
+                                </div>
+                            </div>
+                        </div>
+
+                        
+
+                        <hr>
+                    </div>
+                    
+                    
+                    <div class="request">
+
+                        <h4 id="request-course-service-plan-a-new-lecture-teacher">
+                            Plan a new lecture (Teacher)
+                            <a href="#request-course-service-plan-a-new-lecture-teacher"><i class="glyphicon glyphicon-link"></i></a>
+                        </h4>
+
+                        <div></div>
+
+                        <div>
+                            <ul class="nav nav-tabs" role="tablist">
+                                <li role="presentation" class="active"><a href="#request-course-service-plan-a-new-lecture-teacher-example-curl" data-toggle="tab">Curl</a></li>
+                                <li role="presentation"><a href="#request-course-service-plan-a-new-lecture-teacher-example-http" data-toggle="tab">HTTP</a></li>
+                            </ul>
+                            <div class="tab-content">
+                                <div class="tab-pane active" id="request-course-service-plan-a-new-lecture-teacher-example-curl">
+                                    <pre><code class="hljs curl">curl -X POST -d '{
+    "courseId":"{{testCourseId}}",
+    "date":"{{testDate}}",
+    "durationInMinutes": {{testLectureDuration}}
+}' "http://localhost:8585/lecture/planNewLecture"</code></pre>
+                                </div>
+                                <div class="tab-pane" id="request-course-service-plan-a-new-lecture-teacher-example-http">
+                                    <pre><code class="hljs http">POST /lecture/planNewLecture HTTP/1.1
+Host: localhost:8585
+
+{
+    "courseId":"{{testCourseId}}",
+    "date":"{{testDate}}",
+    "durationInMinutes": {{testLectureDuration}}
+}</code></pre>
+                                </div>
+                            </div>
+                        </div>
+
+                        
+
+                        <hr>
+                    </div>
+                    
+                    
+                    <div class="request">
+
+                        <h4 id="request-course-service-get-all-courses-teacher">
+                            Get all courses (Teacher)
+                            <a href="#request-course-service-get-all-courses-teacher"><i class="glyphicon glyphicon-link"></i></a>
+                        </h4>
+
+                        <div></div>
+
+                        <div>
+                            <ul class="nav nav-tabs" role="tablist">
+                                <li role="presentation" class="active"><a href="#request-course-service-get-all-courses-teacher-example-curl" data-toggle="tab">Curl</a></li>
+                                <li role="presentation"><a href="#request-course-service-get-all-courses-teacher-example-http" data-toggle="tab">HTTP</a></li>
+                            </ul>
+                            <div class="tab-content">
+                                <div class="tab-pane active" id="request-course-service-get-all-courses-teacher-example-curl">
+                                    <pre><code class="hljs curl">curl -X GET "http://localhost:8585/course/getAllCourses"</code></pre>
+                                </div>
+                                <div class="tab-pane" id="request-course-service-get-all-courses-teacher-example-http">
+                                    <pre><code class="hljs http">GET /course/getAllCourses HTTP/1.1
+Host: localhost:8585</code></pre>
+                                </div>
+                            </div>
+                        </div>
+
+                        
+
+                        <hr>
+                    </div>
+                    
+                    
+                    <div class="request">
+
+                        <h4 id="request-course-service-get-course-by-id-teacher">
+                            Get course by id (Teacher)
+                            <a href="#request-course-service-get-course-by-id-teacher"><i class="glyphicon glyphicon-link"></i></a>
+                        </h4>
+
+                        <div></div>
+
+                        <div>
+                            <ul class="nav nav-tabs" role="tablist">
+                                <li role="presentation" class="active"><a href="#request-course-service-get-course-by-id-teacher-example-curl" data-toggle="tab">Curl</a></li>
+                                <li role="presentation"><a href="#request-course-service-get-course-by-id-teacher-example-http" data-toggle="tab">HTTP</a></li>
+                            </ul>
+                            <div class="tab-content">
+                                <div class="tab-pane active" id="request-course-service-get-course-by-id-teacher-example-curl">
+                                    <pre><code class="hljs curl">curl -X GET "http://localhost:8585/course/getCourse?courseId={{testCourseId}}"</code></pre>
+                                </div>
+                                <div class="tab-pane" id="request-course-service-get-course-by-id-teacher-example-http">
+                                    <pre><code class="hljs http">GET /course/getCourse?courseId={{testCourseId}} HTTP/1.1
+Host: localhost:8585</code></pre>
+                                </div>
+                            </div>
+                        </div>
+
+                        
+
+                        <hr>
+                    </div>
+                    
+                    
+                    <div class="request">
+
+                        <h4 id="request-course-service-get-courses-that-teacher-teaches-teacher">
+                            Get courses that teacher teaches (Teacher)
+                            <a href="#request-course-service-get-courses-that-teacher-teaches-teacher"><i class="glyphicon glyphicon-link"></i></a>
+                        </h4>
+
+                        <div></div>
+
+                        <div>
+                            <ul class="nav nav-tabs" role="tablist">
+                                <li role="presentation" class="active"><a href="#request-course-service-get-courses-that-teacher-teaches-teacher-example-curl" data-toggle="tab">Curl</a></li>
+                                <li role="presentation"><a href="#request-course-service-get-courses-that-teacher-teaches-teacher-example-http" data-toggle="tab">HTTP</a></li>
+                            </ul>
+                            <div class="tab-content">
+                                <div class="tab-pane active" id="request-course-service-get-courses-that-teacher-teaches-teacher-example-curl">
+                                    <pre><code class="hljs curl">curl -X GET "http://localhost:8585/course/getCoursesForTeacher?teacherId={{testTeacherNetId}}"</code></pre>
+                                </div>
+                                <div class="tab-pane" id="request-course-service-get-courses-that-teacher-teaches-teacher-example-http">
+                                    <pre><code class="hljs http">GET /course/getCoursesForTeacher?teacherId={{testTeacherNetId}} HTTP/1.1
+Host: localhost:8585</code></pre>
+                                </div>
+                            </div>
+                        </div>
+
+                        
+
+                        <hr>
+                    </div>
+                    
+                    
+                    <div class="request">
+
+                        <h4 id="request-course-service-get-all-course-participants-teacher">
+                            Get all course participants (Teacher)
+                            <a href="#request-course-service-get-all-course-participants-teacher"><i class="glyphicon glyphicon-link"></i></a>
+                        </h4>
+
+                        <div></div>
+
+                        <div>
+                            <ul class="nav nav-tabs" role="tablist">
+                                <li role="presentation" class="active"><a href="#request-course-service-get-all-course-participants-teacher-example-curl" data-toggle="tab">Curl</a></li>
+                                <li role="presentation"><a href="#request-course-service-get-all-course-participants-teacher-example-http" data-toggle="tab">HTTP</a></li>
+                            </ul>
+                            <div class="tab-content">
+                                <div class="tab-pane active" id="request-course-service-get-all-course-participants-teacher-example-curl">
+                                    <pre><code class="hljs curl">curl -X GET "http://localhost:8585/course/getCourseParticipants?courseId={{testCourseId}}"</code></pre>
+                                </div>
+                                <div class="tab-pane" id="request-course-service-get-all-course-participants-teacher-example-http">
+                                    <pre><code class="hljs http">GET /course/getCourseParticipants?courseId={{testCourseId}} HTTP/1.1
+Host: localhost:8585</code></pre>
+                                </div>
+                            </div>
+                        </div>
+
+                        
+
+                        <hr>
+                    </div>
+                    
+                    
+                    <div class="request">
+
+                        <h4 id="request-course-service-get-all-enrollments-teacher">
+                            Get all enrollments (Teacher)
+                            <a href="#request-course-service-get-all-enrollments-teacher"><i class="glyphicon glyphicon-link"></i></a>
+                        </h4>
+
+                        <div></div>
+
+                        <div>
+                            <ul class="nav nav-tabs" role="tablist">
+                                <li role="presentation" class="active"><a href="#request-course-service-get-all-enrollments-teacher-example-curl" data-toggle="tab">Curl</a></li>
+                                <li role="presentation"><a href="#request-course-service-get-all-enrollments-teacher-example-http" data-toggle="tab">HTTP</a></li>
+                            </ul>
+                            <div class="tab-content">
+                                <div class="tab-pane active" id="request-course-service-get-all-enrollments-teacher-example-curl">
+                                    <pre><code class="hljs curl">curl -X GET "http://localhost:8585/enrollment/getAllEnrollments"</code></pre>
+                                </div>
+                                <div class="tab-pane" id="request-course-service-get-all-enrollments-teacher-example-http">
+                                    <pre><code class="hljs http">GET /enrollment/getAllEnrollments HTTP/1.1
+Host: localhost:8585</code></pre>
+                                </div>
+                            </div>
+                        </div>
+
+                        
+
+                        <hr>
+                    </div>
+                    
+                    
+                    <div class="request">
+
+                        <h4 id="request-course-service-get-enrollments-for-a-specific-course-teacher">
+                            Get enrollments for a specific course (Teacher)
+                            <a href="#request-course-service-get-enrollments-for-a-specific-course-teacher"><i class="glyphicon glyphicon-link"></i></a>
+                        </h4>
+
+                        <div></div>
+
+                        <div>
+                            <ul class="nav nav-tabs" role="tablist">
+                                <li role="presentation" class="active"><a href="#request-course-service-get-enrollments-for-a-specific-course-teacher-example-curl" data-toggle="tab">Curl</a></li>
+                                <li role="presentation"><a href="#request-course-service-get-enrollments-for-a-specific-course-teacher-example-http" data-toggle="tab">HTTP</a></li>
+                            </ul>
+                            <div class="tab-content">
+                                <div class="tab-pane active" id="request-course-service-get-enrollments-for-a-specific-course-teacher-example-curl">
+                                    <pre><code class="hljs curl">curl -X GET "http://localhost:8585/enrollment/getEnrollmentsByCourse?courseId={{testCourseId}}"</code></pre>
+                                </div>
+                                <div class="tab-pane" id="request-course-service-get-enrollments-for-a-specific-course-teacher-example-http">
+                                    <pre><code class="hljs http">GET /enrollment/getEnrollmentsByCourse?courseId={{testCourseId}} HTTP/1.1
+Host: localhost:8585</code></pre>
+                                </div>
+                            </div>
+                        </div>
+
+                        
+
+                        <hr>
+                    </div>
+                    
+                    
+                    <div class="request">
+
+                        <h4 id="request-course-service-get-all-requested-lectures-teacher">
+                            Get all requested lectures (Teacher)
+                            <a href="#request-course-service-get-all-requested-lectures-teacher"><i class="glyphicon glyphicon-link"></i></a>
+                        </h4>
+
+                        <div></div>
+
+                        <div>
+                            <ul class="nav nav-tabs" role="tablist">
+                                <li role="presentation" class="active"><a href="#request-course-service-get-all-requested-lectures-teacher-example-curl" data-toggle="tab">Curl</a></li>
+                                <li role="presentation"><a href="#request-course-service-get-all-requested-lectures-teacher-example-http" data-toggle="tab">HTTP</a></li>
+                            </ul>
+                            <div class="tab-content">
+                                <div class="tab-pane active" id="request-course-service-get-all-requested-lectures-teacher-example-curl">
+                                    <pre><code class="hljs curl">curl -X GET "http://localhost:8585/lecture/getAllLectures"</code></pre>
+                                </div>
+                                <div class="tab-pane" id="request-course-service-get-all-requested-lectures-teacher-example-http">
+                                    <pre><code class="hljs http">GET /lecture/getAllLectures HTTP/1.1
+Host: localhost:8585</code></pre>
+                                </div>
+                            </div>
+                        </div>
+
+                        
+
+                        <hr>
+                    </div>
+                    
+                    
+                    <div class="request">
+
+                        <h4 id="request-course-service-get-all-requested-lectures-after-a-specific-date-teacher">
+                            Get all requested lectures after a specific date (Teacher)
+                            <a href="#request-course-service-get-all-requested-lectures-after-a-specific-date-teacher"><i class="glyphicon glyphicon-link"></i></a>
+                        </h4>
+
+                        <div></div>
+
+                        <div>
+                            <ul class="nav nav-tabs" role="tablist">
+                                <li role="presentation" class="active"><a href="#request-course-service-get-all-requested-lectures-after-a-specific-date-teacher-example-curl" data-toggle="tab">Curl</a></li>
+                                <li role="presentation"><a href="#request-course-service-get-all-requested-lectures-after-a-specific-date-teacher-example-http" data-toggle="tab">HTTP</a></li>
+                            </ul>
+                            <div class="tab-content">
+                                <div class="tab-pane active" id="request-course-service-get-all-requested-lectures-after-a-specific-date-teacher-example-curl">
+                                    <pre><code class="hljs curl">curl -X GET "http://localhost:8585/lecture/getLecturesAfterDate?date={{testDate}}"</code></pre>
+                                </div>
+                                <div class="tab-pane" id="request-course-service-get-all-requested-lectures-after-a-specific-date-teacher-example-http">
+                                    <pre><code class="hljs http">GET /lecture/getLecturesAfterDate?date={{testDate}} HTTP/1.1
+Host: localhost:8585</code></pre>
+                                </div>
+                            </div>
+                        </div>
+
+                        
+
+                        <hr>
+                    </div>
+                    
+                    
+                    <div class="request">
+
+                        <h4 id="request-course-service-cancel-a-lecture-teacher">
+                            Cancel a lecture (Teacher)
+                            <a href="#request-course-service-cancel-a-lecture-teacher"><i class="glyphicon glyphicon-link"></i></a>
+                        </h4>
+
+                        <div></div>
+
+                        <div>
+                            <ul class="nav nav-tabs" role="tablist">
+                                <li role="presentation" class="active"><a href="#request-course-service-cancel-a-lecture-teacher-example-curl" data-toggle="tab">Curl</a></li>
+                                <li role="presentation"><a href="#request-course-service-cancel-a-lecture-teacher-example-http" data-toggle="tab">HTTP</a></li>
+                            </ul>
+                            <div class="tab-content">
+                                <div class="tab-pane active" id="request-course-service-cancel-a-lecture-teacher-example-curl">
+                                    <pre><code class="hljs curl">curl -X DELETE "http://localhost:8585/course/cancelLecture?courseId={{testCourseId}}&date={{testDate}}"</code></pre>
+                                </div>
+                                <div class="tab-pane" id="request-course-service-cancel-a-lecture-teacher-example-http">
+                                    <pre><code class="hljs http">DELETE /course/cancelLecture?courseId={{testCourseId}}&date={{testDate}} HTTP/1.1
+Host: localhost:8585</code></pre>
+                                </div>
+                            </div>
+                        </div>
+
+                        
+
+                        <hr>
+                    </div>
+                    
+                    
+                    <div class="request">
+
+                        <h4 id="request-course-service-delete-a-course-teacher">
+                            Delete a course (Teacher)
+                            <a href="#request-course-service-delete-a-course-teacher"><i class="glyphicon glyphicon-link"></i></a>
+                        </h4>
+
+                        <div></div>
+
+                        <div>
+                            <ul class="nav nav-tabs" role="tablist">
+                                <li role="presentation" class="active"><a href="#request-course-service-delete-a-course-teacher-example-curl" data-toggle="tab">Curl</a></li>
+                                <li role="presentation"><a href="#request-course-service-delete-a-course-teacher-example-http" data-toggle="tab">HTTP</a></li>
+                            </ul>
+                            <div class="tab-content">
+                                <div class="tab-pane active" id="request-course-service-delete-a-course-teacher-example-curl">
+                                    <pre><code class="hljs curl">curl -X DELETE -d '{
+    "courseId":"{{testCourseId}}",
+    "courseName":"{{testCourseName}}",
+    "teacherId":"{{testTeacherNetId}}",
+    "participants": ["{{testStudentNetId}}", "{{testStudentNetId2}}", "{{testStudentNetId3}}"]
+}' "http://localhost:8585/course/deleteCourse?courseId={{testCourseId}}"</code></pre>
+                                </div>
+                                <div class="tab-pane" id="request-course-service-delete-a-course-teacher-example-http">
+                                    <pre><code class="hljs http">DELETE /course/deleteCourse?courseId={{testCourseId}} HTTP/1.1
+Host: localhost:8585
+
+{
+    "courseId":"{{testCourseId}}",
+    "courseName":"{{testCourseName}}",
+    "teacherId":"{{testTeacherNetId}}",
+    "participants": ["{{testStudentNetId}}", "{{testStudentNetId2}}", "{{testStudentNetId3}}"]
+}</code></pre>
+                                </div>
+                            </div>
+                        </div>
+
+                        
+
+                        <hr>
+                    </div>
+                    
+
+                </div>
+                
+                
+                <div class="endpoints-group">
+                    <h3 id="folder-restrictions-service">
+                        Restrictions Service
+                        <a href="#folder-restrictions-service"><i class="glyphicon glyphicon-link"></i></a>
+                    </h3>
+
+                    <div><p>The Restrictions Service allows the application to work with frequently changing Covid19 regulations.</p>
+</div>
+
+                    
+                    
+                    <div class="request">
+
+                        <h4 id="request-restrictions-service-set-the-capacity-restriction-of-rooms-teacher">
+                            Set the capacity restriction of rooms (Teacher)
+                            <a href="#request-restrictions-service-set-the-capacity-restriction-of-rooms-teacher"><i class="glyphicon glyphicon-link"></i></a>
+                        </h4>
+
+                        <div></div>
+
+                        <div>
+                            <ul class="nav nav-tabs" role="tablist">
+                                <li role="presentation" class="active"><a href="#request-restrictions-service-set-the-capacity-restriction-of-rooms-teacher-example-curl" data-toggle="tab">Curl</a></li>
+                                <li role="presentation"><a href="#request-restrictions-service-set-the-capacity-restriction-of-rooms-teacher-example-http" data-toggle="tab">HTTP</a></li>
+                            </ul>
+                            <div class="tab-content">
+                                <div class="tab-pane active" id="request-restrictions-service-set-the-capacity-restriction-of-rooms-teacher-example-curl">
+                                    <pre><code class="hljs curl">curl -X POST "http://localhost:8084/restrictions/setCapacityRestriction?bigOrSmallRoom={{bigOrSmallRoom}}?maxPercantageAllowed=?{{testMaxPercentageAllowed}}"</code></pre>
+                                </div>
+                                <div class="tab-pane" id="request-restrictions-service-set-the-capacity-restriction-of-rooms-teacher-example-http">
+                                    <pre><code class="hljs http">POST /restrictions/setCapacityRestriction?bigOrSmallRoom={{bigOrSmallRoom}}?maxPercantageAllowed=?{{testMaxPercentageAllowed}} HTTP/1.1
+Host: localhost:8084</code></pre>
+                                </div>
+                            </div>
+                        </div>
+
+                        
+
+                        <hr>
+                    </div>
+                    
+                    
+                    <div class="request">
+
+                        <h4 id="request-restrictions-service-set-the-minimum-number-of-seats-for-a-big-room-teacher">
+                            Set the minimum number of seats for a big room (Teacher)
+                            <a href="#request-restrictions-service-set-the-minimum-number-of-seats-for-a-big-room-teacher"><i class="glyphicon glyphicon-link"></i></a>
+                        </h4>
+
+                        <div></div>
+
+                        <div>
+                            <ul class="nav nav-tabs" role="tablist">
+                                <li role="presentation" class="active"><a href="#request-restrictions-service-set-the-minimum-number-of-seats-for-a-big-room-teacher-example-curl" data-toggle="tab">Curl</a></li>
+                                <li role="presentation"><a href="#request-restrictions-service-set-the-minimum-number-of-seats-for-a-big-room-teacher-example-http" data-toggle="tab">HTTP</a></li>
+                            </ul>
+                            <div class="tab-content">
+                                <div class="tab-pane active" id="request-restrictions-service-set-the-minimum-number-of-seats-for-a-big-room-teacher-example-curl">
+                                    <pre><code class="hljs curl">curl -X POST "http://localhost:8084/restrictions/setMinSeatsBig?{{testMinSeatsBig}}"</code></pre>
+                                </div>
+                                <div class="tab-pane" id="request-restrictions-service-set-the-minimum-number-of-seats-for-a-big-room-teacher-example-http">
+                                    <pre><code class="hljs http">POST /restrictions/setMinSeatsBig?{{testMinSeatsBig}} HTTP/1.1
+Host: localhost:8084</code></pre>
+                                </div>
+                            </div>
+                        </div>
+
+                        
+
+                        <hr>
+                    </div>
+                    
+                    
+                    <div class="request">
+
+                        <h4 id="request-restrictions-service-set-the-time-gap-between-any-two-lectures-teacher">
+                            Set the time gap between any two lectures (Teacher)
+                            <a href="#request-restrictions-service-set-the-time-gap-between-any-two-lectures-teacher"><i class="glyphicon glyphicon-link"></i></a>
+                        </h4>
+
+                        <div></div>
+
+                        <div>
+                            <ul class="nav nav-tabs" role="tablist">
+                                <li role="presentation" class="active"><a href="#request-restrictions-service-set-the-time-gap-between-any-two-lectures-teacher-example-curl" data-toggle="tab">Curl</a></li>
+                                <li role="presentation"><a href="#request-restrictions-service-set-the-time-gap-between-any-two-lectures-teacher-example-http" data-toggle="tab">HTTP</a></li>
+                            </ul>
+                            <div class="tab-content">
+                                <div class="tab-pane active" id="request-restrictions-service-set-the-time-gap-between-any-two-lectures-teacher-example-curl">
+                                    <pre><code class="hljs curl">curl -X POST "http://localhost:8084/restrictions/setTimeGapLength?{{testTimeGapLength}}"</code></pre>
+                                </div>
+                                <div class="tab-pane" id="request-restrictions-service-set-the-time-gap-between-any-two-lectures-teacher-example-http">
+                                    <pre><code class="hljs http">POST /restrictions/setTimeGapLength?{{testTimeGapLength}} HTTP/1.1
+Host: localhost:8084</code></pre>
+                                </div>
+                            </div>
+                        </div>
+
+                        
+
+                        <hr>
+                    </div>
+                    
+                    
+                    <div class="request">
+
+                        <h4 id="request-restrictions-service-get-the-time-gap-between-any-two-lectures-teacher-copy">
+                            Get the time gap between any two lectures (Teacher) Copy
+                            <a href="#request-restrictions-service-get-the-time-gap-between-any-two-lectures-teacher-copy"><i class="glyphicon glyphicon-link"></i></a>
+                        </h4>
+
+                        <div></div>
+
+                        <div>
+                            <ul class="nav nav-tabs" role="tablist">
+                                <li role="presentation" class="active"><a href="#request-restrictions-service-get-the-time-gap-between-any-two-lectures-teacher-copy-example-curl" data-toggle="tab">Curl</a></li>
+                                <li role="presentation"><a href="#request-restrictions-service-get-the-time-gap-between-any-two-lectures-teacher-copy-example-http" data-toggle="tab">HTTP</a></li>
+                            </ul>
+                            <div class="tab-content">
+                                <div class="tab-pane active" id="request-restrictions-service-get-the-time-gap-between-any-two-lectures-teacher-copy-example-curl">
+                                    <pre><code class="hljs curl">curl -X GET "http://localhost:8084/restrictions/getTimeGapLength"</code></pre>
+                                </div>
+                                <div class="tab-pane" id="request-restrictions-service-get-the-time-gap-between-any-two-lectures-teacher-copy-example-http">
+                                    <pre><code class="hljs http">GET /restrictions/getTimeGapLength HTTP/1.1
+Host: localhost:8084</code></pre>
+                                </div>
+                            </div>
+                        </div>
+
+                        
+
+                        <hr>
+                    </div>
+                    
+                    
+                    <div class="request">
+
+                        <h4 id="request-restrictions-service-set-start-time-for-scheduling-teacher">
+                            Set start time for scheduling (Teacher)
+                            <a href="#request-restrictions-service-set-start-time-for-scheduling-teacher"><i class="glyphicon glyphicon-link"></i></a>
+                        </h4>
+
+                        <div></div>
+
+                        <div>
+                            <ul class="nav nav-tabs" role="tablist">
+                                <li role="presentation" class="active"><a href="#request-restrictions-service-set-start-time-for-scheduling-teacher-example-curl" data-toggle="tab">Curl</a></li>
+                                <li role="presentation"><a href="#request-restrictions-service-set-start-time-for-scheduling-teacher-example-http" data-toggle="tab">HTTP</a></li>
+                            </ul>
+                            <div class="tab-content">
+                                <div class="tab-pane active" id="request-restrictions-service-set-start-time-for-scheduling-teacher-example-curl">
+                                    <pre><code class="hljs curl">curl -X POST "http://localhost:8084/restrictions/setStartTime?{{testStartTime}}"</code></pre>
+                                </div>
+                                <div class="tab-pane" id="request-restrictions-service-set-start-time-for-scheduling-teacher-example-http">
+                                    <pre><code class="hljs http">POST /restrictions/setStartTime?{{testStartTime}} HTTP/1.1
+Host: localhost:8084</code></pre>
+                                </div>
+                            </div>
+                        </div>
+
+                        
+
+                        <hr>
+                    </div>
+                    
+                    
+                    <div class="request">
+
+                        <h4 id="request-restrictions-service-set-end-time-for-scheduling-teacher">
+                            Set end time for scheduling (Teacher)
+                            <a href="#request-restrictions-service-set-end-time-for-scheduling-teacher"><i class="glyphicon glyphicon-link"></i></a>
+                        </h4>
+
+                        <div></div>
+
+                        <div>
+                            <ul class="nav nav-tabs" role="tablist">
+                                <li role="presentation" class="active"><a href="#request-restrictions-service-set-end-time-for-scheduling-teacher-example-curl" data-toggle="tab">Curl</a></li>
+                                <li role="presentation"><a href="#request-restrictions-service-set-end-time-for-scheduling-teacher-example-http" data-toggle="tab">HTTP</a></li>
+                            </ul>
+                            <div class="tab-content">
+                                <div class="tab-pane active" id="request-restrictions-service-set-end-time-for-scheduling-teacher-example-curl">
+                                    <pre><code class="hljs curl">curl -X POST "http://localhost:8084/restrictions/setEndTime?{{testEndTime}}"</code></pre>
+                                </div>
+                                <div class="tab-pane" id="request-restrictions-service-set-end-time-for-scheduling-teacher-example-http">
+                                    <pre><code class="hljs http">POST /restrictions/setEndTime?{{testEndTime}} HTTP/1.1
+Host: localhost:8084</code></pre>
+                                </div>
+                            </div>
+                        </div>
+
+                        
+
+                        <hr>
+                    </div>
+                    
+                    
+                    <div class="request">
+
+                        <h4 id="request-restrictions-service-get-start-time-for-scheduling-teacher">
+                            Get start time for scheduling (Teacher)
+                            <a href="#request-restrictions-service-get-start-time-for-scheduling-teacher"><i class="glyphicon glyphicon-link"></i></a>
+                        </h4>
+
+                        <div></div>
+
+                        <div>
+                            <ul class="nav nav-tabs" role="tablist">
+                                <li role="presentation" class="active"><a href="#request-restrictions-service-get-start-time-for-scheduling-teacher-example-curl" data-toggle="tab">Curl</a></li>
+                                <li role="presentation"><a href="#request-restrictions-service-get-start-time-for-scheduling-teacher-example-http" data-toggle="tab">HTTP</a></li>
+                            </ul>
+                            <div class="tab-content">
+                                <div class="tab-pane active" id="request-restrictions-service-get-start-time-for-scheduling-teacher-example-curl">
+                                    <pre><code class="hljs curl">curl -X GET "http://localhost:8084/restrictions/getStartTime"</code></pre>
+                                </div>
+                                <div class="tab-pane" id="request-restrictions-service-get-start-time-for-scheduling-teacher-example-http">
+                                    <pre><code class="hljs http">GET /restrictions/getStartTime HTTP/1.1
+Host: localhost:8084</code></pre>
+                                </div>
+                            </div>
+                        </div>
+
+                        
+
+                        <hr>
+                    </div>
+                    
+                    
+                    <div class="request">
+
+                        <h4 id="request-restrictions-service-get-end-time-for-scheduling-teacher">
+                            Get end time for scheduling (Teacher)
+                            <a href="#request-restrictions-service-get-end-time-for-scheduling-teacher"><i class="glyphicon glyphicon-link"></i></a>
+                        </h4>
+
+                        <div></div>
+
+                        <div>
+                            <ul class="nav nav-tabs" role="tablist">
+                                <li role="presentation" class="active"><a href="#request-restrictions-service-get-end-time-for-scheduling-teacher-example-curl" data-toggle="tab">Curl</a></li>
+                                <li role="presentation"><a href="#request-restrictions-service-get-end-time-for-scheduling-teacher-example-http" data-toggle="tab">HTTP</a></li>
+                            </ul>
+                            <div class="tab-content">
+                                <div class="tab-pane active" id="request-restrictions-service-get-end-time-for-scheduling-teacher-example-curl">
+                                    <pre><code class="hljs curl">curl -X GET "http://localhost:8084/restrictions/getEndTime"</code></pre>
+                                </div>
+                                <div class="tab-pane" id="request-restrictions-service-get-end-time-for-scheduling-teacher-example-http">
+                                    <pre><code class="hljs http">GET /restrictions/getEndTime HTTP/1.1
+Host: localhost:8084</code></pre>
+                                </div>
+                            </div>
+                        </div>
+
+                        
+
+                        <hr>
+                    </div>
+                    
+                    
+                    <div class="request">
+
+                        <h4 id="request-restrictions-service-get-all-rooms-with-adjusted-capacity-teacher">
+                            Get all rooms with adjusted capacity (Teacher)
+                            <a href="#request-restrictions-service-get-all-rooms-with-adjusted-capacity-teacher"><i class="glyphicon glyphicon-link"></i></a>
+                        </h4>
+
+                        <div></div>
+
+                        <div>
+                            <ul class="nav nav-tabs" role="tablist">
+                                <li role="presentation" class="active"><a href="#request-restrictions-service-get-all-rooms-with-adjusted-capacity-teacher-example-curl" data-toggle="tab">Curl</a></li>
+                                <li role="presentation"><a href="#request-restrictions-service-get-all-rooms-with-adjusted-capacity-teacher-example-http" data-toggle="tab">HTTP</a></li>
+                            </ul>
+                            <div class="tab-content">
+                                <div class="tab-pane active" id="request-restrictions-service-get-all-rooms-with-adjusted-capacity-teacher-example-curl">
+                                    <pre><code class="hljs curl">curl -X GET "http://localhost:8084/restrictions/getAllRoomsWithAdjustedCapacity"</code></pre>
+                                </div>
+                                <div class="tab-pane" id="request-restrictions-service-get-all-rooms-with-adjusted-capacity-teacher-example-http">
+                                    <pre><code class="hljs http">GET /restrictions/getAllRoomsWithAdjustedCapacity HTTP/1.1
+Host: localhost:8084</code></pre>
+                                </div>
+                            </div>
+                        </div>
+
+                        
+
+                        <hr>
+                    </div>
+                    
+
+                </div>
+                
+                
+                <div class="endpoints-group">
+                    <h3 id="folder-room-service">
+                        Room Service
+                        <a href="#folder-room-service"><i class="glyphicon glyphicon-link"></i></a>
+                    </h3>
+
+                    <div><p>The Room Service provides rooms to schedule lectures in.</p>
+</div>
+
+                    
+                    
+                    <div class="request">
+
+                        <h4 id="request-room-service-add-a-new-room-system">
+                            Add a new room (System)
+                            <a href="#request-room-service-add-a-new-room-system"><i class="glyphicon glyphicon-link"></i></a>
+                        </h4>
+
+                        <div></div>
+
+                        <div>
+                            <ul class="nav nav-tabs" role="tablist">
+                                <li role="presentation" class="active"><a href="#request-room-service-add-a-new-room-system-example-curl" data-toggle="tab">Curl</a></li>
+                                <li role="presentation"><a href="#request-room-service-add-a-new-room-system-example-http" data-toggle="tab">HTTP</a></li>
+                            </ul>
+                            <div class="tab-content">
+                                <div class="tab-pane active" id="request-room-service-add-a-new-room-system-example-curl">
+                                    <pre><code class="hljs curl">curl -X POST "http://localhost:8085/rooms/addNewRoom?name={{testRoomName}}&capacity={{testRoomCapacity}}"</code></pre>
+                                </div>
+                                <div class="tab-pane" id="request-room-service-add-a-new-room-system-example-http">
+                                    <pre><code class="hljs http">POST /rooms/addNewRoom?name={{testRoomName}}&capacity={{testRoomCapacity}} HTTP/1.1
+Host: localhost:8085</code></pre>
+                                </div>
+                            </div>
+                        </div>
+
+                        
+
+                        <hr>
+                    </div>
+                    
+                    
+                    <div class="request">
+
+                        <h4 id="request-room-service-delete-a-room-system">
+                            Delete a room (System)
+                            <a href="#request-room-service-delete-a-room-system"><i class="glyphicon glyphicon-link"></i></a>
+                        </h4>
+
+                        <div></div>
+
+                        <div>
+                            <ul class="nav nav-tabs" role="tablist">
+                                <li role="presentation" class="active"><a href="#request-room-service-delete-a-room-system-example-curl" data-toggle="tab">Curl</a></li>
+                                <li role="presentation"><a href="#request-room-service-delete-a-room-system-example-http" data-toggle="tab">HTTP</a></li>
+                            </ul>
+                            <div class="tab-content">
+                                <div class="tab-pane active" id="request-room-service-delete-a-room-system-example-curl">
+                                    <pre><code class="hljs curl">curl -X DELETE "http://localhost:8085/rooms/deleteRoom?name={{testRoomName}}"</code></pre>
+                                </div>
+                                <div class="tab-pane" id="request-room-service-delete-a-room-system-example-http">
+                                    <pre><code class="hljs http">DELETE /rooms/deleteRoom?name={{testRoomName}} HTTP/1.1
+Host: localhost:8085</code></pre>
+                                </div>
+                            </div>
+                        </div>
+
+                        
+
+                        <hr>
+                    </div>
+                    
+                    
+                    <div class="request">
+
+                        <h4 id="request-room-service-get-all-rooms-teacher">
+                            Get all rooms (Teacher)
+                            <a href="#request-room-service-get-all-rooms-teacher"><i class="glyphicon glyphicon-link"></i></a>
+                        </h4>
+
+                        <div></div>
+
+                        <div>
+                            <ul class="nav nav-tabs" role="tablist">
+                                <li role="presentation" class="active"><a href="#request-room-service-get-all-rooms-teacher-example-curl" data-toggle="tab">Curl</a></li>
+                                <li role="presentation"><a href="#request-room-service-get-all-rooms-teacher-example-http" data-toggle="tab">HTTP</a></li>
+                            </ul>
+                            <div class="tab-content">
+                                <div class="tab-pane active" id="request-room-service-get-all-rooms-teacher-example-curl">
+                                    <pre><code class="hljs curl">curl -X GET "http://localhost:8085/rooms/getAllRooms"</code></pre>
+                                </div>
+                                <div class="tab-pane" id="request-room-service-get-all-rooms-teacher-example-http">
+                                    <pre><code class="hljs http">GET /rooms/getAllRooms HTTP/1.1
+Host: localhost:8085</code></pre>
+                                </div>
+                            </div>
+                        </div>
+
+                        
+
+                        <hr>
+                    </div>
+                    
+                    
+                    <div class="request">
+
+                        <h4 id="request-room-service-get-room-name-for-a-particular-room-id-teacher">
+                            Get room name for a particular room Id (Teacher)
+                            <a href="#request-room-service-get-room-name-for-a-particular-room-id-teacher"><i class="glyphicon glyphicon-link"></i></a>
+                        </h4>
+
+                        <div></div>
+
+                        <div>
+                            <ul class="nav nav-tabs" role="tablist">
+                                <li role="presentation" class="active"><a href="#request-room-service-get-room-name-for-a-particular-room-id-teacher-example-curl" data-toggle="tab">Curl</a></li>
+                                <li role="presentation"><a href="#request-room-service-get-room-name-for-a-particular-room-id-teacher-example-http" data-toggle="tab">HTTP</a></li>
+                            </ul>
+                            <div class="tab-content">
+                                <div class="tab-pane active" id="request-room-service-get-room-name-for-a-particular-room-id-teacher-example-curl">
+                                    <pre><code class="hljs curl">curl -X GET "http://localhost:8085/rooms/getRoomName?roomId={{testRoomId}}"</code></pre>
+                                </div>
+                                <div class="tab-pane" id="request-room-service-get-room-name-for-a-particular-room-id-teacher-example-http">
+                                    <pre><code class="hljs http">GET /rooms/getRoomName?roomId={{testRoomId}} HTTP/1.1
+Host: localhost:8085</code></pre>
+                                </div>
+                            </div>
+                        </div>
+
+                        
+
+                        <hr>
+                    </div>
+                    
+
+                </div>
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-2.2.2.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $("table:not(.table)").addClass('table table-bordered');
+    });
+</script>
+</body>
+</html>
