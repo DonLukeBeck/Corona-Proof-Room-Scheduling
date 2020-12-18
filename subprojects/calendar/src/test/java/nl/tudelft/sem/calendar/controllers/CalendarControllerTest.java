@@ -34,6 +34,7 @@ import nl.tudelft.sem.calendar.repositories.AttendanceRepository;
 import nl.tudelft.sem.calendar.repositories.LectureRepository;
 import nl.tudelft.sem.calendar.scheduling.LectureScheduler;
 import nl.tudelft.sem.calendar.util.Validate;
+import nl.tudelft.sem.shared.entity.StringMessage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -64,8 +65,8 @@ class CalendarControllerTest {
     private int endTimeSec;
     private LocalTime endTime;
     private int timeGapLength;
-    private transient String noAccessMessage =
-        "{\"message\": \"You are not allowed to view this page. Please contact administrator.\"}";
+    private transient StringMessage noAccessMessage =
+        new StringMessage("You are not allowed to view this page. Please contact administrator.");
     public ObjectMapper objectMapper =
         new ObjectMapper().registerModule(new JavaTimeModule());
 
@@ -172,9 +173,9 @@ class CalendarControllerTest {
         when(validate.validateRole(teacherRequest, "teacher"))
                 .thenReturn(netIds[3]);
         when(validate.validateRole(wrongRequest, "teacher"))
-                .thenReturn(noAccessMessage);
+                .thenReturn(noAccessMessage.getMessage());
         when(validate.validateRole(wrongRequest, "student"))
-                .thenReturn(noAccessMessage);
+                .thenReturn(noAccessMessage.getMessage());
 
         when(attendanceRepository.findByStudentId(netIds[1])).thenReturn(attendances.subList(1, 3));
 
@@ -205,7 +206,7 @@ class CalendarControllerTest {
             throws InterruptedException, ServerErrorException, IOException {
 
         assertThat(calendarController.scheduleLectures(teacherRequest).getBody())
-            .contains("Successfully scheduled lectures.");
+            .isEqualTo(new StringMessage("Successfully scheduled lectures."));
 
         verify(restrictionCommunicator, times(1)).getStartTime();
         verify(restrictionCommunicator, times(1)).getEndTime();
@@ -233,7 +234,7 @@ class CalendarControllerTest {
     void testScheduleLecturesAccessDenied()
             throws IOException, InterruptedException {
         assertThat(calendarController.scheduleLectures(wrongRequest).getBody())
-            .contains(noAccessMessage);
+            .isEqualTo(noAccessMessage);
     }
 
     @Test
@@ -377,7 +378,7 @@ class CalendarControllerTest {
     @Test
     void testIndicateAbsenceSuccess() throws IOException, InterruptedException {
         assertThat(calendarController.indicateAbsence(studentRequest, netIds[1],
-            courses[0].getCourseId(), dates[0]).getBody()).contains("Indicated absence.");
+            courses[0].getCourseId(), dates[0]).getBody()).isEqualTo(new StringMessage("Indicated absence."));
 
         verify(lectureRepository, times(1))
                 .findByDateAndCourseId(dates[0].plusDays(1), courses[0].getCourseId());

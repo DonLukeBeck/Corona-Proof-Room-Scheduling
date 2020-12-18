@@ -22,6 +22,7 @@ import nl.tudelft.sem.calendar.repositories.AttendanceRepository;
 import nl.tudelft.sem.calendar.repositories.LectureRepository;
 import nl.tudelft.sem.calendar.scheduling.LectureScheduler;
 import nl.tudelft.sem.calendar.util.Validate;
+import nl.tudelft.sem.shared.entity.StringMessage;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,8 +41,8 @@ public class CalendarController {
 
     private transient String teacherRole = "teacher";
     private transient String studentRole = "student";
-    private transient String noAccessMessage =
-        "{\"message\": \"You are not allowed to view this page. Please contact administrator.\"}";
+    private transient StringMessage noAccessMessage =
+        new StringMessage("You are not allowed to view this page. Please contact administrator.");
 
     @Autowired
     private transient LectureScheduler lectureScheduler;
@@ -99,11 +100,11 @@ public class CalendarController {
      */
     @PostMapping(path = "/scheduleLectures")
     @ResponseBody
-    public ResponseEntity<String> scheduleLectures(HttpServletRequest request)
+    public ResponseEntity<?> scheduleLectures(HttpServletRequest request)
             throws JSONException, InterruptedException, IOException {
 
         String validation = validate.validateRole(request, teacherRole);
-        if (validation.equals(noAccessMessage)) {
+        if (validation.equals(noAccessMessage.getMessage())) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(noAccessMessage);
         }
 
@@ -129,10 +130,10 @@ public class CalendarController {
             // Schedule the lecture
             lectureScheduler.scheduleAllLectures();
 
-            return ResponseEntity.ok("{\"message\": \"Successfully scheduled lectures.\"}");
+            return ResponseEntity.ok(new StringMessage("Successfully scheduled lectures."));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("{\"message\": \"Internal server error.\"}");
+                    .body(new StringMessage("Internal server error."));
         }
     }
 
@@ -152,7 +153,7 @@ public class CalendarController {
             throws IOException, InterruptedException, ServerErrorException {
 
         String validation = validate.validateRole(request, studentRole);
-        if (validation.equals(noAccessMessage)) {
+        if (validation.equals(noAccessMessage.getMessage())) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(noAccessMessage);
         }
 
@@ -185,7 +186,7 @@ public class CalendarController {
             throws IOException, InterruptedException, ServerErrorException {
 
         String validation = validate.validateRole(request, teacherRole);
-        if (validation.equals(noAccessMessage)) {
+        if (validation.equals(noAccessMessage.getMessage())) {
             return ResponseEntity.ok(noAccessMessage);
         }
 
@@ -223,7 +224,7 @@ public class CalendarController {
             throws IOException, InterruptedException, ServerErrorException {
 
         String validation = validate.validateRole(request, studentRole);
-        if (validation.equals(noAccessMessage)) {
+        if (validation.equals(noAccessMessage.getMessage())) {
             return ResponseEntity.ok(noAccessMessage);
         }
 
@@ -259,7 +260,7 @@ public class CalendarController {
             throws IOException, InterruptedException, ServerErrorException {
 
         String validation = validate.validateRole(request, teacherRole);
-        if (validation.equals(noAccessMessage)) {
+        if (validation.equals(noAccessMessage.getMessage())) {
             return ResponseEntity.ok(noAccessMessage);
         }
 
@@ -298,7 +299,7 @@ public class CalendarController {
             throws IOException, InterruptedException, ServerErrorException {
 
         String validation = validate.validateRole(request, studentRole);
-        if (validation.equals(noAccessMessage)) {
+        if (validation.equals(noAccessMessage.getMessage())) {
             return ResponseEntity.ok(noAccessMessage);
         }
 
@@ -334,7 +335,7 @@ public class CalendarController {
 
         String validation = validate.validateRole(request, teacherRole);
 
-        if (validation.equals(noAccessMessage)) {
+        if (validation.equals(noAccessMessage.getMessage())) {
             return ResponseEntity.ok(noAccessMessage);
         }
 
@@ -359,7 +360,7 @@ public class CalendarController {
     @SuppressWarnings({"PMD.DataflowAnomalyAnalysis", "PMD.AvoidDuplicateLiterals"})
     // we need to add specific values to lectureIds
     // we need to suppress this warning for every method
-    public ResponseEntity<String> indicateAbsence(HttpServletRequest request,
+    public ResponseEntity<?> indicateAbsence(HttpServletRequest request,
                                              String userId, String courseId,
                                              @DateTimeFormat(iso = DateTimeFormat
                                              .ISO.DATE) LocalDate date)
@@ -381,10 +382,10 @@ public class CalendarController {
                     attendanceRepository.save(a);
                 }
             }
-            return ResponseEntity.ok("{\"message\": \"Indicated absence.\"}");
+            return ResponseEntity.ok(new StringMessage("Indicated absence."));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Could not indicated absence.");
+                    .body(new StringMessage("Could not indicated absence."));
         }
     }
 
@@ -407,7 +408,7 @@ public class CalendarController {
 
         String validation = validate.validateRole(request, teacherRole);
 
-        if (validation.equals(noAccessMessage)) {
+        if (validation.equals(noAccessMessage.getMessage())) {
             return ResponseEntity.ok(noAccessMessage);
         }
 
@@ -455,11 +456,11 @@ public class CalendarController {
         try {
             JSONObject jwtInfo = JwtValidate.jwtValidate(request);
             if (!jwtInfo.getString("role").equals(role)) {
-                return noAccessMessage;
+                return noAccessMessage.getMessage();
             }
             return jwtInfo.getString("netid");
         } catch (Exception e) {
-            return noAccessMessage;
+            return noAccessMessage.getMessage();
         }
     }
 }
