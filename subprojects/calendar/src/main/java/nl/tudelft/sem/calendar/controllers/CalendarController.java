@@ -40,7 +40,7 @@ public class CalendarController {
     private transient String teacherRole = "teacher";
     private transient String studentRole = "student";
     private transient String noAccessMessage =
-            "You are not allowed to view this page. Please contact administrator.";
+        "{\"message\": \"You are not allowed to view this page. Please contact administrator.\"}";
 
     @Autowired
     private transient LectureScheduler lectureScheduler;
@@ -69,11 +69,11 @@ public class CalendarController {
     @PostMapping(path = "/scheduleLectures")
     @ResponseBody
     public ResponseEntity<?> scheduleLectures(HttpServletRequest request)
-            throws InterruptedException, IOException, JSONException {
+            throws JSONException {
 
         String validation = validateRole(request, teacherRole);
         if (validation.equals(noAccessMessage)) {
-            return ResponseEntity.ok(noAccessMessage);
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(noAccessMessage);
         }
 
         try {
@@ -98,11 +98,11 @@ public class CalendarController {
             // Schedule the lecture
             lectureScheduler.scheduleAllLectures();
 
-            return ResponseEntity.ok("Successfully scheduled lectures.");
+            return ResponseEntity.ok("{\"message\": \"Successfully scheduled lectures.\"}");
         } catch (Exception e) {
             System.out.println(e.toString());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Internal server error.");
+                    .body("{\"message\": \"Internal server error.\"}");
         }
     }
 
@@ -351,7 +351,7 @@ public class CalendarController {
                     attendanceRepository.save(a);
                 }
             }
-            return ResponseEntity.ok("Indicated absence.");
+            return ResponseEntity.ok("{\"message\": \"Indicated absence.\"}");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Could not indicated absence.");
