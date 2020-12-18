@@ -15,6 +15,8 @@ import javax.servlet.http.HttpServletRequest;
 import nl.tudelft.sem.restrictions.communication.RoomsCommunicator;
 import nl.tudelft.sem.restrictions.communication.ServerErrorException;
 import nl.tudelft.sem.restrictions.communication.Validate;
+import nl.tudelft.sem.shared.entity.IntValue;
+import nl.tudelft.sem.shared.entity.StringMessage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -40,8 +42,8 @@ class RestrictionControllerTest {
     private Room room2;
     private Room room3;
     private Room room4;
-    private transient String noAccessMessage =
-            "You are not allowed to view this page. Please contact administrator.";
+    private transient StringMessage noAccessMessage =
+        new StringMessage("You are not allowed to view this page. Please contact administrator.");
 
     private List<Room> allRooms;
     private ResponseEntity<?> ae;
@@ -66,7 +68,7 @@ class RestrictionControllerTest {
      */
     @BeforeEach
     void setUp() throws IOException, InterruptedException {
-        ae = ResponseEntity.ok("Already Exists");
+        ae = ResponseEntity.ok(new StringMessage("Already Exists"));
         fb = ResponseEntity.ok(noAccessMessage);
         this.rest1 = new Restriction();
         this.rest1.setValue(1.0f);
@@ -106,7 +108,7 @@ class RestrictionControllerTest {
         when(validate.validateRole(request, "teacher"))
                 .thenReturn("netid");
         when(validate.validateRole(wrongRequest, "teacher"))
-                .thenReturn(noAccessMessage);
+                .thenReturn(noAccessMessage.getMessage());
     }
 
     @Test
@@ -116,17 +118,17 @@ class RestrictionControllerTest {
 
     @Test
     public void addNewRestrictionSuccess() {
-        assertEquals("Saved", restrictionController.addNewRestriction("name", 3.0f));
+        assertEquals(new StringMessage("Saved"), restrictionController.addNewRestriction("name", 3.0f));
     }
 
     @Test
     public void addNewRestrictionSuccess1() {
-        assertEquals("Updated", restrictionController.addNewRestriction("test", 4.0f));
+        assertEquals(new StringMessage("Updated"), restrictionController.addNewRestriction("test", 4.0f));
     }
 
     @Test
     public void addNewRestrictionSuccess2() {
-        assertEquals("Already Exists", restrictionController.addNewRestriction("test2", 2.0f));
+        assertEquals(new StringMessage("Already Exists"), restrictionController.addNewRestriction("test2", 2.0f));
     }
 
     @Test
@@ -186,12 +188,12 @@ class RestrictionControllerTest {
 
     @Test
     void getCapacityRestriction() {
-        assertEquals(1.0f, restrictionController.getCapacityRestriction(true));
+        assertEquals(1.0f, restrictionController.getCapacityRestriction(true).getValue());
     }
 
     @Test
     void getCapacityRestriction2() {
-        assertEquals(2.0f, restrictionController.getCapacityRestriction(false));
+        assertEquals(2.0f, restrictionController.getCapacityRestriction(false).getValue());
     }
 
     @Test
@@ -201,13 +203,13 @@ class RestrictionControllerTest {
 
     @Test
     void getTimeGapLength() {
-        assertEquals(ResponseEntity.ok(1), restrictionController.getTimeGapLength());
+        assertEquals(ResponseEntity.ok(new IntValue(1)), restrictionController.getTimeGapLength());
     }
 
     @Test
     void setStartTime() throws IOException, InterruptedException {
         LocalTime st = LocalTime.ofSecondOfDay(1000);
-        assertEquals(ResponseEntity.ok("Updated"),
+        assertEquals(ResponseEntity.ok(new StringMessage("Updated")),
                 restrictionController.setStartTime(request, st));
         assertEquals(fb,
                 restrictionController.setStartTime(wrongRequest, st));
@@ -216,7 +218,7 @@ class RestrictionControllerTest {
     @Test
     void setEndTime() throws IOException, InterruptedException {
         LocalTime et = LocalTime.ofSecondOfDay(3000);
-        assertEquals(ResponseEntity.ok("Updated"),
+        assertEquals(ResponseEntity.ok(new StringMessage("Updated")),
                 restrictionController.setEndTime(request, et));
         assertEquals(fb,
                 restrictionController.setEndTime(wrongRequest, et));
@@ -224,12 +226,12 @@ class RestrictionControllerTest {
 
     @Test
     void getStartTime() {
-        assertEquals(ResponseEntity.ok(2000), restrictionController.getStartTime());
+        assertEquals(ResponseEntity.ok(new IntValue(2000)), restrictionController.getStartTime());
     }
 
     @Test
     void getEndTime() {
-        assertEquals(ResponseEntity.ok(4000), restrictionController.getEndTime());
+        assertEquals(ResponseEntity.ok(new IntValue(4000)), restrictionController.getEndTime());
     }
 
     @Test

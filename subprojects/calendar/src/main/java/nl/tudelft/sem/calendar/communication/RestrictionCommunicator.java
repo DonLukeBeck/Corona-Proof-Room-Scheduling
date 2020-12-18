@@ -6,6 +6,7 @@ import java.util.List;
 import nl.tudelft.sem.calendar.entities.Room;
 import nl.tudelft.sem.calendar.exceptions.ServerErrorException;
 import nl.tudelft.sem.calendar.util.Constants;
+import nl.tudelft.sem.shared.entity.IntValue;
 import org.springframework.stereotype.Service;
 
 
@@ -43,8 +44,7 @@ public class RestrictionCommunicator extends Communicator {
 
         var response = getResponse("/restrictions/getTimeGapLength",
                 Constants.RESTRICTION_SERVER_URL);
-        return objectMapper.readValue(response.body(), new TypeReference<>() {
-        });
+        return objectMapper.readValue(response.body(), new TypeReference<IntValue>() {}).getValue();
     }
 
     /**
@@ -60,8 +60,7 @@ public class RestrictionCommunicator extends Communicator {
 
         var response = getResponse("/restrictions/getStartTime",
                 Constants.RESTRICTION_SERVER_URL);
-        return objectMapper.readValue(response.body(), new TypeReference<>() {
-        });
+        return objectMapper.readValue(response.body(), new TypeReference<IntValue>() {}).getValue();
     }
 
     /**
@@ -77,7 +76,6 @@ public class RestrictionCommunicator extends Communicator {
 
         var response = getResponse("/restrictions/getEndTime",
                 Constants.RESTRICTION_SERVER_URL);
-        return objectMapper.readValue(response.body(), new TypeReference<>() {
-        });
+        return objectMapper.readValue(response.body(), new TypeReference<IntValue>() {}).getValue();
     }
 }
