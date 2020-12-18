@@ -193,6 +193,7 @@ public class CourseManagementController {
     /**
      * Returns the courseId given the teacher's ID.
      */
+    @SuppressWarnings("PMD.DataflowAnomalyAnalysis")  // we need to redefine result
     @GetMapping(path = "/getCourseIdForTeacher") // Map ONLY Get Requests
     public List<String> getCourseIdForTeacher(@RequestParam String teacherId) {
         List<Course> course = courseRepository.findAllByTeacherId(teacherId);
