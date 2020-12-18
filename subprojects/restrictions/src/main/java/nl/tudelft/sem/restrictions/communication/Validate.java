@@ -9,6 +9,9 @@ import org.springframework.stereotype.Service;
 @Service
 public class Validate {
 
+    static String noAccessMessage =
+        "You are not allowed to view this page. Please contact administrator.";
+
     /**
      * Helper method to validate the role of a user.
      *
@@ -20,16 +23,14 @@ public class Validate {
     public String validateRole(HttpServletRequest request, String role)
             throws JSONException, IOException, InterruptedException {
 
-        JSONObject jwtInfo = JwtValidate.jwtValidate(request);
-        String noAccessMessage =
-                "You are not allowed to view this page. Please contact administrator.";
         try {
+            JSONObject jwtInfo = JwtValidate.jwtValidate(request);
             if (!jwtInfo.getString("role").equals(role)) {
                 return noAccessMessage;
             }
+            return jwtInfo.getString("netid");
         } catch (Exception e) {
             return noAccessMessage;
         }
-        return jwtInfo.getString("netid");
     }
 }
