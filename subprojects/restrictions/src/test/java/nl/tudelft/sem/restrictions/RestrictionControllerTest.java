@@ -6,23 +6,28 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
+import java.io.IOException;
 import java.time.LocalTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.NoSuchElementException;
+import javax.servlet.http.HttpServletRequest;
+import nl.tudelft.sem.restrictions.communication.RoomsCommunicator;
+import nl.tudelft.sem.restrictions.communication.ServerErrorException;
+import nl.tudelft.sem.restrictions.communication.Validate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mockito;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ContextConfiguration;
 
-
-
 @ContextConfiguration(classes = Restriction.class)
 @AutoConfigureMockMvc
-@WebMvcTest
+@WebMvcTest(RestrictionController.class)
 // This class doesn't ever need to be serialized, so neither do it's members
 @SuppressWarnings("PMD.BeanMembersShouldSerialize")
 class RestrictionControllerTest {
@@ -35,24 +40,34 @@ class RestrictionControllerTest {
     private Room room2;
     private Room room3;
     private Room room4;
+    private transient String noAccessMessage =
+            "You are not allowed to view this page. Please contact administrator.";
 
     private List<Room> allRooms;
     private ResponseEntity<?> ae;
+    private ResponseEntity<?> fb;
+    private HttpServletRequest request;
+    private HttpServletRequest wrongRequest;
 
-    private RestrictionController restrictionController;
+    @MockBean
+    RoomsCommunicator roomsCommunicator;
 
     @MockBean
     RestrictionRepository restrictionRepository;
 
-    //    @MockBean
-    //    RoomsCommunicator roomsCommunicator;
+    @MockBean
+    Validate validate;
+
+    @InjectMocks
+    private RestrictionController restrictionController;
 
     /**
      * The initial setup before each test.
      */
     @BeforeEach
-    void setUp() {
+    void setUp() throws IOException, InterruptedException {
         ae = ResponseEntity.ok("Already Exists");
+        fb = ResponseEntity.ok(noAccessMessage);
         this.rest1 = new Restriction();
         this.rest1.setValue(1.0f);
         this.rest1.setName("test");
@@ -67,7 +82,11 @@ class RestrictionControllerTest {
         this.rest3 = new Restriction("test3", 2000.0f);
         this.rest4 = new Restriction("test4", 4000.0f);
 
-        restrictionController = new RestrictionController(restrictionRepository);
+        request = Mockito.mock(HttpServletRequest.class);
+        wrongRequest = Mockito.mock(HttpServletRequest.class);
+
+        restrictionController = new RestrictionController(restrictionRepository,
+                roomsCommunicator, validate);
         when(restrictionRepository.findByName(rest1.getName()))
                 .thenReturn(java.util.Optional.ofNullable(rest1));
         when(restrictionRepository.findByName(rest2.getName()))
@@ -84,8 +103,10 @@ class RestrictionControllerTest {
                 .thenReturn(java.util.Optional.ofNullable(rest3));
         when(restrictionRepository.findByName("endTime"))
                 .thenReturn(java.util.Optional.ofNullable(rest4));
-        //        when(roomsCommunicator.getAllRooms())
-        //                .thenReturn(allRooms);
+        when(validate.validateRole(request, "teacher"))
+                .thenReturn("netid");
+        when(validate.validateRole(wrongRequest, "teacher"))
+                .thenReturn(noAccessMessage);
     }
 
     @Test
@@ -135,29 +156,32 @@ class RestrictionControllerTest {
 
     @Test
     void getRestrictionVal2() {
-        assertThrows(NoSuchElementException.class, () -> {
-            restrictionController.getRestrictionVal("aaa");
-        });
+        assertThrows(NoSuchElementException.class,
+                () -> restrictionController.getRestrictionVal("aaa"));
     }
 
     @Test
-    void setCapacityRestriction() {
-        assertEquals(ae, restrictionController.setCapacityRestriction(true, 1.0f));
+    void setCapacityRestriction() throws IOException, InterruptedException {
+        assertEquals(ae, restrictionController.setCapacityRestriction(request, true, 1.0f));
+        assertEquals(fb, restrictionController.setCapacityRestriction(wrongRequest, true, 1.0f));
     }
 
     @Test
-    void setCapacityRestriction2() {
-        assertEquals(ae, restrictionController.setCapacityRestriction(false, 2.0f));
+    void setCapacityRestriction2() throws IOException, InterruptedException {
+        assertEquals(ae, restrictionController.setCapacityRestriction(request, false, 2.0f));
+        assertEquals(fb, restrictionController.setCapacityRestriction(wrongRequest, false, 2.0f));
     }
 
     @Test
-    void setMinSeatsBig() {
-        assertEquals(ae, restrictionController.setMinSeatsBig(2.0f));
+    void setMinSeatsBig() throws IOException, InterruptedException {
+        assertEquals(ae, restrictionController.setMinSeatsBig(request, 2.0f));
+        assertEquals(fb, restrictionController.setMinSeatsBig(wrongRequest, 2.0f));
     }
 
     @Test
-    void setTimeGapLength() {
-        assertEquals(ae, restrictionController.setTimeGapLength(1.0f));
+    void setTimeGapLength() throws IOException, InterruptedException {
+        assertEquals(ae, restrictionController.setTimeGapLength(request, 1.0f));
+        assertEquals(fb, restrictionController.setTimeGapLength(wrongRequest, 1.0f));
     }
 
     @Test
@@ -181,15 +205,21 @@ class RestrictionControllerTest {
     }
 
     @Test
-    void setStartTime() {
+    void setStartTime() throws IOException, InterruptedException {
         LocalTime st = LocalTime.ofSecondOfDay(1000);
-        assertEquals(ResponseEntity.ok("Updated"), restrictionController.setStartTime(st));
+        assertEquals(ResponseEntity.ok("Updated"),
+                restrictionController.setStartTime(request, st));
+        assertEquals(fb,
+                restrictionController.setStartTime(wrongRequest, st));
     }
 
     @Test
-    void setEndTime() {
+    void setEndTime() throws IOException, InterruptedException {
         LocalTime et = LocalTime.ofSecondOfDay(3000);
-        assertEquals(ResponseEntity.ok("Updated"), restrictionController.setEndTime(et));
+        assertEquals(ResponseEntity.ok("Updated"),
+                restrictionController.setEndTime(request, et));
+        assertEquals(fb,
+                restrictionController.setEndTime(wrongRequest, et));
     }
 
     @Test
@@ -202,15 +232,22 @@ class RestrictionControllerTest {
         assertEquals(ResponseEntity.ok(4000), restrictionController.getEndTime());
     }
 
-    //    @Test
-    //    void getRoomsAdjusted() throws InterruptedException, ServerErrorException, IOException {
-    //        Room room6 = new Room(1, "DW-1", 20);
-    //        Room room7 = new Room(2, "DW-2", 60);
-    //        Room room8 = new Room(3, "DW-3", 90);
-    //        Room room9 = new Room(4, "DW-4", 120);
-    //        List<Room> it = Arrays.asList(room6, room7, room8, room9);
-    //
-    //        assertEquals(ResponseEntity.ok(it), restrictionController.
-    //        getAllRoomsWithAdjustedCapacity());
-    //    }
+    @Test
+    void getRoomsAdjusted() throws InterruptedException, ServerErrorException, IOException {
+        when(roomsCommunicator.getAllRooms()).thenReturn(allRooms);
+        when(restrictionRepository.findByName("minSeatsBig"))
+                .thenReturn(java.util.Optional.of(new Restriction("", 200.0f)));
+        when(restrictionRepository.findByName("bigRoomMaxPercentage"))
+                .thenReturn(java.util.Optional.of(new Restriction("", 30.0f)));
+        when(restrictionRepository.findByName("smallRoomMaxPercentage"))
+                .thenReturn(java.util.Optional.of(new Restriction("", 20.0f)));
+        Room room6 = new Room(1, "DW-1", 20);
+        Room room7 = new Room(2, "DW-2", 60);
+        Room room8 = new Room(3, "DW-3", 90);
+        Room room9 = new Room(4, "DW-4", 120);
+        List<Room> it = Arrays.asList(room6, room7, room8, room9);
+
+        assertEquals(ResponseEntity.ok(it), restrictionController
+                .getAllRoomsWithAdjustedCapacity());
+    }
 }

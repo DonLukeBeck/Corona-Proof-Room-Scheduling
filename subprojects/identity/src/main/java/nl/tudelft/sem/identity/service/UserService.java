@@ -21,6 +21,13 @@ public class UserService implements UserDetailsService {
     @Autowired
     private UserRepository userRepository;
 
+    /**
+     * Method to fetch user object from the database.
+     *
+     * @param netid netid of the user to be fetched
+     * @return the user with encrypted password
+     * @throws UsernameNotFoundException - in case the user has not been found in the database
+     */
     @Override
     public UserDetails loadUserByUsername(String netid) throws UsernameNotFoundException {
 
@@ -37,6 +44,12 @@ public class UserService implements UserDetailsService {
                 .getPassword(), getGrantedAuthorities(user));
     }
 
+    /**
+     * Method to initialise authorities for users.
+     *
+     * @param user the user which the role will be extracted from
+     * @return A collection of authorities for that user
+     */
     private Collection<GrantedAuthority> getGrantedAuthorities(User user) {
 
         Collection<GrantedAuthority> grantedAuthority = new ArrayList<>();

@@ -5,31 +5,47 @@ import java.time.LocalTime;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import javax.servlet.http.HttpServletRequest;
 import nl.tudelft.sem.restrictions.communication.RoomsCommunicator;
 import nl.tudelft.sem.restrictions.communication.ServerErrorException;
+import nl.tudelft.sem.restrictions.communication.Validate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
-@Controller // This means that this class is a RestController
+@RestController // This means that this class is a RestController
 @RequestMapping(path = "/restrictions") // URL's start with /restrictions (after Application path)
 public class RestrictionController {
 
+    private transient String teacherRole = "teacher";
+    private transient String studentRole = "student";
+    private transient String noAccessMessage =
+            "You are not allowed to view this page. Please contact administrator.";
+
     @Autowired
     private transient RestrictionRepository restrictionRepository;
+
+    @Autowired
+    private transient RoomsCommunicator roomsCommunicator;
+
+    @Autowired
+    private transient Validate validate;
 
     /**
      * Initializes the repository that is being used.
      *
      * @param restrictionRepository the repository that will be used
      */
-    public RestrictionController(RestrictionRepository restrictionRepository) {
+    public RestrictionController(RestrictionRepository restrictionRepository,
+                                 RoomsCommunicator roomsCommunicator,
+                                 Validate validate) {
         this.restrictionRepository = restrictionRepository;
+        this.roomsCommunicator = roomsCommunicator;
+        this.validate = validate;
     }
 
     /**
@@ -82,8 +98,15 @@ public class RestrictionController {
      * @return a string containing the success or error message
      */
     @PostMapping(path = "/setCapacityRestriction") // Map ONLY POST Requests
-    public ResponseEntity<?> setCapacityRestriction(@RequestParam boolean bigOrSmallRoom,
-                                         @RequestParam float maxPercentageAllowed) {
+    @ResponseBody
+    public ResponseEntity<?> setCapacityRestriction(HttpServletRequest request,
+                                                    boolean bigOrSmallRoom,
+                                                    float maxPercentageAllowed) throws IOException,
+                                                    InterruptedException {
+        String validation = validate.validateRole(request, teacherRole);
+        if (validation.equals(noAccessMessage)) {
+            return ResponseEntity.ok(noAccessMessage);
+        }
         if (bigOrSmallRoom) {
             return ResponseEntity.ok(
                     addNewRestriction("bigRoomMaxPercentage", maxPercentageAllowed));
@@ -100,7 +123,14 @@ public class RestrictionController {
      * @return a string containing the success or error message
      */
     @PostMapping(path = "/setMinSeatsBig") // Map ONLY POST Requests
-    public ResponseEntity<?> setMinSeatsBig(@RequestParam float numberOfSeats) {
+    @ResponseBody
+    public ResponseEntity<?> setMinSeatsBig(HttpServletRequest request,
+                                            float numberOfSeats) throws IOException,
+                                            InterruptedException {
+        String validation = validate.validateRole(request, teacherRole);
+        if (validation.equals(noAccessMessage)) {
+            return ResponseEntity.ok(noAccessMessage);
+        }
         return ResponseEntity.ok(addNewRestriction("minSeatsBig", numberOfSeats));
     }
 
@@ -111,7 +141,15 @@ public class RestrictionController {
      * @return a string containing the success or error message
      */
     @PostMapping(path = "/setTimeGapLength") // Map ONLY POST Requests
-    public ResponseEntity<?> setTimeGapLength(@RequestParam float gapTimeInMinutes) {
+    @ResponseBody
+    public ResponseEntity<?> setTimeGapLength(HttpServletRequest request,
+                                              float gapTimeInMinutes) throws IOException,
+                                              InterruptedException {
+        String validation = validate.validateRole(request, teacherRole);
+        if (validation.equals(noAccessMessage)) {
+            return ResponseEntity.ok(noAccessMessage);
+        }
+
         return ResponseEntity.ok(addNewRestriction("gapTimeInMinutes", gapTimeInMinutes));
     }
 
@@ -121,7 +159,7 @@ public class RestrictionController {
      * @param bigOrSmallRoom boolean representing if the parameter is for big (1) or small (0) rooms
      * @return a string containing the success or error message
      */
-    public int getCapacityRestriction(@RequestParam boolean bigOrSmallRoom) {
+    public int getCapacityRestriction(boolean bigOrSmallRoom) {
         if (bigOrSmallRoom) {
             return (int) getRestrictionVal("bigRoomMaxPercentage");
         } else {
@@ -156,7 +194,14 @@ public class RestrictionController {
      * @return a string containing the success or error message
      */
     @PostMapping(path = "/setStartTime") // Map ONLY POST Requests
-    public ResponseEntity<?> setStartTime(@RequestParam LocalTime startTime) {
+    @ResponseBody
+    public ResponseEntity<?> setStartTime(HttpServletRequest request,
+                                          LocalTime startTime)
+            throws IOException, InterruptedException {
+        String validation = validate.validateRole(request, teacherRole);
+        if (validation.equals(noAccessMessage)) {
+            return ResponseEntity.ok(noAccessMessage);
+        }
         return ResponseEntity.ok(addNewRestriction("startTime", (float) startTime.toSecondOfDay()));
     }
 
@@ -167,7 +212,15 @@ public class RestrictionController {
      * @return a string containing the success or error message
      */
     @PostMapping(path = "/setEndTime") // Map ONLY POST Requests
-    public ResponseEntity<?> setEndTime(@RequestParam LocalTime endTime) {
+    @ResponseBody
+    public ResponseEntity<?> setEndTime(HttpServletRequest request,
+                                        LocalTime endTime) throws IOException,
+                                        InterruptedException {
+        String validation = validate.validateRole(request, teacherRole);
+        if (validation.equals(noAccessMessage)) {
+            return ResponseEntity.ok(noAccessMessage);
+        }
+
         return ResponseEntity.ok(addNewRestriction("endTime", (float) endTime.toSecondOfDay()));
     }
 
@@ -202,7 +255,7 @@ public class RestrictionController {
     @ResponseBody
     public ResponseEntity<?> getAllRoomsWithAdjustedCapacity()
             throws InterruptedException, ServerErrorException, IOException {
-        List<Room> it = RoomsCommunicator.getAllRooms();
+        List<Room> it = roomsCommunicator.getAllRooms();
         for (Room r : it) {
             int cap = r.getCapacity();
             if (cap >= getMinSeatsBig()) {
@@ -213,5 +266,7 @@ public class RestrictionController {
         }
         return ResponseEntity.ok(it);
     }
+
+
 }
 

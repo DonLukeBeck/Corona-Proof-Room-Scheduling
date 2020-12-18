@@ -1,5 +1,18 @@
 package nl.tudelft.sem.courses;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import java.io.IOException;
+import java.net.http.HttpClient;
+import java.sql.Date;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import nl.tudelft.sem.courses.controller.CourseManagementController;
 import nl.tudelft.sem.courses.entity.Course;
 import nl.tudelft.sem.courses.entity.Enrollment;
@@ -72,15 +85,13 @@ public class CourseManagementControllerTest {
      */
     @BeforeEach
     void setUp() throws IOException, InterruptedException {
-        String courseId = "CSE1200";
-        String courseName = "OOPP";
-        String teacherId = "Andy";
-
         this.request = mock(HttpServletRequest.class);
         this.response = mock(HttpServletResponse.class);
         this.client = mock(HttpClient.class);
         //this.jwt = mock(JwtValidate.class);
         //this.courseManagementController = mock(CourseManagementController.class);
+
+        String courseId = "CSE1200";
 
         this.enrollment = new Enrollment();
         enrollment.setCourseId(courseId);
@@ -89,6 +100,9 @@ public class CourseManagementControllerTest {
         enrollments.add(enrollment);
         participants = new ArrayList<>();
         participants.add(enrollment.getStudentId());
+
+        String courseName = "OOPP";
+        String teacherId = "Andy";
 
         this.addcourse = new AddCourse(courseId, courseName, teacherId, participants);
         this.course = new Course();
@@ -107,7 +121,8 @@ public class CourseManagementControllerTest {
         lectures.add(lecture);
 
         courseManagementController =
-                new CourseManagementController(courseRepository, enrollmentRepository, lectureRepository);
+                new CourseManagementController(courseRepository,
+                        enrollmentRepository, lectureRepository);
         when(courseRepository.findByCourseId(course.getCourseId())).thenReturn(course);
         when(courseRepository.findByCourseName(course.getCourseName())).thenReturn(course);
         when(courseRepository.findByTeacherId(course.getTeacherId())).thenReturn(course);
@@ -115,9 +130,16 @@ public class CourseManagementControllerTest {
         when(enrollmentRepository.findByCourseId(course.getCourseId())).thenReturn(enrollments);
 
         when(lectureRepository.findByCourseId(course.getCourseId())).thenReturn(lectures);
-        when(lectureRepository.findByCourseIdAndScheduledDate(course.getCourseId(), Date.valueOf(localDate.plusDays(1)))).thenReturn(lecture);
+        when(lectureRepository.findByCourseIdAndScheduledDate(course.getCourseId(),
+                Date.valueOf(localDate.plusDays(1)))).thenReturn(lecture);
 
-        when(request.getHeader("Authorization")).thenReturn("Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJsdWthIiwic2NvcGUiOlt7ImF1dGhvcml0eSI6IlJPTEVfVEVBQ0hFUiJ9XSwiZXhwIjoxNjA4MDQ2MTM2LCJpYXQiOjE2MDgwNDI1MzZ9.1Pn1WnHIsa6YHIGqmnCPogfmvPqwXIjpwuhotzk6SnU"); //????
+        when(request.getHeader("Authorization"))
+                .thenReturn("Bearer"
+                        + " eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9."
+                        + "eyJzdWIiOiJsdWthIiwic2NvcGUiOlt7ImF1dGhvcml0"
+                        + "eSI6IlJPTEVfVEVBQ0hFUiJ9XSwiZXhwIjoxNjA4MDQ2MTM2LCJ"
+                        + "pYXQiOjE2MDgwNDI1MzZ9.1Pn1WnHIsa6YHIGqmnCPogfmvPqwXI"
+                        + "jpwuhotzk6SnU"); //????
 
         JSONObject obj = new JSONObject();
         obj.put("role", "teacher");
@@ -173,12 +195,14 @@ public class CourseManagementControllerTest {
 
     @Test
     void getCourseFail() {
-        assertEquals(null, courseManagementController.getCourse("RandomNumber"));
+        assertEquals(null, courseManagementController
+                .getCourse("RandomNumber"));
     }
 
     @Test
     void getCourseParticipantsSuccess() {
-        for (String i : courseManagementController.getCourseParticipants(enrollment.getCourseId())) {
+        for (String i : courseManagementController
+                .getCourseParticipants(enrollment.getCourseId())) {
             Enrollment e = new Enrollment();
             e.setCourseId(enrollment.getCourseId());
             e.setStudentId(i);
@@ -189,17 +213,20 @@ public class CourseManagementControllerTest {
     @Test
     void getCourseParticipantsFail() {
         enrollment.setCourseId("randomCourseIdFail");
-        assertEquals(0, courseManagementController.getCourseParticipants(enrollment.getCourseId()).size());
+        assertEquals(0, courseManagementController
+                .getCourseParticipants(enrollment.getCourseId()).size());
     }
 
     @Test
     void getCourseIdForTeacherSuccess() {
-        assertEquals(course.getCourseId(), courseManagementController.getCourseIdForTeacher(course.getTeacherId()));
+        assertEquals(course.getCourseId(), courseManagementController
+                .getCourseIdForTeacher(course.getTeacherId()));
     }
 
     @Test
     void getCourseIdForTeacherFail() {
-        assertEquals(errorMessage, courseManagementController.getCourseIdForTeacher("Random Teacher"));
+        assertEquals(errorMessage, courseManagementController
+                .getCourseIdForTeacher("Random Teacher"));
     }
 
     @Test
@@ -210,8 +237,10 @@ public class CourseManagementControllerTest {
     @Test
     void planNewLectureFail() {
         addlecture.setCourseId("randomCourseIdFail");
-        assertEquals("The course with id randomCourseIdFail does not exist.", courseManagementController.planNewLecture(addlecture));
-        assertEquals("The course with id " + addlecture.getCourseId()  + " does not exist.", courseManagementController.planNewLecture(addlecture));
+        assertEquals("The course with id randomCourseIdFail does not exist.",
+                courseManagementController.planNewLecture(addlecture));
+        assertEquals("The course with id " + addlecture.getCourseId() + " does not exist.",
+                courseManagementController.planNewLecture(addlecture));
     }
 
     @Test
@@ -223,8 +252,12 @@ public class CourseManagementControllerTest {
 
     @Test
     void cancelLectureFail() {
-        assertEquals(errorMessage, courseManagementController.cancelLecture("randomCourseIdFail", localDate));
+        assertEquals(errorMessage, courseManagementController
+                .cancelLecture("randomCourseIdFail", localDate));
+
         localDate = LocalDate.of(1985, 1, 8);
-        assertEquals(errorMessage, courseManagementController.cancelLecture(lecture.getCourseId(), localDate));
+
+        assertEquals(errorMessage, courseManagementController
+                .cancelLecture(lecture.getCourseId(), localDate));
     }
 }
