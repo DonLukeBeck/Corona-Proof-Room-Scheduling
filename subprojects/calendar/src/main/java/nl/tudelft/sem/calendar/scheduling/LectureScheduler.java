@@ -93,14 +93,16 @@ public class LectureScheduler {
             List<Lecture> toScheduleThisDay = getSortedLecturesForDay(date, lecturesByDay);
             for (Lecture toBeScheduled : toScheduleThisDay) {
 
+                //checkstyle complains about the distance between the variable and its first usage
+                //however, we cannot use it after the calls below because the method will fail
+                int capacity = assignRoom(toBeScheduled, toBeScheduled.getDurationInMinutes());
+
                 // solve a time conversion issue by adding an hour to the time before export
                 toBeScheduled.setStartTime(toBeScheduled.getStartTime().plusHours(1));
                 toBeScheduled.setEndTime(toBeScheduled.getEndTime().plusHours(1));
 
                 // save lecture in database and update it with a version including an id
                 toBeScheduled = lectureRepository.saveAndFlush(toBeScheduled);
-
-                int capacity = assignRoom(toBeScheduled, toBeScheduled.getDurationInMinutes());
 
                 // then assign students to this lecture with id
                 assignStudents(capacity, toBeScheduled, allParticipants);
