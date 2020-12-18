@@ -16,6 +16,7 @@ import nl.tudelft.sem.courses.util.JwtValidate;
 import nl.tudelft.sem.shared.entity.AddCourse;
 import nl.tudelft.sem.shared.entity.AddLecture;
 import nl.tudelft.sem.shared.entity.BareCourse;
+import nl.tudelft.sem.shared.entity.StringMessage;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,7 +47,7 @@ public class CourseManagementController {
     @Autowired
     private transient LectureRepository lectureRepository;
 
-    private transient String errorMessage = "{\"message\": \"Error\"}";
+    private transient String errorMessage = "Error";
     private transient JwtValidate jwtValidate = new JwtValidate();
 
     /**
@@ -121,18 +122,18 @@ public class CourseManagementController {
         try {
             if (!jwtInfo.getString("role").equals("teacher")) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body(
-                    stringToJsonMessage("You are not allowed to create a course. Please contact administrator."));
+                    new StringMessage("You are not allowed to create a course. Please contact administrator."));
             }
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(
-                stringToJsonMessage("You are not allowed to create a course. Please contact administrator."));
+                new StringMessage("You are not allowed to create a course. Please contact administrator."));
         }
 
         Course r = courseRepository.findByCourseId(addCourse.getCourseId());
         try {
             if (r.getCourseId().equals(addCourse.getCourseId())) {
                 return ResponseEntity.status(HttpStatus.CONFLICT).body(
-                    stringToJsonMessage("Already Exists"));
+                    new StringMessage("Already Exists"));
             }
             return null;
         } catch (Exception e) {
@@ -148,7 +149,7 @@ public class CourseManagementController {
             course.setCourseId(addCourse.getCourseId());
             course.setTeacherId(addCourse.getTeacherId());
             courseRepository.save(course);
-            return ResponseEntity.ok(stringToJsonMessage("Saved"));
+            return ResponseEntity.ok(new StringMessage("Saved"));
         }
     }
 
@@ -156,18 +157,18 @@ public class CourseManagementController {
      * Deletes a new course with provided parameters.
      */
     @DeleteMapping(path = "/deleteCourse") // Map ONLY POST Requests
-    public String deleteCourse(@RequestParam String courseId) {
+    public StringMessage deleteCourse(@RequestParam String courseId) {
         Course r = courseRepository.findByCourseId(courseId);
         if (r == null) {
-            return errorMessage;
+            return new StringMessage(errorMessage);
         }
 
         if (r.getCourseId().equals(courseId)) {
             courseRepository.delete(r);
-            return stringToJsonMessage("Course Deleted");
+            return new StringMessage("Course Deleted");
         }
 
-        return errorMessage;
+        return new StringMessage(errorMessage);
     }
 
     /**
@@ -198,12 +199,12 @@ public class CourseManagementController {
      * Returns the courseId given the teacher's ID.
      */
     @GetMapping(path = "/getCourseIdForTeacher") // Map ONLY Get Requests
-    public String getCourseIdForTeacher(@RequestParam String teacherId) {
+    public StringMessage getCourseIdForTeacher(@RequestParam String teacherId) {
         Course course = courseRepository.findByTeacherId(teacherId);
         if (course == null) {
-            return errorMessage;
+            return new StringMessage(errorMessage);
         }
-        return stringToJsonMessage(course.getCourseId());
+        return new StringMessage(course.getCourseId());
     }
 
     /**
@@ -213,16 +214,16 @@ public class CourseManagementController {
     @SuppressWarnings("PMD.DataflowAnomalyAnalysis")
     // Found 'DD'-anomaly for variable 'lectureId' (lines '96'-'98').
     // -> correct since we need to count
-    public String planNewLecture(@RequestBody AddLecture addLecture) {
+    public StringMessage planNewLecture(@RequestBody AddLecture addLecture) {
         if (courseRepository.findByCourseId(addLecture.getCourseId()) != null) {
             Lecture lecture = new Lecture();
             lecture.setCourseId(addLecture.getCourseId());
             lecture.setDuration(addLecture.getDurationInMinutes());
             lecture.setScheduledDate(addLecture.getDate());
             lectureRepository.save(lecture);
-            return stringToJsonMessage("nl.tudelft.sem.shared.entity.Lecture added");
+            return new StringMessage("nl.tudelft.sem.shared.entity.Lecture added");
         } else {
-            return stringToJsonMessage("The course with id " + addLecture.getCourseId() +
+            return new StringMessage("The course with id " + addLecture.getCourseId() +
                 " does not exist.");
         }
     }
@@ -231,20 +232,16 @@ public class CourseManagementController {
      * Cancels a lecture with provided arguments.
      */
     @DeleteMapping(path = "/cancelLecture") // Map ONLY POST Requests
-    public String cancelLecture(@RequestParam String courseId, @RequestParam @DateTimeFormat(
+    public StringMessage cancelLecture(@RequestParam String courseId, @RequestParam @DateTimeFormat(
             iso = DateTimeFormat.ISO.DATE) LocalDate date) {
         // We need to add one day since Spring of MariaDB or something matches against one day off
         Date sqlDate = Date.valueOf(date.plusDays(1));
         Lecture lecture = lectureRepository.findByCourseIdAndScheduledDate(courseId, sqlDate);
         if (lecture == null) {
-            return errorMessage;
+            return new StringMessage(errorMessage);
         }
         lectureRepository.delete(lecture);
-        return stringToJsonMessage("nl.tudelft.sem.shared.entity.Lecture deleted");
-    }
-
-    private String stringToJsonMessage(String s) {
-        return "{\"message\": \"" + s + "\"}";
+        return new StringMessage("nl.tudelft.sem.shared.entity.Lecture deleted");
     }
 
 }

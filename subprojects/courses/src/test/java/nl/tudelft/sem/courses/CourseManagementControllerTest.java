@@ -3,6 +3,7 @@ package nl.tudelft.sem.courses;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -25,6 +26,7 @@ import nl.tudelft.sem.courses.repository.EnrollmentRepository;
 import nl.tudelft.sem.courses.repository.LectureRepository;
 import nl.tudelft.sem.courses.util.JwtValidate;
 import nl.tudelft.sem.shared.entity.AddCourse;
+import nl.tudelft.sem.shared.entity.StringMessage;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -50,7 +52,7 @@ public class CourseManagementControllerTest {
     private List<String> participants;
     private List<Enrollment> enrollments;
     private List<Lecture> lectures;
-    private String errorMessage = "{\"message\": \"Error\"}";
+    private StringMessage errorMessage = new StringMessage("Error");
 
     private CourseManagementController courseManagementController;
 
@@ -160,7 +162,7 @@ public class CourseManagementControllerTest {
     @Test
     void deleteCourseSuccess() {
         assertThat(courseManagementController.deleteCourse(course.getCourseId()))
-            .contains("Deleted");
+            .isEqualTo(new StringMessage("Course Deleted"));
     }
 
     @Test
@@ -175,8 +177,7 @@ public class CourseManagementControllerTest {
 
     @Test
     void getCourseFail() {
-        assertEquals(null, courseManagementController
-                .getCourse("RandomNumber"));
+        assertNull(courseManagementController.getCourse("RandomNumber"));
     }
 
     @Test
@@ -200,7 +201,7 @@ public class CourseManagementControllerTest {
     @Test
     void getCourseIdForTeacherSuccess() {
         assertThat(courseManagementController.getCourseIdForTeacher(course.getTeacherId()))
-            .contains(course.getCourseId());
+            .isEqualTo(new StringMessage(course.getCourseId()));
     }
 
     @Test
@@ -211,14 +212,16 @@ public class CourseManagementControllerTest {
 
     @Test
     void planNewLectureSuccess() {
-        assertThat(courseManagementController.planNewLecture(addlecture)).contains("nl.tudelft.sem.shared.entity.Lecture added");
+        assertThat(courseManagementController.planNewLecture(addlecture))
+            .isEqualTo(new StringMessage("nl.tudelft.sem.shared.entity.Lecture added"));
     }
 
     @Test
     void planNewLectureFail() {
         addlecture.setCourseId("randomCourseIdFail");
         assertThat(courseManagementController.planNewLecture(addlecture))
-            .contains("The course with id " + addlecture.getCourseId() + " does not exist.");
+            .isEqualTo(new StringMessage("The course with id "
+                + addlecture.getCourseId() + " does not exist."));
     }
 
     @Test
@@ -226,17 +229,17 @@ public class CourseManagementControllerTest {
         // the method cancelLecture does not work
         // Uncomment line below if method is fixed
         assertThat(courseManagementController.cancelLecture(lecture.getCourseId(), localDate))
-            .contains("nl.tudelft.sem.shared.entity.Lecture deleted");
+            .isEqualTo(new StringMessage("nl.tudelft.sem.shared.entity.Lecture deleted"));
     }
 
     @Test
     void cancelLectureFail() {
         assertThat(courseManagementController.cancelLecture("randomCourseIdFail", localDate))
-            .contains(errorMessage);
+            .isEqualTo(errorMessage);
 
         localDate = LocalDate.of(1985, 1, 8);
 
         assertThat(courseManagementController.cancelLecture(lecture.getCourseId(), localDate))
-            .contains(errorMessage);
+            .isEqualTo(errorMessage);
     }
 }
