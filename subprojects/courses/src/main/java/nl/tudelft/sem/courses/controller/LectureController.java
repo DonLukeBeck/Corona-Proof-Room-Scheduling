@@ -1,5 +1,6 @@
 package nl.tudelft.sem.courses.controller;
 
+import java.io.IOException;
 import java.sql.Date;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -7,6 +8,8 @@ import java.time.ZoneId;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import nl.tudelft.sem.courses.util.Validate;
 import nl.tudelft.sem.shared.entity.AddLecture;
 import nl.tudelft.sem.shared.entity.BareLecture;
 import nl.tudelft.sem.courses.entity.Lecture;
@@ -26,22 +29,43 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
+
 @RestController
 @RequestMapping(path = "/lecture")
-public class LectureController extends Controller {
+public class LectureController {
     @Autowired
     private transient CourseRepository courseRepository;
 
     @Autowired
     private transient LectureRepository lectureRepository;
 
+    @Autowired
+    private transient Validate validate;
+
+    private transient String teacherRole = "teacher";
+    protected transient String noAccessMessage = "You are not allowed to view this page. Please contact administrator.";
+
     /**
      * Instantiates repository needed.
      */
     public LectureController(CourseRepository courseRepository,
-                                      LectureRepository lectureRepository) {
+                                      LectureRepository lectureRepository, Validate validate) {
         this.courseRepository = courseRepository;
         this.lectureRepository = lectureRepository;
+        this.validate = validate;
+    }
+
+    public CourseRepository getCourseRepository() {
+        return courseRepository;
+    }
+
+    public LectureRepository getLectureRepository() {
+        return lectureRepository;
+    }
+
+    public Validate getValidate() {
+        return validate;
     }
 
     /**
@@ -65,9 +89,10 @@ public class LectureController extends Controller {
     @ResponseBody
     public ResponseEntity<?> getLecturesAfterDate(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
-        return ResponseEntity.ok(bareFromLecture(lectureRepository.findAll().stream()
-            .filter(l -> date.isBefore(l.getScheduledDate().toLocalDate())))
-            .collect(Collectors.toList()));
+        Date sqlDate = Date.valueOf(date);
+        return ResponseEntity.ok(bareFromLecture(
+                lectureRepository.findByScheduledDateAfter(sqlDate).stream()).collect(Collectors.toList()));
+
     }
 
     /**
@@ -90,9 +115,13 @@ public class LectureController extends Controller {
     @SuppressWarnings("PMD.DataflowAnomalyAnalysis")
     // Found 'DD'-anomaly for variable 'lectureId' (lines '96'-'98').
     // -> correct since we need to count
-    public ResponseEntity<?> planNewLecture(@RequestBody AddLecture addLecture)
-            throws JSONException {
-        System.out.println("1");
+    public ResponseEntity<?> planNewLecture(HttpServletRequest request , @RequestBody AddLecture addLecture)
+            throws JSONException, IOException, InterruptedException {
+        String validation = validate.validateRole(request, teacherRole);
+        if (validation.equals(noAccessMessage)) {
+            return ResponseEntity.ok(new Message(noAccessMessage));
+        }
+            System.out.println("1");
         if (courseRepository.findByCourseId(addLecture.getCourseId()) != null) {
             Lecture lecture = new Lecture();
             lecture.setCourseId(addLecture.getCourseId());
@@ -112,9 +141,15 @@ public class LectureController extends Controller {
      * Cancels a lecture with provided arguments.
      */
     @DeleteMapping(path = "/cancelLecture") // Map ONLY POST Requests
-    public ResponseEntity<?> cancelLecture(@RequestParam String courseId, @RequestParam @DateTimeFormat(
-            iso = DateTimeFormat.ISO.DATE) LocalDate date) throws JSONException {
-        // We need to add one day since Spring of MariaDB or something matches against one day off
+    public ResponseEntity<?> cancelLecture(HttpServletRequest request, @RequestParam String courseId, @RequestParam @DateTimeFormat(
+            iso = DateTimeFormat.ISO.DATE) LocalDate date) throws JSONException, IOException, InterruptedException {
+
+        String validation = validate.validateRole(request, teacherRole);
+        if (validation.equals(noAccessMessage)) {
+            return ResponseEntity.ok(new Message(noAccessMessage));
+        }
+
+            // We need to add one day since Spring of MariaDB or something matches against one day off
         Date sqlDate = Date.valueOf(date.plusDays(1));
         List<Lecture> lectures = lectureRepository.findByCourseIdAndScheduledDate(courseId, sqlDate);
         if (lectures.size() == 0) {

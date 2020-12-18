@@ -1,7 +1,5 @@
 package nl.tudelft.sem.courses.controller;
 
-import nl.tudelft.sem.shared.entity.AddCourse;
-import nl.tudelft.sem.shared.entity.AddLecture;
 import nl.tudelft.sem.shared.entity.BareLecture;
 import nl.tudelft.sem.courses.entity.Course;
 import nl.tudelft.sem.courses.entity.Enrollment;
@@ -10,15 +8,12 @@ import nl.tudelft.sem.courses.repository.CourseRepository;
 import nl.tudelft.sem.courses.repository.EnrollmentRepository;
 import nl.tudelft.sem.courses.repository.LectureRepository;
 import org.json.JSONException;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
-
-import java.io.IOException;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -98,7 +93,6 @@ public class EnrollmentControllerTest {
         when(lectureRepository.findByCourseId(course.getCourseId())).thenReturn(lectures);
         when(lectureRepository.findByCourseIdAndScheduledDate(course.getCourseId(),
                 Date.valueOf(localDate.plusDays(1)))).thenReturn(List.of(lecture));
-        when(lectureRepository.findByScheduledDateAfter(sqldt)).thenReturn(lectures);
     }
 
     @Test
@@ -112,9 +106,10 @@ public class EnrollmentControllerTest {
                 enrollmentController.getAllEnrollments().getBody());
     }
 
-    @Test
-    void getEnrollmentsByCourseTest() {
-        assertEquals(enrollmentRepository.findByCourseId(course.getCourseId()),
-                enrollmentController.getEnrollmentsByCourse(course.getCourseId()).getBody());
+
+        @Test
+        void getEnrollmentsByCourseTest () {
+            assertEquals(enrollmentRepository.findByCourseId(course.getCourseId()),
+                    enrollmentController.getEnrollmentsByCourse(course.getCourseId()).getBody());
+        }
     }
-}
