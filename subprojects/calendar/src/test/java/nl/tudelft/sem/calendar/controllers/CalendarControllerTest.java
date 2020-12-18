@@ -174,9 +174,10 @@ class CalendarControllerTest {
         .thenReturn(lecturesToSchedule.get(0));
         when(lectureRepository.findByLectureId(lecturesToSchedule.get(1).getLectureId()))
         .thenReturn(lecturesToSchedule.get(1));
-
         when(lectureRepository.findByCourseId(lecturesToSchedule.get(1).getCourseId()))
                 .thenReturn(Arrays.asList(lecturesToSchedule.get(1)));
+        when(lectureRepository.findByDate(dates[0].plusDays(1)))
+                .thenReturn(Arrays.asList(lecturesToSchedule.get(0), lecturesToSchedule.get(1)));
 
         when(roomCommunicator.getRoomName(lecturesToSchedule.get(0).getLectureId()))
         .thenReturn(lecturesToSchedule.get(0).getRoomName());
@@ -239,7 +240,6 @@ class CalendarControllerTest {
         verify(roomCommunicator, times(1)).getRoomName(lecturesToSchedule.get(1).getLectureId());
     }
 
-
     @Test
     void testGetMyPersonalScheduleStudentAccessDenied()
             throws InterruptedException, ServerErrorException, IOException {
@@ -253,7 +253,6 @@ class CalendarControllerTest {
         List<Lecture> lectureList = new ArrayList<>();
         assertEquals(ResponseEntity.ok(lectureList),
                         calendarController.getMyPersonalScheduleTeacher(teacherRequest));
-
     }
 
     @Test
@@ -266,11 +265,20 @@ class CalendarControllerTest {
     @Test
     void testGetMyPersonalScheduleForDayStudentSuccess()
                 throws InterruptedException, ServerErrorException, IOException {
-        //ResponseEntity<List<Lecture>> result =
-        //(ResponseEntity<List<Lecture>>) calendarController.getMyPersonalScheduleForDayStudent(studentRequest, dates[0]);
-           //                                                assertEquals(2, Objects.requireNonNull(result.getBody()).size());
 
+        ResponseEntity<List<Lecture>> result =
+        (ResponseEntity<List<Lecture>>) calendarController.getMyPersonalScheduleForDayStudent(studentRequest, dates[0]);
+        assertEquals(2, Objects.requireNonNull(result.getBody()).size());
 
+        assertTrue(result.getBody().get(1).isSelectedForOnCampus());
+        assertFalse(result.getBody().get(0).isSelectedForOnCampus());
+
+        assertEquals(lecturesToSchedule.get(0).getRoomName(), result.getBody().get(0).getRoomName());
+        assertEquals(lecturesToSchedule.get(1).getRoomName() , result.getBody().get(1).getRoomName());
+
+        verify(lectureRepository, times(1)).findByDate(dates[0].plusDays(1));
+        verify(roomCommunicator, times(1)).getRoomName(lecturesToSchedule.get(0).getLectureId());
+        verify(roomCommunicator, times(1)).getRoomName(lecturesToSchedule.get(1).getLectureId());
     }
 
     @Test
@@ -328,6 +336,7 @@ class CalendarControllerTest {
 
     @Test
     void testIndicateAbsenceSuccess() {
+
     }
 
     @Test
