@@ -1,4 +1,4 @@
-package nl.tudelft.sem.courses;
+package nl.tudelft.sem.courses.controller;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import nl.tudelft.sem.courses.controller.CourseManagementController;
+import nl.tudelft.sem.courses.entity.Message;
 import nl.tudelft.sem.shared.entity.AddCourse;
 import nl.tudelft.sem.shared.entity.AddLecture;
 import nl.tudelft.sem.courses.entity.Course;
@@ -23,21 +23,21 @@ import nl.tudelft.sem.courses.repository.CourseRepository;
 import nl.tudelft.sem.courses.repository.EnrollmentRepository;
 import nl.tudelft.sem.courses.repository.LectureRepository;
 import nl.tudelft.sem.courses.util.JwtValidate;
-import nl.tudelft.sem.shared.entity.AddCourse;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ContextConfiguration;
 
-@ContextConfiguration(classes = CourseManagementController.class)
+@ContextConfiguration(classes = CourseController.class)
 @AutoConfigureMockMvc
 @WebMvcTest
 // This class doesn't ever need to be serialized, so neither do it's members
 @SuppressWarnings("PMD.BeanMembersShouldSerialize")
-public class CourseManagementControllerTest {
+public class CourseControllerTest {
 
     private AddCourse addcourse;
     private Course course;
@@ -52,7 +52,7 @@ public class CourseManagementControllerTest {
     private String errorMessage = "Error";
     private List<Course> courses;
 
-    private CourseManagementController courseManagementController;
+    private CourseController courseController;
 
     private static HttpClient client;
     private HttpServletRequest request;
@@ -109,9 +109,9 @@ public class CourseManagementControllerTest {
         lectures = new ArrayList<>();
         lectures.add(lecture);
 
-        courseManagementController =
-                new CourseManagementController(courseRepository,
-                        enrollmentRepository, lectureRepository);
+        courseController =
+                new CourseController(courseRepository,
+                        enrollmentRepository);
         when(courseRepository.findByCourseId(course.getCourseId())).thenReturn(course);
         when(courseRepository.findByCourseName(course.getCourseName())).thenReturn(course);
         when(courseRepository.findAllByTeacherId(course.getTeacherId())).thenReturn(courses);
@@ -140,7 +140,7 @@ public class CourseManagementControllerTest {
 
     @Test
     public void constructorNotNull() {
-        assertNotNull(courseManagementController);
+        assertNotNull(courseController);
     }
 
     //    @Test
@@ -162,32 +162,34 @@ public class CourseManagementControllerTest {
 
     @Test
     void deleteCourseSuccess() {
-        assertEquals("Deleted",
-                courseManagementController.deleteCourse(course.getCourseId()));
+        assertEquals(ResponseEntity.ok(new Message("Course deleted.")),
+                courseController.deleteCourse(course.getCourseId()));
     }
 
     @Test
     void deleteCourseFail() {
-        assertEquals(errorMessage,
-                courseManagementController.deleteCourse("RandomNumber"));
+        assertEquals(ResponseEntity.notFound().build(),
+                courseController.deleteCourse("RandomNumber"));
     }
 
 
     @Test
     void getCourseSuccess() {
-        assertEquals(course, courseManagementController.getCourse(course.getCourseId()));
+        assertEquals(course, courseController.getCourse(course.getCourseId()).getBody());
     }
 
     @Test
     void getCourseFail() {
-        assertEquals(null, courseManagementController
+        assertEquals(ResponseEntity.notFound().build(), courseController
                 .getCourse("RandomNumber"));
     }
 
     @Test
     void getCourseParticipantsSuccess() {
-        for (String i : courseManagementController
-                .getCourseParticipants(enrollment.getCourseId())) {
+        List<String> part = (List) courseController
+                .getCourseParticipants(enrollment.getCourseId()).getBody();
+
+        for (String i : part) {
             Enrollment e = new Enrollment();
             e.setCourseId(enrollment.getCourseId());
             e.setStudentId(i);
@@ -198,54 +200,23 @@ public class CourseManagementControllerTest {
     @Test
     void getCourseParticipantsFail() {
         enrollment.setCourseId("randomCourseIdFail");
-        assertEquals(0, courseManagementController
-                .getCourseParticipants(enrollment.getCourseId()).size());
+        List<String> part = (List) courseController
+                .getCourseParticipants(enrollment.getCourseId()).getBody();
+        assertEquals(0, part.size());
     }
 
     @Test
     void getCourseIdForTeacherSuccess() {
+        List<Course> t = (List) courseController
+                .getCoursesForTeacher(course.getTeacherId()).getBody();
         for (Course c : courses) {
-            assert(courseManagementController
-                    .getCourseIdForTeacher(course.getTeacherId()).contains(c.getCourseId()));
+            assert(t.contains(c));
         }
     }
 
     @Test
     void getCourseIdForTeacherFail() {
-        assertEquals(null, courseManagementController
-                .getCourseIdForTeacher("Random Teacher"));
-    }
-
-    @Test
-    void planNewLectureSuccess() {
-        assertEquals("nl.tudelft.sem.shared.entity.Lecture added", courseManagementController.planNewLecture(addlecture));
-    }
-
-    @Test
-    void planNewLectureFail() {
-        addlecture.setCourseId("randomCourseIdFail");
-        assertEquals("The course with id randomCourseIdFail does not exist.",
-                courseManagementController.planNewLecture(addlecture));
-        assertEquals("The course with id " + addlecture.getCourseId() + " does not exist.",
-                courseManagementController.planNewLecture(addlecture));
-    }
-
-    @Test
-    void cancelLectureSuccess() {
-        // the method cancelLecture does not work
-        // Uncomment line below if method is fixed
-        assertEquals("nl.tudelft.sem.shared.entity.Lecture deleted", courseManagementController
-                .cancelLecture(lecture.getCourseId(), localDate));
-    }
-
-    @Test
-    void cancelLectureFail() {
-        assertEquals("nl.tudelft.sem.shared.entity.Lecture deleted", courseManagementController
-                .cancelLecture("randomCourseIdFail", localDate));
-
-        localDate = LocalDate.of(1985, 1, 8);
-
-        assertEquals("nl.tudelft.sem.shared.entity.Lecture deleted", courseManagementController
-                .cancelLecture(lecture.getCourseId(), localDate));
+        assertEquals(ResponseEntity.ok(new ArrayList()), courseController
+                .getCoursesForTeacher("Random Teacher"));
     }
 }

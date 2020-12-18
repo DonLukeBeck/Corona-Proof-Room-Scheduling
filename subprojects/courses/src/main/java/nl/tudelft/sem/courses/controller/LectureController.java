@@ -7,18 +7,16 @@ import java.time.ZoneId;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import nl.tudelft.sem.shared.entity.AddLecture;
+import nl.tudelft.sem.shared.entity.BareLecture;
 import nl.tudelft.sem.courses.entity.Lecture;
 import nl.tudelft.sem.courses.entity.Message;
 import nl.tudelft.sem.courses.repository.CourseRepository;
-import nl.tudelft.sem.courses.repository.EnrollmentRepository;
 import nl.tudelft.sem.courses.repository.LectureRepository;
-import nl.tudelft.sem.shared.entity.AddLecture;
-import nl.tudelft.sem.shared.entity.BareLecture;
 import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,15 +24,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
-@Controller
+@RestController
 @RequestMapping(path = "/lecture")
-public class LectureController {
+public class LectureController extends Controller {
     @Autowired
     private transient CourseRepository courseRepository;
-
-    @Autowired
-    private transient EnrollmentRepository enrollmentRepository;
 
     @Autowired
     private transient LectureRepository lectureRepository;
@@ -69,17 +65,13 @@ public class LectureController {
     @ResponseBody
     public ResponseEntity<?> getLecturesAfterDate(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
-        Date sqlDate = Date.valueOf(date);
-        return ResponseEntity.ok(bareFromLecture(lectureRepository.findByScheduledDateAfter(sqlDate).stream()).collect(Collectors.toList()));
-        /**
         return ResponseEntity.ok(bareFromLecture(lectureRepository.findAll().stream()
             .filter(l -> date.isBefore(l.getScheduledDate().toLocalDate())))
             .collect(Collectors.toList()));
-         */
     }
 
     /**
-     * Helper method to convert a {@link Lecture} stream into a {@link BareLecture} stream.
+     * Helper method to convert a {@link BareLecture} stream into a {@link Lecture} stream.
      *
      * @param lectures a stream of lectures
      *
