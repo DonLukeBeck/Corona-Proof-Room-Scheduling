@@ -18,7 +18,7 @@ import nl.tudelft.sem.shared.entity.BareLecture;
 import org.springframework.stereotype.Service;
 
 @Service
-public class CourseManagementCommunicator extends  Communicator {
+public class CourseCommunicator extends  Communicator {
 
     /**
      * Retrieves the lectures that need to be scheduled from the
