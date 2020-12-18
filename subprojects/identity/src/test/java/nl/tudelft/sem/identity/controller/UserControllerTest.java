@@ -183,7 +183,7 @@ public class UserControllerTest {
                 .andReturn().getResponse().getContentAsString();
 
         JSONObject obj = new JSONObject(jsonToken);
-        assertThat(obj.getString("role")).isEqualTo("null");
+        assertThat(obj.get("role")).isEqualTo(null);
     }
 
 }
