@@ -11,6 +11,7 @@ import nl.tudelft.sem.courses.entity.Enrollment;
 import nl.tudelft.sem.courses.entity.Message;
 import nl.tudelft.sem.courses.repository.CourseRepository;
 import nl.tudelft.sem.courses.repository.EnrollmentRepository;
+import nl.tudelft.sem.courses.util.Validate;
 import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -26,39 +27,39 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController // This means that this class is a RestController
 @RequestMapping(path = "/course") // URL's start with /course (after Application path)
-public class CourseController extends Controller {
+public class CourseController {
 
     @Autowired
     private transient CourseRepository courseRepository;
-
     @Autowired
     private transient EnrollmentRepository enrollmentRepository;
+    @Autowired
+    private transient Validate validate;
 
     private transient String teacherRole = "teacher";
+
+    protected transient String noAccessMessage =
+            "You are not allowed to view this page. Please contact administrator.";
 
     /**
      * Instantiates repository needed.
      */
     public CourseController(CourseRepository courseRepository,
-                            EnrollmentRepository enrollmentRepository) {
+                            EnrollmentRepository enrollmentRepository, Validate validate) {
         this.courseRepository = courseRepository;
         this.enrollmentRepository = enrollmentRepository;
+        this.validate = validate;
+    }
+
+    public Validate getValidate() {
+        return validate;
     }
 
     public CourseRepository getCourseRepository() {
         return courseRepository;
     }
-
-    public void setCourseRepository(CourseRepository courseRepository) {
-        this.courseRepository = courseRepository;
-    }
-
     public EnrollmentRepository getEnrollmentRepository() {
         return enrollmentRepository;
-    }
-
-    public void setEnrollmentRepository(EnrollmentRepository enrollmentRepository) {
-        this.enrollmentRepository = enrollmentRepository;
     }
 
     /**
@@ -76,7 +77,6 @@ public class CourseController extends Controller {
      * Retrieves a course list based on teacher id.
      *
      * @param teacherId id of the teacher
-     *
      * @return A list of {@link Course}s
      */
     @GetMapping("/getCoursesForTeacher")
@@ -92,8 +92,8 @@ public class CourseController extends Controller {
     /**
      * Adds a new course with provided parameters.
      *
+     * @param request an {@link HttpServletRequest} containing validation information
      * @param addCourse the course to add
-     *
      * @return an indication of whether the operation succeeded or not.
      */
     @PostMapping(path = "/createNewCourse") // Map ONLY POST Requests
@@ -101,8 +101,8 @@ public class CourseController extends Controller {
             HttpServletRequest request, @RequestBody AddCourse addCourse)
             throws IOException, InterruptedException, JSONException {
 
-        String validation = validateRole(request, teacherRole);
-        if (validation.equals(new Message(noAccessMessage))) {
+        String validation = validate.validateRole(request, teacherRole);
+        if (validation.equals(noAccessMessage)) {
             return ResponseEntity.ok(new Message(noAccessMessage));
         }
 
@@ -131,9 +131,20 @@ public class CourseController extends Controller {
 
     /**
      * Deletes a new course with provided parameters.
+     *
+     * @param courseId the Id of the course to delete
+     * @param request an {@link HttpServletRequest} containing validation information
+     * @return an indication of whether the operation succeeded or not.
      */
     @DeleteMapping(path = "/deleteCourse") // Map ONLY POST Requests
-    public ResponseEntity<?> deleteCourse(@RequestParam String courseId) throws JSONException {
+    public ResponseEntity<?> deleteCourse(HttpServletRequest request,
+          @RequestParam String courseId) throws JSONException, IOException, InterruptedException {
+
+        String validation = validate.validateRole(request, teacherRole);
+        if (validation.equals(noAccessMessage)) {
+            return ResponseEntity.ok(new Message(noAccessMessage));
+        }
+
         Course r = courseRepository.findByCourseId(courseId);
         if (r == null) {
             return ResponseEntity.notFound().build();
@@ -144,6 +155,9 @@ public class CourseController extends Controller {
 
     /**
      * Returns a course with provided parameters.
+     *
+     * @param courseId the Id of the course to delete
+     * @return the course if found, else a 404
      */
     @GetMapping(path = "/getCourse") // Map ONLY POST Requests
     public ResponseEntity<?> getCourse(@RequestParam String courseId) {
@@ -156,6 +170,9 @@ public class CourseController extends Controller {
 
     /**
      * Returns a list of participants with provided parameters.
+     *
+     * @param courseId the Id of the course to retrieve the participants for
+     * @return a list of course participants
      */
     @GetMapping(path = "/getCourseParticipants") // Map ONLY Get Requests
     public ResponseEntity<?> getCourseParticipants(@RequestParam String courseId) {
