@@ -1,6 +1,8 @@
 package nl.tudelft.sem.rooms;
 
 import java.util.Optional;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import nl.tudelft.sem.shared.entity.StringMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -8,6 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -31,13 +34,16 @@ public class RoomController {
     /**
      * This function is used to create a new room.
      *
-     * @param name of the new room
-     * @param capacity of the new room
+     * @param context the {@link RoomController.NewRoomContext} to create a new room
      * @return success or error message
      */
     @PostMapping(path = "/addNewRoom") // Map ONLY POST Requests
     @ResponseBody
-    public ResponseEntity<?> addNewRoom(@RequestParam String name, @RequestParam int capacity) {
+    public ResponseEntity<?> addNewRoom(@RequestBody NewRoomContext context) {
+        String name = context.getName();
+        // `capacity` is being read in multiple places, and is not undefined after not being used
+        @SuppressWarnings("PMD.DataflowAnomalyAnalysis")
+        int capacity = context.getCapacity();
         Optional<Room> r1 = roomRepository.findByName(name);
         if (r1.isPresent()) {
             return ResponseEntity.ok(new StringMessage("Already Exists"));
@@ -51,6 +57,13 @@ public class RoomController {
         r.setName(name);
         roomRepository.save(r);
         return ResponseEntity.ok(new StringMessage("Room added."));
+    }
+
+    @Data
+    @AllArgsConstructor
+    public static class NewRoomContext {
+        String name;
+        int capacity;
     }
 
     /**

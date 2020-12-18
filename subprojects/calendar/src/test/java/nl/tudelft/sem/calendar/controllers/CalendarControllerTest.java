@@ -377,8 +377,9 @@ class CalendarControllerTest {
 
     @Test
     void testIndicateAbsenceSuccess() throws IOException, InterruptedException {
-        assertThat(calendarController.indicateAbsence(studentRequest, netIds[1],
-            courses[0].getCourseId(), dates[0]).getBody()).isEqualTo(new StringMessage("Indicated absence."));
+        CalendarController.AbsenceContext context =
+            new CalendarController.AbsenceContext(netIds[1], courses[0].getCourseId(), dates[0]);
+        assertThat(calendarController.indicateAbsence(studentRequest, context).getBody()).isEqualTo(new StringMessage("Indicated absence."));
 
         verify(lectureRepository, times(1))
                 .findByDateAndCourseId(dates[0].plusDays(1), courses[0].getCourseId());
@@ -387,9 +388,10 @@ class CalendarControllerTest {
     @Test
     void testIndicateAbsenceAccessDenied()
             throws IOException, InterruptedException {
+        CalendarController.AbsenceContext context =
+            new CalendarController.AbsenceContext("userid", courses[0].getCourseId(), dates[0]);
         assertEquals(ResponseEntity.ok(noAccessMessage),
-                calendarController.indicateAbsence(
-                        wrongRequest,"userid", courses[0].getCourseId(), dates[0]));
+                calendarController.indicateAbsence(wrongRequest, context));
     }
 
     @Test

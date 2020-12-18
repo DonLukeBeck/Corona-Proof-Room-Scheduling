@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import nl.tudelft.sem.calendar.communication.CourseCommunicator;
 import nl.tudelft.sem.calendar.communication.RestrictionCommunicator;
 import nl.tudelft.sem.calendar.communication.RoomCommunicator;
@@ -32,6 +34,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -350,9 +353,7 @@ public class CalendarController {
      * This method is used by a user to indicate that
      * the user will be absent during a fysical lecture.
      *
-     * @param userId the userId of the user.
-     * @param courseId the course for which the user will be absent.
-     * @param date the date on which the lecture would have took place
+     * @param context the {@link CalendarController.AbsenceContext} of the request
      *
      * @return a string with 'success' if done.
      */
@@ -362,10 +363,11 @@ public class CalendarController {
     // we need to add specific values to lectureIds
     // we need to suppress this warning for every method
     public ResponseEntity<?> indicateAbsence(HttpServletRequest request,
-                                             String userId, String courseId,
-                                             @DateTimeFormat(iso = DateTimeFormat
-                                             .ISO.DATE) LocalDate date)
+                                             @RequestBody AbsenceContext context)
             throws IOException, InterruptedException {
+        String userId = context.getUserId();
+        String courseId = context.getCourseId();
+        LocalDate date = context.getDate();
 
         if (!validate.validateRole(request, studentRole).equals(userId)) {
             return ResponseEntity.ok(noAccessMessage);
@@ -388,6 +390,14 @@ public class CalendarController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new StringMessage("Could not indicated absence."));
         }
+    }
+
+    @Data
+    @AllArgsConstructor
+    public static class AbsenceContext {
+        String userId;
+        String courseId;
+        LocalDate date;
     }
 
     /**

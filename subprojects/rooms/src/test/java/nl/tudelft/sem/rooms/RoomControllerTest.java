@@ -57,20 +57,26 @@ class RoomControllerTest {
 
     @Test
     void addNewRoom() {
+        RoomController.NewRoomContext context =
+            new RoomController.NewRoomContext(room1.getName(), room1.getCapacity());
         assertEquals(ResponseEntity.ok(new StringMessage("Already Exists")),
-                roomController.addNewRoom(room1.getName(), room1.getCapacity()));
+                roomController.addNewRoom(context));
     }
 
     @Test
     void addNewRoom1() {
+        RoomController.NewRoomContext context =
+            new RoomController.NewRoomContext("hey", -4);
         assertEquals(ResponseEntity.ok(new StringMessage("Invalid capacity.")),
-                roomController.addNewRoom("hey", -4));
+                roomController.addNewRoom(context));
     }
 
     @Test
     void addNewRoom2() {
+        RoomController.NewRoomContext context =
+            new RoomController.NewRoomContext("hey", 4);
         assertEquals(ResponseEntity.ok(new StringMessage("Room added.")),
-                roomController.addNewRoom("hey", 4));
+                roomController.addNewRoom(context));
     }
 
     @Test
