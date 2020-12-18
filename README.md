@@ -4,7 +4,7 @@
 
 # CSE2115 - Corona-Proof Room Scheduling Project
 ## Group OP29-SEM57:  
-Alexandru Bobe, Can Parlar, Luca Becheanu, Matthijs de Goede, Merdan Durmuş, Timen, Zandbergen
+Alexandru Bobe, Can Parlar, Luca Becheanu, Matthijs de Goede, Merdan Durmuş, Timen Zandbergen
 
 ### Running
 To run the main server:  
@@ -34,10 +34,15 @@ gradle pmdTest
 
 ### Database Information
 Our project has 5 databases all hosted privately on a vps.  
-Calendar, Identity, Courses, Restrictions, Rooms.
+```
+hostname:    timenzan.nl
+username:    semgroup
+password:    5d42d7790150c738b40801bbed1f8524777563a13
+databases: calendar, course, identity, restriction, room
+```
 
 ### Docs
 Inside the /doc folder, we have our sprint files. In each sprint we have a retrospective for that week and files of that week.  
 The initial requirements are in /doc/sprint0  
-Our database schema and domain overview are in /doc/sprint1
-Our final documents and reflections are in /doc/sprint4
+Our database schema and domain overview are in /doc/sprint1  
+Our final documents and reflections are in /doc/sprint4  
