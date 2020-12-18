@@ -10,10 +10,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @SpringBootApplication
 @EntityScan("nl.tudelft.sem.rooms")
 @EnableJpaRepositories("nl.tudelft.sem.rooms")
-public class Application {
-
-	public static void main(String[] args) {
-		SpringApplication.run(Application.class, args);
-	}
-
+public class Application { public static void main(String[] args) {
+	SpringApplication.run(Application.class, args);
+    }
 }

@@ -9,5 +9,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface RestrictionRepository extends JpaRepository<Restriction, String>,
         JpaSpecificationExecutor<Restriction> {
-    Optional<Restriction> getRestrictionByName(String name);
+    Optional<Restriction> findByName(String name);
 }

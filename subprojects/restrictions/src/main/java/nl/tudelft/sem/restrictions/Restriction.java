@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "Restriction")
+@Table(name = "restriction")
 public class Restriction {
     @Id
     @Column(name = "name")
@@ -33,7 +33,7 @@ public class Restriction {
     /**
      * Sets the name variable.
      *
-     * @param name of the restrictions entity
+     * @param name of the restrictions nl.tudelft.sem.shared.entity
      */
     public void setName(String name) {
         this.name = name;
@@ -51,7 +51,7 @@ public class Restriction {
     /**
      * Sets the value variable.
      *
-     * @param value of the restrictions entity
+     * @param value of the restrictions nl.tudelft.sem.shared.entity
      */
     public void setValue(float value) {
         this.value = value;

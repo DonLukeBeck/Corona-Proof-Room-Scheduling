@@ -1,15 +1,14 @@
 package nl.tudelft.sem.calendar.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 import lombok.AllArgsConstructor;
@@ -19,14 +18,17 @@ import lombok.Generated;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "Lecture", schema = "public")
+@Table(name = "lecture", schema = "public")
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
 @Builder
-public class Lecture {
+public class Lecture implements Serializable  {
+    
+    private static final long serialVersionUID = 1233464399341123464L;
+
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "lecture_id")
     @Generated
     private Integer lectureId;
@@ -46,12 +48,20 @@ public class Lecture {
     @Column(name = "date")
     private LocalDate date;
 
-    @OneToMany(mappedBy = "lectureId", fetch =  FetchType.LAZY)
-    List<Attendance> attendances;
-
     // Attributes of the lecture, before it gets scheduled
     @Transient
+    @JsonIgnore
     private int durationInMinutes;
+
     @Transient
+    @JsonIgnore
     private Course course;
+
+    // Used for schedule retrieval
+
+    @Transient
+    private String roomName;
+    @Transient
+    private boolean selectedForOnCampus;
+
 }

@@ -26,6 +26,10 @@ public class JwtFilter extends OncePerRequestFilter {
     @Autowired
     private UserService service;
 
+    /**
+     * This method extracts the token from the request header and starts applying filters
+     * that validate the token.
+     */
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {

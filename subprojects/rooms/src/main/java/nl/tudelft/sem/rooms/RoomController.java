@@ -1,12 +1,21 @@
 package nl.tudelft.sem.rooms;
 
+import java.util.Optional;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import nl.tudelft.sem.shared.entity.StringMessage;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.ResponseBody;
 
-@RestController // This means that this class is a RestController
+@Controller // This means that this class is a RestController
 @RequestMapping(path = "/rooms") // URL's start with /restrictions (after Application path)
 public class RoomController {
 
@@ -25,25 +34,36 @@ public class RoomController {
     /**
      * This function is used to create a new room.
      *
-     * @param name of the new room
-     * @param capacity of the new room
+     * @param context the {@link RoomController.NewRoomContext} to create a new room
      * @return success or error message
      */
-    public String addNewRoom(String name, int capacity) {
-        for (Room ro : roomRepository.findAll()) {
-            if (ro.getName().equals(name)) {
-                return "Already Exists";
-            }
+    @PostMapping(path = "/addNewRoom") // Map ONLY POST Requests
+    @ResponseBody
+    public ResponseEntity<?> addNewRoom(@RequestBody NewRoomContext context) {
+        String name = context.getName();
+        // `capacity` is being read in multiple places, and is not undefined after not being used
+        @SuppressWarnings("PMD.DataflowAnomalyAnalysis")
+        int capacity = context.getCapacity();
+        Optional<Room> r1 = roomRepository.findByName(name);
+        if (r1.isPresent()) {
+            return ResponseEntity.ok(new StringMessage("Already Exists"));
         }
         final int invCap = 1;
         if (capacity < invCap) {
-            return "Invalid Capacity";
+            return ResponseEntity.ok(new StringMessage("Invalid capacity."));
         }
         Room r = new Room();
         r.setCapacity(capacity);
         r.setName(name);
         roomRepository.save(r);
-        return "Saved";
+        return ResponseEntity.ok(new StringMessage("Room added."));
+    }
+
+    @Data
+    @AllArgsConstructor
+    public static class NewRoomContext {
+        String name;
+        int capacity;
     }
 
     /**
@@ -52,14 +72,16 @@ public class RoomController {
      * @param name of the room
      * @return success or error message
      */
-    public String deleteRoom(String name) {
-        for (Room ro : roomRepository.findAll()) {
-            if (ro.getName().equals(name)) {
-                roomRepository.deleteById(ro.getRoomId());
-                return "Deleted";
-            }
+
+    @DeleteMapping(path = "/deleteRoom") // Map ONLY POST Requests
+    @ResponseBody
+    public ResponseEntity<?> deleteRoom(@RequestParam String name) {
+        Optional<Room> ro = roomRepository.findByName(name);
+        if (ro.isPresent()) {
+            roomRepository.deleteById(ro.get().getRoomId());
+            return ResponseEntity.ok(new StringMessage("Deleted"));
         }
-        return "DNE";
+        return ResponseEntity.ok(new StringMessage("Room could not be found."));
     }
 
     /**
@@ -67,20 +89,26 @@ public class RoomController {
      *
      * @return iterable containing all rooms
      */
-    @PostMapping(path = "/getAllRooms") // Map ONLY POST Requests
-    public Iterable<Room> getAllRooms() {
-        return roomRepository.findAll();
+    @GetMapping(path = "/getAllRooms") // Map ONLY POST Requests
+    @ResponseBody
+    public ResponseEntity<?> getAllRooms() {
+        return ResponseEntity.ok(roomRepository.findAll());
     }
 
     /**
-     * Returns the room by its id.
+     * Returns the room name by its id.
      *
      * @param roomId of the room
-     * @return room entity
+     * @return room name
      */
-    @PostMapping(path = "/getRoom") // Map ONLY POST Requests
-    public Room getRoom(@RequestParam int roomId) {
-        return roomRepository.findById(roomId).orElse(null);
+    @GetMapping(path = "/getRoomName") // Map ONLY POST Requests
+    @ResponseBody
+    public ResponseEntity<?> getRoomName(@RequestParam int roomId) {
+        Room r = roomRepository.findById(roomId).orElse(null);
+        if (r != null) {
+            return ResponseEntity.ok(new StringMessage(r.getName()));
+        }
+        return ResponseEntity.notFound().build();
     }
 
 }

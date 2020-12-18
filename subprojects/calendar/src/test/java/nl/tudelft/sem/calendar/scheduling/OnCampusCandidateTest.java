@@ -1,6 +1,7 @@
 package nl.tudelft.sem.calendar.scheduling;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import java.time.LocalDate;
 import org.junit.jupiter.api.BeforeEach;
@@ -42,7 +43,6 @@ class OnCampusCandidateTest {
         assertEquals(candidate, candidate);
         assertEquals(candidate.hashCode(), candidate.hashCode());
     }
-
 
     /**
      * Tests the equals method in case a campus candidate with the same netId and deadline is
