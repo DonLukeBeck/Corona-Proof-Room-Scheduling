@@ -35,7 +35,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping(path = "/calendar")
-
 public class CalendarController {
 
     private transient String teacherRole = "teacher";
@@ -81,6 +80,7 @@ public class CalendarController {
             // Make API call to retrieve the start time
             LocalTime startTime = LocalTime
                     .ofSecondOfDay(restrictionManagementCommunicator.getStartTime());
+
             // Make API call to retrieve the end time
             LocalTime endTime = LocalTime
                     .ofSecondOfDay(restrictionManagementCommunicator.getEndTime());
@@ -333,7 +333,7 @@ public class CalendarController {
                                              String userId, String courseId,
                                              @DateTimeFormat(iso = DateTimeFormat
                                              .ISO.DATE) LocalDate date)
-            throws IOException, InterruptedException {
+            throws IOException, InterruptedException, JSONException {
 
         if (!validateRole(request, studentRole).equals(userId)) {
             return ResponseEntity.ok(noAccessMessage);

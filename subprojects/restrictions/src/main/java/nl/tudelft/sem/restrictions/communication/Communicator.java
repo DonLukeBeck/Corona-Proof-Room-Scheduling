@@ -10,7 +10,9 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
+import org.springframework.stereotype.Service;
 
+@Service
 public abstract class Communicator {
     private static HttpClient client = HttpClient.newBuilder().build();
     public static ObjectMapper objectMapper =
@@ -30,13 +32,5 @@ public abstract class Communicator {
             throw new ServerErrorException();
         }
         return response;
-    }
-
-    protected static String encode(String s) {
-        return URLEncoder.encode(s, StandardCharsets.UTF_8);
-    }
-
-    protected static void setHttpClient(HttpClient httpClient) {
-        client = httpClient;
     }
 }
