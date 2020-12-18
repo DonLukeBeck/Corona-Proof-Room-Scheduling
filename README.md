@@ -1,24 +1,24 @@
 ![coverage](https://gitlab.ewi.tudelft.nl/cse2115/2020-2010/8-corona-proof-room-scheduling/op29-sem57/badges/master/coverage.svg)
-![pipeline](https://gitlab.ewi.tudelft.nl/cse2115/2020-2010/8-corona-proof-room-scheduling/op29-sem57/badges/master/pipeline.svg)
+![pipeline](https://gitlab.ewi.tudelft.nl/cse2115/2020-2010/8-corona-proof-room-scheduling/op29-sem57/badges/master/pipeline.svg)  
+[![Run in Postman](https://run.pstmn.io/button.svg)](https://app.getpostman.com/run-collection/cc338932253b8ffe60f6)
 
-
-# CSE2115 - Project
+# CSE2115 - Corona-Proof Room Scheduling Project
+## Group OP29-SEM57:  
+Alexandru Bobe, Can Parlar, Luca Becheanu, Matthijs de Goede, Merdan Durmuş, Timen Zandbergen
 
 ### Running
-`gradle bootRun`
+To run the main server:  
+`gradle bootRun`  
+To generate the jar files:  
+`gradle :[service]:bootJar`  
+Which can be found in:   
+`subprojects/[service]/libs/[service]-[version].jar`  
 
 ### Testing
 ```
 gradle test
 ```
-
 To generate a coverage report:
-```
-gradle jacocoTestCoverageVerification
-```
-
-
-And
 ```
 gradle jacocoTestReport
 ```
@@ -32,7 +32,17 @@ gradle pmdMain
 gradle pmdTest
 ```
 
-### Notes
-- You should have a local .gitignore file to make sure that any OS-specific and IDE-specific files do not get pushed to the repo (e.g. .idea). These files do not belong in the .gitignore on the repo.
-- If you change the name of the repo to something other than template, you should also edit the build.gradle file.
-- You can add issue and merge request templates in the .gitlab folder on your repo.
+### Database Information
+Our project has 5 databases all hosted privately on a vps.  
+```
+hostname:    timenzan.nl
+username:    semgroup
+password:    5d42d7790150c738b40801bbed1f8524777563a13
+databases: calendar, course, identity, restriction, room
+```
+
+### Docs
+Inside the /doc folder, we have our sprint files. In each sprint we have a retrospective for that week and files of that week.  
+The initial requirements are in /doc/sprint0  
+Our database schema and domain overview are in /doc/sprint1  
+Our final documents and reflections are in /doc/sprint4  

@@ -37,6 +37,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
 @RequestMapping(path = "/calendar")
+
 public class CalendarController {
 
     private transient String teacherRole = "teacher";
@@ -370,11 +371,11 @@ public class CalendarController {
             return ResponseEntity.ok(noAccessMessage);
         }
         try {
-            List<Lecture> lectures = lectureRepository
+            List<Lecture> list = lectureRepository
                     .findByDateAndCourseId(date.plusDays(1), courseId);
-            for (Lecture lecture : lectures) {
-                int lectureId = lecture.getLectureId();
 
+            for (Lecture l : list) {
+                int lectureId = l.getRoomId();
                 for (Attendance a :
                         attendanceRepository.findByLectureIdAndStudentId(lectureId, userId)) {
                     attendanceRepository.delete(a);
@@ -412,18 +413,21 @@ public class CalendarController {
             return ResponseEntity.ok(noAccessMessage);
         }
 
-        List<Lecture> lectures = lectureRepository
-                .findByDateAndCourseId(date.plusDays(1), courseId);
+        List<Lecture> list = lectureRepository.findByDateAndCourseId(date.plusDays(1),
+                courseId);
         List<String> netIds = new ArrayList<>();
-        for (Lecture lecture : lectures) {
-            int lectureId = lecture.getLectureId();
-            List<String> tempList = attendanceRepository
+
+        for (Lecture l : list) {
+            int lectureId = l.getRoomId();
+            List<String> temp = attendanceRepository
                     .findByLectureId(lectureId).stream()
                     .filter(Attendance::getPhysical)
                     .map(Attendance::getStudentId)
                     .collect(Collectors.toList());
-            netIds.addAll(tempList);
+            netIds.addAll(temp);
         }
+
+
 
         return ResponseEntity.ok(netIds);
     }

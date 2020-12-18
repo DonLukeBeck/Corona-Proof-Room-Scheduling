@@ -22,6 +22,7 @@ public class RestrictionCommunicator extends Communicator {
      * @throws ServerErrorException a server error exception
      */
     public List<Room> getAllRoomsWithAdjustedCapacity() throws
+
             InterruptedException, ServerErrorException, IOException {
 
         var response = getResponse("/restrictions/getAllRoomsWithAdjustedCapacity",
@@ -56,6 +57,7 @@ public class RestrictionCommunicator extends Communicator {
      * @throws ServerErrorException a server error exception
      */
     public int getStartTime() throws
+
             InterruptedException, ServerErrorException, IOException {
 
         var response = getResponse("/restrictions/getStartTime",
@@ -71,7 +73,9 @@ public class RestrictionCommunicator extends Communicator {
      * @throws InterruptedException an interrupted exception
      * @throws ServerErrorException a server error exception
      */
+
     public int getEndTime() throws
+
             InterruptedException, ServerErrorException, IOException {
 
         var response = getResponse("/restrictions/getEndTime",

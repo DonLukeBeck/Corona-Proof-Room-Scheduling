@@ -22,7 +22,7 @@ public class CourseCommunicator extends  Communicator {
 
     /**
      * Retrieves the lectures that need to be scheduled from the
-     * nl.tudelft.sem.shared.entity.Course Management Service.
+     * Course Management Service.
      *
      * @param date the (current) date after which the lectures should be considered for scheduling.
      *
@@ -35,7 +35,7 @@ public class CourseCommunicator extends  Communicator {
     public List<Lecture> getToBeScheduledLectures(LocalDate date)
         throws IOException, InterruptedException, ServerErrorException {
 
-        var response = getResponse("/lecture/date/"
+        var response = getResponse("/lecture/getLecturesAfterDate?date="
                 + encode(date.toString()), Constants.COURSE_SERVER_URL);
         var bareLectures
             = objectMapper.readValue(response.body(), new TypeReference<List<BareLecture>>() {});
@@ -68,11 +68,11 @@ public class CourseCommunicator extends  Communicator {
     public Course courseFromId(String courseId)
         throws IOException, InterruptedException, ServerErrorException {
         var resp = objectMapper.readValue(getResponse(
-            "/course/id/" + courseId, Constants.COURSE_SERVER_URL).body(),
+            "/course/getCourse?courseId=" + courseId, Constants.COURSE_SERVER_URL).body(),
                 new TypeReference<BareCourse>(){});
         var enrollments = objectMapper.readValue(getResponse(
-            "/enrollment/course/" + encode(courseId), Constants.COURSE_SERVER_URL).body(),
-                new TypeReference<List<BareEnrollment>>(){});
+            "/enrollment/getEnrollmentsByCourse?courseId=" + encode(courseId),
+                Constants.COURSE_SERVER_URL).body(), new TypeReference<List<BareEnrollment>>(){});
 
 
         return new Course(resp.getCourseId(), resp.getCourseName(), resp.getTeacherId(),
@@ -92,8 +92,8 @@ public class CourseCommunicator extends  Communicator {
     public List<BareCourse> coursesFromTeacher(String teacherId)
             throws IOException, InterruptedException, ServerErrorException {
         var resp = objectMapper.readValue(getResponse(
-                "/course/teacher/" + teacherId, Constants.COURSE_SERVER_URL).body(),
-                new TypeReference<List<BareCourse>>(){});
+                "/course/getCoursesForTeacher?teacherId=" + encode(teacherId),
+                Constants.COURSE_SERVER_URL).body(), new TypeReference<List<BareCourse>>(){});
         return resp;
     }
 }
