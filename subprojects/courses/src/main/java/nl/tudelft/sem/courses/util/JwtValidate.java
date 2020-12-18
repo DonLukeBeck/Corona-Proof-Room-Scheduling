@@ -14,8 +14,8 @@ import org.springframework.boot.jackson.JsonObjectSerializer;
 
 public class JwtValidate {
 
-    private transient HttpClient client = HttpClient.newBuilder().build();
-    private transient String uri = "/validate";
+    private static transient HttpClient client = HttpClient.newBuilder().build();
+    private static transient String uri = "/validate";
 
     /**
      * Primary method to verify the role inside a jwt token from a request authorization Header.
@@ -28,7 +28,7 @@ public class JwtValidate {
     // Found 'DD'-anomaly for variable 'token'
     // This is not a redefinition of the same variable
     // we cannot initialise the token in an if statement
-    public JSONObject jwtValidate(HttpServletRequest request)
+    public static JSONObject jwtValidate(HttpServletRequest request)
             throws IOException, InterruptedException, JSONException {
 
         //extract authorization from request

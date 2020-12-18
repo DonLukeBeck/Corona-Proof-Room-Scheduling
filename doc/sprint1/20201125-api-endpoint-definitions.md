@@ -3,12 +3,12 @@
 ## Identity Service
 String createToken(String netId, String password)  
 
-## nl.tudelft.sem.shared.entity.Course Management Service
+## Course Management Service
 * createNewCourse(int courseId, String name, int teacherId, List<User> participants)
 * deleteCourse(int courseId)
 * planNewLecture(int courseId, int durationInMinutes, Date date)
 * cancelLecture(int courseId, Date date)
-* nl.tudelft.sem.shared.entity.Course getCourse(int courseId)
+* Course getCourse(int courseId)
 * List<String> getCourseParticipants(int courseId) 
 
 ## Restriction Management Service
