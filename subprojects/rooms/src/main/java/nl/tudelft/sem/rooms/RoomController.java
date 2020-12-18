@@ -1,6 +1,7 @@
 package nl.tudelft.sem.rooms;
 
 import java.util.Optional;
+import nl.tudelft.sem.shared.entity.StringMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -39,17 +40,17 @@ public class RoomController {
     public ResponseEntity<?> addNewRoom(@RequestParam String name, @RequestParam int capacity) {
         Optional<Room> r1 = roomRepository.findByName(name);
         if (r1.isPresent()) {
-            return ResponseEntity.ok("Already Exists");
+            return ResponseEntity.ok(new StringMessage("Already Exists"));
         }
         final int invCap = 1;
         if (capacity < invCap) {
-            return ResponseEntity.ok("Invalid capacity.");
+            return ResponseEntity.ok(new StringMessage("Invalid capacity."));
         }
         Room r = new Room();
         r.setCapacity(capacity);
         r.setName(name);
         roomRepository.save(r);
-        return ResponseEntity.ok("Room added.");
+        return ResponseEntity.ok(new StringMessage("Room added."));
     }
 
     /**
@@ -65,9 +66,9 @@ public class RoomController {
         Optional<Room> ro = roomRepository.findByName(name);
         if (ro.isPresent()) {
             roomRepository.deleteById(ro.get().getRoomId());
-            return ResponseEntity.ok("Deleted");
+            return ResponseEntity.ok(new StringMessage("Deleted"));
         }
-        return ResponseEntity.ok("Room could not be found.");
+        return ResponseEntity.ok(new StringMessage("Room could not be found."));
     }
 
     /**
@@ -92,7 +93,7 @@ public class RoomController {
     public ResponseEntity<?> getRoomName(@RequestParam int roomId) {
         Room r = roomRepository.findById(roomId).orElse(null);
         if (r != null) {
-            return ResponseEntity.ok(r.getName());
+            return ResponseEntity.ok(new StringMessage(r.getName()));
         }
         return ResponseEntity.notFound().build();
     }

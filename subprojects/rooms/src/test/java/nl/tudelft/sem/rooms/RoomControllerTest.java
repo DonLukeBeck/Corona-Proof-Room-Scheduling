@@ -6,6 +6,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
 import java.util.List;
+import nl.tudelft.sem.shared.entity.StringMessage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -56,31 +57,31 @@ class RoomControllerTest {
 
     @Test
     void addNewRoom() {
-        assertEquals(ResponseEntity.ok("Already Exists"),
+        assertEquals(ResponseEntity.ok(new StringMessage("Already Exists")),
                 roomController.addNewRoom(room1.getName(), room1.getCapacity()));
     }
 
     @Test
     void addNewRoom1() {
-        assertEquals(ResponseEntity.ok("Invalid capacity."),
+        assertEquals(ResponseEntity.ok(new StringMessage("Invalid capacity.")),
                 roomController.addNewRoom("hey", -4));
     }
 
     @Test
     void addNewRoom2() {
-        assertEquals(ResponseEntity.ok("Room added."),
+        assertEquals(ResponseEntity.ok(new StringMessage("Room added.")),
                 roomController.addNewRoom("hey", 4));
     }
 
     @Test
     void deleteRoom() {
-        assertEquals(ResponseEntity.ok("Room could not be found."),
+        assertEquals(ResponseEntity.ok(new StringMessage("Room could not be found.")),
                 roomController.deleteRoom("Test"));
     }
 
     @Test
     void deleteRoom1() {
-        assertEquals(ResponseEntity.ok("Deleted"),
+        assertEquals(ResponseEntity.ok(new StringMessage("Deleted")),
                 roomController.deleteRoom("DW-1"));
     }
 
@@ -92,7 +93,7 @@ class RoomControllerTest {
 
     @Test
     void getRoomName() {
-        assertEquals(ResponseEntity.ok("DW-2"),
+        assertEquals(ResponseEntity.ok(new StringMessage("DW-2")),
                 roomController.getRoomName(room2.getRoomId()));
     }
 
