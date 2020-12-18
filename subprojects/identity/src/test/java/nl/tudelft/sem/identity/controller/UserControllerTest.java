@@ -18,6 +18,7 @@ import nl.tudelft.sem.identity.entity.User;
 import nl.tudelft.sem.identity.repository.UserRepository;
 import nl.tudelft.sem.identity.util.JwtUtil;
 import org.assertj.core.api.Condition;
+import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +30,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.context.WebApplicationContext;
-
 
 @ContextConfiguration(classes = UserController.class)
 @AutoConfigureMockMvc
@@ -47,7 +47,13 @@ public class UserControllerTest {
 
     private MockMvc mockMvc;
 
-    private User correctUser;
+    private final String netid = "CorrectNetid";
+
+    private final String password = "SecurePassword123";
+
+    private final String loginUri = "/login";
+
+    private final String validateUri = "/validate";
 
     private AuthenticationRequest authenticationRequest;
 
@@ -63,34 +69,121 @@ public class UserControllerTest {
     @BeforeEach
     public void setup() {
         this.mockMvc = webAppContextSetup(webApplicationContext).build();
-        this.correctUser = new User("CorrectNetid",
-                encoder.encode("SecurePassword123"),
+        User correctUser = new User(netid,
+                encoder.encode(password),
                 "student", false);
         this.authenticationRequest = new AuthenticationRequest(correctUser.getNetid(),
-            "SecurePassword123");
+            password);
+        when(userRepository.findByNetid(correctUser.getNetid())).thenReturn(correctUser);
     }
 
 
     @Test
     public void loginCorrect() throws Exception {
-        when(userRepository.findByNetid(correctUser.getNetid())).thenReturn(correctUser);
 
-        String uri = "/login";
-        String jwt = mockMvc.perform(post(uri)
+        String jwtJsonString = mockMvc.perform(post(loginUri)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
             .content(objectMapper.writeValueAsString(authenticationRequest)))
                 .andExpect(status().isOk())
             .andReturn().getResponse().getContentAsString();
 
+        JSONObject jwtJson = new JSONObject(jwtJsonString);
+        String jwt = jwtJson.getString("messageText");
+
         Claims claims = Jwts.parser().setSigningKey(jwtUtil.getSecret()).parseClaimsJws(jwt)
                 .getBody();
-        assertThat(claims.getSubject()).isEqualTo("CorrectNetid");
+        assertThat(claims.getSubject()).isEqualTo(netid);
         ArrayList<LinkedHashMap<String, Object>> scope =  claims.get("scope", ArrayList.class);
         assertTrue(scope.get(0).containsValue("ROLE_STUDENT"));
         var cond = new Condition<LinkedHashMap>(
                 m -> m.containsValue("ROLE_STUDENT"), "Contains student");
         assertThat(scope).haveExactly(1, cond);
         assertThat(claims.getIssuedAt()).isBefore(claims.getExpiration());
+    }
+
+    @Test
+    public void loginFailedPassword() throws Exception {
+        authenticationRequest.setPassword("1234");
+        
+        String jwt = mockMvc.perform(post(loginUri).contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(objectMapper.writeValueAsString(authenticationRequest)))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+
+        JSONObject obj = new JSONObject(jwt);
+        assertThat(obj.getString("messageText")).isEqualTo("Authentication failure");
+    }
+
+    @Test
+    public void loginFailedUsername() throws Exception {
+        authenticationRequest.setNetid("fail");
+
+        String jwt = mockMvc.perform(post(loginUri)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(objectMapper.writeValueAsString(authenticationRequest)))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+
+        JSONObject obj = new JSONObject(jwt);
+        assertThat(obj.getString("messageText")).isEqualTo("Authentication failure");
+    }
+
+    @Test
+    public void validateCorrectStudent() throws Exception {
+
+        String jwt = jwtUtil.generateToken(netid);
+
+        String jsonToken = mockMvc.perform(post(validateUri)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(jwt)).andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+
+        JSONObject obj = new JSONObject(jsonToken);
+        assertThat(obj.getString("role")).isEqualTo("student");
+        assertThat(obj.getString("netid")).isEqualTo(netid);
+    }
+
+    @Test
+    public void validateCorrectTeacher() throws Exception {
+
+        User correctUser = new User(netid,
+                encoder.encode(password),
+                "teacher", false);
+        this.authenticationRequest = new AuthenticationRequest(correctUser.getNetid(),
+                password);
+        when(userRepository.findByNetid(correctUser.getNetid())).thenReturn(correctUser);
+        
+        String jwt = jwtUtil.generateToken(netid);
+   
+        String jsonToken = mockMvc.perform(post(validateUri)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(jwt)).andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+
+        JSONObject obj = new JSONObject(jsonToken);
+        assertThat(obj.getString("role")).isEqualTo("teacher");
+        assertThat(obj.getString("netid")).isEqualTo(netid);
+    }
+
+    @Test
+    public void validateFailed() throws Exception {
+
+        User correctUser = new User(netid,
+                encoder.encode(password),
+                "fail", false);
+        this.authenticationRequest = new AuthenticationRequest(correctUser.getNetid(),
+                password);
+        when(userRepository.findByNetid(correctUser.getNetid())).thenReturn(correctUser);
+
+        String jwt = jwtUtil.generateToken(netid);
+
+        String jsonToken = mockMvc.perform(post(validateUri)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(jwt)).andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+
+        JSONObject obj = new JSONObject(jsonToken);
+        assertThat(obj.get("role")).isEqualTo(null);
     }
 
 }

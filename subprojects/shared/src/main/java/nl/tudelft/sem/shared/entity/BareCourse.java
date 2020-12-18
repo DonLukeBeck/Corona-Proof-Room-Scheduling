@@ -1,4 +1,4 @@
-package nl.tudelft.sem.calendar.entities;
+package nl.tudelft.sem.shared.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,8 +9,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class BareEnrollment {
-    private static final long serialVersionUID = 1231234123412341244L;
+public class BareCourse {
+    private static final long serialVersionUID = 1233464312341123464L;
     private String courseId;
-    private String studentId;
+    private String courseName;
+    private String teacherId;
 }

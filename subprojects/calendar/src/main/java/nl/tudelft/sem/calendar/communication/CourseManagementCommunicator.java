@@ -7,21 +7,22 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
-import nl.tudelft.sem.calendar.entities.BareCourse;
-import nl.tudelft.sem.calendar.entities.BareEnrollment;
-import nl.tudelft.sem.calendar.entities.BareLecture;
 import nl.tudelft.sem.calendar.entities.Course;
 import nl.tudelft.sem.calendar.entities.Enrollment;
 import nl.tudelft.sem.calendar.entities.Lecture;
 import nl.tudelft.sem.calendar.exceptions.ServerErrorException;
 import nl.tudelft.sem.calendar.util.Constants;
+import nl.tudelft.sem.shared.entity.BareCourse;
+import nl.tudelft.sem.shared.entity.BareEnrollment;
+import nl.tudelft.sem.shared.entity.BareLecture;
 import org.springframework.stereotype.Service;
 
 @Service
 public class CourseManagementCommunicator extends  Communicator {
 
     /**
-     * Retrieves the lectures that need to be scheduled from the Course Management Service.
+     * Retrieves the lectures that need to be scheduled from the
+     * nl.tudelft.sem.shared.entity.Course Management Service.
      *
      * @param date the (current) date after which the lectures should be considered for scheduling.
      *
