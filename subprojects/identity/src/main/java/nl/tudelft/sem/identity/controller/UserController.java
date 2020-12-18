@@ -2,7 +2,7 @@ package nl.tudelft.sem.identity.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import nl.tudelft.sem.identity.entity.AuthenticationRequest;
-import nl.tudelft.sem.identity.entity.Message;
+import nl.tudelft.sem.shared.entity.Message;
 import nl.tudelft.sem.identity.entity.TokenInfo;
 import nl.tudelft.sem.identity.util.JwtUtil;
 import nl.tudelft.sem.identity.util.JwtValidate;

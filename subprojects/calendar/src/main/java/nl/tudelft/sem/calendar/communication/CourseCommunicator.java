@@ -22,7 +22,7 @@ public class CourseCommunicator extends  Communicator {
 
     /**
      * Retrieves the lectures that need to be scheduled from the
-     * nl.tudelft.sem.shared.entity.Course Management Service.
+     * Course Management Service.
      *
      * @param date the (current) date after which the lectures should be considered for scheduling.
      *

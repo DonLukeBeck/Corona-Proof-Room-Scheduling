@@ -16,7 +16,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "nl.tudelft.sem.shared.entity.Enrollment")
+@Table(name = "enrollment")
 @IdClass(Enrollment.class)
 public class Enrollment implements Serializable {
 
