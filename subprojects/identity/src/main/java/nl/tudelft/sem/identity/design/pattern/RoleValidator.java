@@ -19,7 +19,12 @@ public class RoleValidator extends BaseValidator {
     }
 
     @Override
-    public boolean handle(TokenRole tokenRole) {
-        return  this.claimsContainsRole(claims(tokenRole.getToken()), tokenRole.getRole());
+    public boolean handle(TokenRole tokenRole) throws Exception {
+        try {
+            this.claimsContainsRole(claims(tokenRole.getToken()), tokenRole.getRole());
+        } catch (Exception e) {
+            return false;
+        }
+        return super.checkNext(tokenRole);
     }
 }

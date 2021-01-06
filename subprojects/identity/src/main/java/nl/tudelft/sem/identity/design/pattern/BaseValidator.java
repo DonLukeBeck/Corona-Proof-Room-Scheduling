@@ -1,6 +1,5 @@
 package nl.tudelft.sem.identity.design.pattern;
 
-import antlr.Token;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
@@ -8,9 +7,9 @@ import nl.tudelft.sem.identity.entity.TokenRole;
 
 public abstract class BaseValidator implements Validator {
 
-    private Validator next;
-    private final String secret = "semcoronaproofroomreservation";
-    private JwtParser parser = Jwts.parser().setSigningKey(secret);
+    private transient Validator next;
+    private transient final String secret = "semcoronaproofroomreservation";
+    private transient JwtParser parser = Jwts.parser().setSigningKey(secret);
 
     /**
      * Get the claims from the compact jws, a cryptographically signed jwt.
