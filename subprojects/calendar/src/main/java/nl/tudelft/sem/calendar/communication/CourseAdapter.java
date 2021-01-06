@@ -20,7 +20,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class CourseAdapter {
 
-    private transient CourseCommunicator courseCommunicator;
+    private final transient CourseCommunicator courseCommunicator = new CourseCommunicator();
 
     /**
      * Retrieves the lectures that need to be scheduled from the
