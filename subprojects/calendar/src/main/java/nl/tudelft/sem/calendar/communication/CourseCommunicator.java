@@ -33,8 +33,7 @@ public class CourseCommunicator extends Communicator {
         throws IOException, InterruptedException, ServerErrorException {
         return objectMapper.readValue(getResponse(
             "/course/getCoursesForTeacher?teacherId=" + encode(teacherId),
-            Constants.COURSE_SERVER_URL).body(), new TypeReference<>() {
-        });
+            Constants.COURSE_SERVER_URL).body(), new TypeReference<>() {});
     }
 
     /**
@@ -50,8 +49,7 @@ public class CourseCommunicator extends Communicator {
         throws InterruptedException, ServerErrorException, IOException {
         return objectMapper.readValue(getResponse("/lecture/getLecturesAfterDate?date="
                 + encode(date.toString()), Constants.COURSE_SERVER_URL).body(),
-            new TypeReference<>() {
-            });
+            new TypeReference<>() {});
     }
 
     /**
@@ -67,8 +65,7 @@ public class CourseCommunicator extends Communicator {
         throws InterruptedException, ServerErrorException, IOException {
         return objectMapper.readValue(getResponse("/course/getCourse?courseId="
                 + courseId, Constants.COURSE_SERVER_URL).body(),
-            new TypeReference<>() {
-            });
+            new TypeReference<>() {});
     }
 
     /**
@@ -84,8 +81,7 @@ public class CourseCommunicator extends Communicator {
         throws InterruptedException, ServerErrorException, IOException {
         return objectMapper.readValue(getResponse("/enrollment/getEnrollmentsByCourse?courseId="
                 + courseId, Constants.COURSE_SERVER_URL).body(),
-            new TypeReference<>() {
-            });
+            new TypeReference<>() {});
     }
 
 }
