@@ -1,10 +1,13 @@
 package nl.tudelft.sem.identity.controller;
 
 import lombok.extern.slf4j.Slf4j;
+import nl.tudelft.sem.identity.design.pattern.DateValidator;
+import nl.tudelft.sem.identity.design.pattern.RoleValidator;
+import nl.tudelft.sem.identity.design.pattern.Validator;
 import nl.tudelft.sem.identity.entity.AuthenticationRequest;
 import nl.tudelft.sem.identity.entity.TokenInfo;
+import nl.tudelft.sem.identity.entity.TokenRole;
 import nl.tudelft.sem.identity.util.JwtUtil;
-import nl.tudelft.sem.identity.util.JwtValidate;
 import nl.tudelft.sem.shared.entity.StringMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.ComponentScan;
@@ -32,22 +35,44 @@ public class UserController {
 
     /**
      * Validates jwt tokens from incoming authorization requests.
+     * This method makes use of the Chain of Responsibility design pattern.
      *
      * @param token String containing jwt token
      * @return Extracted role from token
      */
     @PostMapping(path = "/validate")
     public ResponseEntity<?> validate(@RequestBody String token) {
-        JwtValidate jwtValid = new JwtValidate();
         JwtUtil jwtUtil = new JwtUtil();
 
-        if (jwtValid.isTeacher(token)) {
-            return ResponseEntity.ok(new TokenInfo("teacher", jwtUtil.extractNetid(token)));
-        } else if (jwtValid.isStudent(token)) {
-            return ResponseEntity.ok(new TokenInfo("student", jwtUtil.extractNetid(token)));
-        } else {
+        TokenRole tokenRole = new TokenRole("ROLE_TEACHER", token);
+
+        //creating the chain
+        Validator handler = new DateValidator();
+        handler.setNext(new RoleValidator());
+
+        try {
+            //one method call to rule the chain of validation for teacher
+            boolean isValid = handler.handle(tokenRole);
+            if (isValid) {
+                return ResponseEntity.ok(new TokenInfo("teacher",
+                        jwtUtil.extractNetid(tokenRole.getToken())));
+            }
+            try {
+                tokenRole = new TokenRole("ROLE_STUDENT", token);
+                //one method call to rule the chain of validation for student
+                isValid = handler.handle(tokenRole);
+                if (isValid) {
+                    return ResponseEntity.ok(new TokenInfo("student",
+                            jwtUtil.extractNetid(tokenRole.getToken())));
+                }
+            } catch (Exception e) {
+                return ResponseEntity.ok(new TokenInfo(null, jwtUtil.extractNetid(token)));
+            }
+        } catch (Exception e) {
             return ResponseEntity.ok(new TokenInfo(null, jwtUtil.extractNetid(token)));
         }
+
+        return ResponseEntity.ok(new TokenInfo(null, jwtUtil.extractNetid(token)));
     }
 
     /**
