@@ -35,6 +35,7 @@ public class UserController {
 
     /**
      * Validates jwt tokens from incoming authorization requests.
+     * This method makes use of the Chain of Responsibility design pattern.
      *
      * @param token String containing jwt token
      * @return Extracted role from token
@@ -45,10 +46,12 @@ public class UserController {
 
         TokenRole tokenRole = new TokenRole("ROLE_TEACHER", token);
 
+        //creating the chain
         Validator handler = new DateValidator();
         handler.setNext(new RoleValidator());
 
         try {
+            //one method call to rule the chain of validation for teacher
             boolean isValid = handler.handle(tokenRole);
             if (isValid) {
                 return ResponseEntity.ok(new TokenInfo("teacher",
@@ -56,6 +59,7 @@ public class UserController {
             }
             try {
                 tokenRole = new TokenRole("ROLE_STUDENT", token);
+                //one method call to rule the chain of validation for student
                 isValid = handler.handle(tokenRole);
                 if (isValid) {
                     return ResponseEntity.ok(new TokenInfo("student",

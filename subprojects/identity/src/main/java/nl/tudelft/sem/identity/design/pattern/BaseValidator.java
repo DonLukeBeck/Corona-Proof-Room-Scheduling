@@ -5,6 +5,9 @@ import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
 import nl.tudelft.sem.identity.entity.TokenRole;
 
+/**
+ * Code that all handlers have in common.
+ */
 public abstract class BaseValidator implements Validator {
 
     private transient Validator next;
