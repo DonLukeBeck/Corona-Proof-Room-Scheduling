@@ -8,7 +8,7 @@ import nl.tudelft.sem.identity.entity.TokenRole;
 public abstract class BaseValidator implements Validator {
 
     private transient Validator next;
-    private transient final String secret = "semcoronaproofroomreservation";
+    private transient String secret = "semcoronaproofroomreservation";
     private transient JwtParser parser = Jwts.parser().setSigningKey(secret);
 
     /**

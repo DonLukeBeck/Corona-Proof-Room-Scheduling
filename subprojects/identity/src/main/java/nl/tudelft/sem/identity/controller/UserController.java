@@ -54,18 +54,20 @@ public class UserController {
                 return ResponseEntity.ok(new TokenInfo("teacher",
                         jwtUtil.extractNetid(tokenRole.getToken())));
             }
-        } catch (Exception e) {
             try {
                 tokenRole = new TokenRole("ROLE_STUDENT", token);
-                boolean isValid = handler.handle(tokenRole);
+                isValid = handler.handle(tokenRole);
                 if (isValid) {
                     return ResponseEntity.ok(new TokenInfo("student",
                             jwtUtil.extractNetid(tokenRole.getToken())));
                 }
-            } catch (Exception ex) {
+            } catch (Exception e) {
                 return ResponseEntity.ok(new TokenInfo(null, jwtUtil.extractNetid(token)));
             }
+        } catch (Exception e) {
+            return ResponseEntity.ok(new TokenInfo(null, jwtUtil.extractNetid(token)));
         }
+
         return ResponseEntity.ok(new TokenInfo(null, jwtUtil.extractNetid(token)));
     }
 
