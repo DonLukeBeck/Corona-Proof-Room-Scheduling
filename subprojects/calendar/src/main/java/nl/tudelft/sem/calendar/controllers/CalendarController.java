@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import nl.tudelft.sem.calendar.communication.CourseCommunicator;
+import nl.tudelft.sem.calendar.communication.CourseAdapter;
 import nl.tudelft.sem.calendar.communication.RestrictionCommunicator;
 import nl.tudelft.sem.calendar.communication.RoomCommunicator;
 import nl.tudelft.sem.calendar.entities.Attendance;
@@ -61,7 +61,7 @@ public class CalendarController {
     private transient RestrictionCommunicator restrictionCommunicator;
 
     @Autowired
-    private transient CourseCommunicator courseCommunicator;
+    private transient CourseAdapter courseAdapter;
 
     @Autowired
     private transient RoomCommunicator roomCommunicator;
@@ -76,23 +76,23 @@ public class CalendarController {
      * @param attendanceRepository the attendance repository
      * @param lectureRepository the lecture repository
      * @param restrictionCommunicator the communicator for the restrictions service
-     * @param courseCommunicator the communicator for the course service
+     * @param courseAdapter the communicator for the course service
      * @param roomCommunicator  the communicator for the room service
      */
     public CalendarController(
-            LectureScheduler lectureScheduler,
-            AttendanceRepository attendanceRepository,
-            LectureRepository lectureRepository,
-            RestrictionCommunicator restrictionCommunicator,
-            CourseCommunicator courseCommunicator,
-            RoomCommunicator roomCommunicator,
-            Validate validate) {
+        LectureScheduler lectureScheduler,
+        AttendanceRepository attendanceRepository,
+        LectureRepository lectureRepository,
+        RestrictionCommunicator restrictionCommunicator,
+        CourseAdapter courseAdapter,
+        RoomCommunicator roomCommunicator,
+        Validate validate) {
 
         this.lectureScheduler = lectureScheduler;
         this.attendanceRepository = attendanceRepository;
         this.lectureRepository = lectureRepository;
         this.restrictionCommunicator = restrictionCommunicator;
-        this.courseCommunicator = courseCommunicator;
+        this.courseAdapter = courseAdapter;
         this.roomCommunicator = roomCommunicator;
         this.validate = validate;
     }
@@ -127,7 +127,7 @@ public class CalendarController {
             List<Room> rooms =
                     restrictionCommunicator.getAllRoomsWithAdjustedCapacity();
             // Get all the lectures to be scheduled
-            List<Lecture> lecturesToSchedule = courseCommunicator
+            List<Lecture> lecturesToSchedule = courseAdapter
                     .getToBeScheduledLectures(LocalDate.now());
             // Create the scheduler that does the scheduling
             lectureScheduler.setFields(rooms, lecturesToSchedule, startTime,
@@ -196,7 +196,7 @@ public class CalendarController {
         }
 
         List<BareCourse> courseList =
-                courseCommunicator.coursesFromTeacher(validation);
+                courseAdapter.coursesFromTeacher(validation);
 
         List<Lecture> lectureList = new ArrayList<>();
         for (BareCourse bareCourse : courseList) {
@@ -270,7 +270,7 @@ public class CalendarController {
         }
 
         List<BareCourse> courseList =
-               courseCommunicator.coursesFromTeacher(validation);
+               courseAdapter.coursesFromTeacher(validation);
         List<Lecture> lectureList = new ArrayList<>();
 
         for (BareCourse bareCourse : courseList) {
