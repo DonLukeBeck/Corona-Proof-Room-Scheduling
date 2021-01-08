@@ -10,7 +10,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.io.IOException;
@@ -23,7 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import javax.servlet.http.HttpServletRequest;
-import nl.tudelft.sem.calendar.communication.CourseCommunicator;
+import nl.tudelft.sem.calendar.communication.CourseAdapter;
 import nl.tudelft.sem.calendar.communication.RestrictionCommunicator;
 import nl.tudelft.sem.calendar.communication.RoomCommunicator;
 import nl.tudelft.sem.calendar.entities.Attendance;
@@ -85,7 +84,7 @@ class CalendarControllerTest {
     private RestrictionCommunicator restrictionCommunicator;
 
     @MockBean
-    private CourseCommunicator courseCommunicator;
+    private CourseAdapter courseAdapter;
 
     @MockBean
     private RoomCommunicator roomCommunicator;
@@ -122,7 +121,7 @@ class CalendarControllerTest {
 
         calendarController = new CalendarController(lectureScheduler,
                 attendanceRepository, lectureRepository, restrictionCommunicator,
-                courseCommunicator, roomCommunicator, validate);
+            courseAdapter, roomCommunicator, validate);
     }
 
     private void createCourses() {
@@ -167,7 +166,7 @@ class CalendarControllerTest {
         when(restrictionCommunicator.getEndTime()).thenReturn(endTimeSec);
         when(restrictionCommunicator.getTimeGapLength()).thenReturn(timeGapLength);
         when(restrictionCommunicator.getAllRoomsWithAdjustedCapacity()).thenReturn(rooms);
-        when(courseCommunicator.getToBeScheduledLectures(any())).thenReturn(lecturesToSchedule);
+        when(courseAdapter.getToBeScheduledLectures(any())).thenReturn(lecturesToSchedule);
 
         when(validate.validateRole(studentRequest, "student"))
                 .thenReturn(netIds[1]);
@@ -215,7 +214,7 @@ class CalendarControllerTest {
 
         verify(restrictionCommunicator, times(1))
                 .getAllRoomsWithAdjustedCapacity();
-        verify(courseCommunicator, times(1))
+        verify(courseAdapter, times(1))
                 .getToBeScheduledLectures(LocalDate.now());
 
         verify(lectureScheduler, times(1))

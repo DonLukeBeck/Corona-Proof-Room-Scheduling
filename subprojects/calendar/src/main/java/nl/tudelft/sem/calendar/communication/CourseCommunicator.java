@@ -18,83 +18,71 @@ import nl.tudelft.sem.shared.entity.BareLecture;
 import org.springframework.stereotype.Service;
 
 @Service
-public class CourseCommunicator extends  Communicator {
-
-    /**
-     * Retrieves the lectures that need to be scheduled from the
-     * Course Management Service.
-     *
-     * @param date the (current) date after which the lectures should be considered for scheduling.
-     *
-     * @return a list of {@link Lecture} objects, used in the scheduling process
-     *
-     * @throws IOException an input/output exception
-     * @throws InterruptedException an interrupted exception
-     * @throws ServerErrorException a server error exception
-     */
-    public List<Lecture> getToBeScheduledLectures(LocalDate date)
-        throws IOException, InterruptedException, ServerErrorException {
-
-        var response = getResponse("/lecture/getLecturesAfterDate?date="
-                + encode(date.toString()), Constants.COURSE_SERVER_URL);
-        var bareLectures
-            = objectMapper.readValue(response.body(), new TypeReference<List<BareLecture>>() {});
-        // this isn't a DU-anomaly since we use it to store and retrieve courses inside the for loop
-        @SuppressWarnings("PMD.DataflowAnomalyAnalysis")
-        var courseMap = new HashMap<String, Course>();
-        var lectureList = new ArrayList<Lecture>();
-        for (var l : bareLectures) {
-            if (!courseMap.containsKey(l.getCourseId())) {
-                courseMap.put(l.getCourseId(), courseFromId(l.getCourseId()));
-            }
-            lectureList.add(Lecture.builder().course(courseMap.get(l.getCourseId()))
-                .courseId(l.getCourseId()).durationInMinutes(l.getDurationInMinutes())
-                .date(l.getDate()).build());
-        }
-        return lectureList;
-    }
-
-    /**
-     * Retrieves the associated course and participants for a lecture.
-     *
-     * @param courseId the id of the course that needs to be retrieved
-     *
-     * @return a {@link Course} object, containing information about the course
-     *
-     * @throws IOException an input/output exception
-     * @throws InterruptedException an interrupted exception
-     * @throws ServerErrorException a server error exception
-     */
-    public Course courseFromId(String courseId)
-        throws IOException, InterruptedException, ServerErrorException {
-        var resp = objectMapper.readValue(getResponse(
-            "/course/getCourse?courseId=" + courseId, Constants.COURSE_SERVER_URL).body(),
-                new TypeReference<BareCourse>(){});
-        var enrollments = objectMapper.readValue(getResponse(
-            "/enrollment/getEnrollmentsByCourse?courseId=" + encode(courseId),
-                Constants.COURSE_SERVER_URL).body(), new TypeReference<List<BareEnrollment>>(){});
-
-
-        return new Course(resp.getCourseId(), resp.getCourseName(), resp.getTeacherId(),
-            enrollments.stream().map(e -> new Enrollment(e.getStudentId(), e.getCourseId()))
-                .collect(Collectors.toList()));
-    }
+public class CourseCommunicator extends Communicator {
 
     /**
      * Retrieves the list of courses based on the id of a teacher.
      *
      * @param teacherId - the id of the teacher
      * @return a list of courses
-     * @throws IOException - an input/output exception
+     * @throws IOException          - an input/output exception
      * @throws InterruptedException - an interrupted exception
      * @throws ServerErrorException - a server error exception
      */
-    public List<BareCourse> coursesFromTeacher(String teacherId)
-            throws IOException, InterruptedException, ServerErrorException {
-        var resp = objectMapper.readValue(getResponse(
-                "/course/getCoursesForTeacher?teacherId=" + encode(teacherId),
-                Constants.COURSE_SERVER_URL).body(), new TypeReference<List<BareCourse>>(){});
-        return resp;
+    public List<BareCourse> getCoursesByTeacher(String teacherId)
+        throws IOException, InterruptedException, ServerErrorException {
+        return objectMapper.readValue(getResponse(
+            "/course/getCoursesForTeacher?teacherId=" + encode(teacherId),
+            Constants.COURSE_SERVER_URL).body(), new TypeReference<>() {});
     }
+
+    /**
+     * Gets lectures after specified date.
+     *
+     * @param date the date after which you want the lectures
+     * @return a list of lectures scheduled after the date
+     * @throws InterruptedException the interrupted exception
+     * @throws ServerErrorException the server error exception
+     * @throws IOException          the io exception
+     */
+    public List<BareLecture> getLecturesAfterDate(LocalDate date)
+        throws InterruptedException, ServerErrorException, IOException {
+        return objectMapper.readValue(getResponse("/lecture/getLecturesAfterDate?date="
+                + encode(date.toString()), Constants.COURSE_SERVER_URL).body(),
+            new TypeReference<>() {});
+    }
+
+    /**
+     * Gets course from id.
+     *
+     * @param courseId the course id
+     * @return the bare course
+     * @throws InterruptedException the interrupted exception
+     * @throws ServerErrorException the server error exception
+     * @throws IOException          the io exception
+     */
+    public BareCourse getCourseFromId(String courseId)
+        throws InterruptedException, ServerErrorException, IOException {
+        return objectMapper.readValue(getResponse("/course/getCourse?courseId="
+                + courseId, Constants.COURSE_SERVER_URL).body(),
+            new TypeReference<>() {});
+    }
+
+    /**
+     * Gets enrollments for course.
+     *
+     * @param courseId the course id
+     * @return the enrollments for course
+     * @throws InterruptedException the interrupted exception
+     * @throws ServerErrorException the server error exception
+     * @throws IOException          the io exception
+     */
+    public List<BareEnrollment> getEnrollmentsForCourse(String courseId)
+        throws InterruptedException, ServerErrorException, IOException {
+        return objectMapper.readValue(getResponse("/enrollment/getEnrollmentsByCourse?courseId="
+                + courseId, Constants.COURSE_SERVER_URL).body(),
+            new TypeReference<>() {});
+    }
+
 }
 

@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class Validate {
     private static String noAccessMessage =
-        "{\"message\": \"You are not allowed to view this page. Please contact administrator.\"}";
+            "You are not allowed to view this page. Please contact administrator.";
 
     /**
      * Helper method to validate the role of a user.
