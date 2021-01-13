@@ -11,14 +11,12 @@ import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import javax.servlet.http.HttpServletRequest;
-import nl.tudelft.sem.calendar.communication.CourseAdapter;
 import nl.tudelft.sem.calendar.communication.RoomCommunicator;
 import nl.tudelft.sem.calendar.entities.Attendance;
 import nl.tudelft.sem.calendar.entities.Course;
@@ -40,11 +38,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 @AutoConfigureMockMvc
-@WebMvcTest(RetrievalController.class)
+@WebMvcTest(StudentRetrievalController.class)
 // This class doesn't ever need to be serialized, so neither do it's members
 @SuppressWarnings("PMD.BeanMembersShouldSerialize")
 
-class RetrievalControllerTest {
+class StudentRetrievalControllerTest {
     private HttpServletRequest wrongRequest;
     private HttpServletRequest studentRequest;
     private HttpServletRequest teacherRequest;
@@ -62,16 +60,13 @@ class RetrievalControllerTest {
     private LectureRepository lectureRepository;
 
     @MockBean
-    private CourseAdapter courseAdapter;
-
-    @MockBean
     private RoomCommunicator roomCommunicator;
 
     @MockBean
     private Validate validate;
 
     @InjectMocks
-    private RetrievalController retrievalController;
+    private StudentRetrievalController retrievalController;
 
     @BeforeEach
     void setup() throws InterruptedException, ServerErrorException, IOException {
@@ -92,8 +87,8 @@ class RetrievalControllerTest {
         createLecturesAndAttendances();
         configureMocks();
 
-        retrievalController = new RetrievalController(roomCommunicator,
-                attendanceRepository, lectureRepository, courseAdapter, validate);
+        retrievalController = new StudentRetrievalController(roomCommunicator,
+                attendanceRepository, lectureRepository, validate);
     }
 
     private void createCourses() {
@@ -136,8 +131,6 @@ class RetrievalControllerTest {
     }
 
     private void configureMocks() throws InterruptedException, ServerErrorException, IOException {
-        when(courseAdapter.getToBeScheduledLectures(any())).thenReturn(lecturesToSchedule);
-
         when(validate.validateRole(studentRequest, "student"))
                 .thenReturn(netIds[1]);
         when(validate.validateRole(teacherRequest, "teacher"))
@@ -205,21 +198,6 @@ class RetrievalControllerTest {
     }
 
     @Test
-    void testGetMyPersonalScheduleTeacherSuccess() 
-            throws InterruptedException, ServerErrorException, IOException {
-        List<Lecture> lectureList = new ArrayList<>();
-        assertEquals(ResponseEntity.ok(lectureList),
-                        retrievalController.getMyPersonalScheduleTeacher(teacherRequest));
-    }
-
-    @Test
-    void testGetMyPersonalScheduleTeacherAccessDenied() 
-            throws InterruptedException, ServerErrorException, IOException {
-        assertEquals(ResponseEntity.ok(Constants.noAccessMessage),
-                retrievalController.getMyPersonalScheduleTeacher(wrongRequest));
-    }
-
-    @Test
     void testGetMyPersonalScheduleForDayStudentSuccess()
                 throws InterruptedException, ServerErrorException, IOException {
 
@@ -252,21 +230,6 @@ class RetrievalControllerTest {
     }
 
     @Test
-    void testGetMyPersonalScheduleForDayTeacherSuccess() 
-            throws InterruptedException, ServerErrorException, IOException {
-        List<Lecture> lectureList = new ArrayList<>();
-        assertEquals(ResponseEntity.ok(lectureList),
-                retrievalController.getMyPersonalScheduleForDayTeacher(teacherRequest, dates[0]));
-    }
-
-    @Test
-    void testGetMyPersonalScheduleForDayTeacherAccessDenied() 
-            throws InterruptedException, ServerErrorException, IOException {
-        assertEquals(ResponseEntity.ok(Constants.noAccessMessage),
-                retrievalController.getMyPersonalScheduleForDayTeacher(wrongRequest, dates[0]));
-    }
-
-    @Test
     void testGetMyPersonalScheduleForCourseStudentSuccess()
             throws InterruptedException, ServerErrorException, IOException {
 
@@ -290,21 +253,6 @@ class RetrievalControllerTest {
             throws InterruptedException, ServerErrorException, IOException {
         assertEquals(ResponseEntity.ok(Constants.noAccessMessage),
                 retrievalController.getMyPersonalScheduleForCourseStudent(
-                        wrongRequest, courses[0].getCourseId()));
-    }
-
-    @Test
-    void testGetMyPersonalScheduleForCourseTeacherSuccess() {
-        List<Lecture> lectureList = new ArrayList<>();
-        assertEquals(ResponseEntity.ok(lectureList),
-                retrievalController.getMyPersonalScheduleForCourseTeacher(
-                        teacherRequest, courses[0].getCourseId()));
-    }
-
-    @Test
-    void testGetMyPersonalScheduleForCourseTeacherAccessDenied() {
-        assertEquals(ResponseEntity.ok(Constants.noAccessMessage),
-                retrievalController.getMyPersonalScheduleForCourseTeacher(
                         wrongRequest, courses[0].getCourseId()));
     }
 
