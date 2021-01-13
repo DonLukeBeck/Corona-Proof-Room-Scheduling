@@ -18,18 +18,24 @@ public class Course {
     private List<Enrollment> participantsList;
 
     /**
-     * Custom constructor to create courses with just a list of netIds. Used to test the scheduling
+     * Custom constructor to create courses with a list of netIds. Used to test the scheduling
      * algorithm.
      *
      * @param netIds a list of netids representing course participants
+     * @param courseId the id of the course to create
+     * @param courseName teh name of the course to create
+     * @param teacherId the id of the teacher teaching the course to create
      */
-    public Course(List<String> netIds) {
+    public Course(List<String> netIds, String courseId, String courseName, String teacherId) {
         participantsList = new ArrayList<>();
-        netIds.stream().forEach(netId -> participantsList.add(new Enrollment(netId, courseId)));
+        netIds.stream().forEach(netId -> this.participantsList.add(new Enrollment(netId, courseId)));
+        this.courseId = courseId;
+        this.courseName = courseName;
+        this.teacherId = teacherId;
     }
 
     /**
-     * Returns the netIds for each enrollment. Used to test the scheduling.
+     * Returns the netIds for each enrollment.
      *
      * @return the list of netIds associated with the course.
      */
