@@ -2,54 +2,35 @@ package nl.tudelft.sem.calendar.controllers;
 
 import java.io.IOException;
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
-import lombok.AllArgsConstructor;
-import lombok.Data;
 import nl.tudelft.sem.calendar.communication.CourseAdapter;
-import nl.tudelft.sem.calendar.communication.RestrictionCommunicator;
 import nl.tudelft.sem.calendar.communication.RoomCommunicator;
 import nl.tudelft.sem.calendar.entities.Attendance;
 import nl.tudelft.sem.calendar.entities.Lecture;
-import nl.tudelft.sem.calendar.entities.Room;
 import nl.tudelft.sem.calendar.exceptions.ServerErrorException;
 import nl.tudelft.sem.calendar.repositories.AttendanceRepository;
 import nl.tudelft.sem.calendar.repositories.LectureRepository;
-import nl.tudelft.sem.calendar.scheduling.LectureScheduler;
-import nl.tudelft.sem.calendar.util.JwtValidate;
 import nl.tudelft.sem.calendar.util.Validate;
+import nl.tudelft.sem.shared.Constants;
 import nl.tudelft.sem.shared.entity.BareCourse;
-import nl.tudelft.sem.shared.entity.StringMessage;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
 @RequestMapping(path = "/calendar")
-
-public class CalendarController {
-
-    private transient String teacherRole = "teacher";
-    private transient String studentRole = "student";
-    private transient StringMessage noAccessMessage =
-        new StringMessage("You are not allowed to view this page. Please contact administrator.");
-
+public class RetrievalController {
     @Autowired
-    private transient LectureScheduler lectureScheduler;
+    private transient RoomCommunicator roomCommunicator;
 
     @Autowired
     private transient AttendanceRepository attendanceRepository;
@@ -58,88 +39,30 @@ public class CalendarController {
     private transient LectureRepository lectureRepository;
 
     @Autowired
-    private transient RestrictionCommunicator restrictionCommunicator;
-
-    @Autowired
     private transient CourseAdapter courseAdapter;
-
-    @Autowired
-    private transient RoomCommunicator roomCommunicator;
 
     @Autowired
     private transient Validate validate;
 
+
     /**
      * Constructor used for testing to inject mockable dependencies.
      *
-     * @param lectureScheduler the lecture scheduler
-     * @param attendanceRepository the attendance repository
-     * @param lectureRepository the lecture repository
-     * @param restrictionCommunicator the communicator for the restrictions service
+     * @param roomCommunicator the communicator to get room information
+     * @param attendanceRepository the repository dealing with attendances
+     * @param lectureRepository the repository dealing with lectures
      * @param courseAdapter the communicator for the course service
-     * @param roomCommunicator  the communicator for the room service
+     * @param validate the validation unit
      */
-    public CalendarController(
-        LectureScheduler lectureScheduler,
-        AttendanceRepository attendanceRepository,
-        LectureRepository lectureRepository,
-        RestrictionCommunicator restrictionCommunicator,
-        CourseAdapter courseAdapter,
-        RoomCommunicator roomCommunicator,
-        Validate validate) {
+    public RetrievalController(
+            RoomCommunicator roomCommunicator, AttendanceRepository attendanceRepository,
+            LectureRepository lectureRepository, CourseAdapter courseAdapter, Validate validate) {
 
-        this.lectureScheduler = lectureScheduler;
+        this.roomCommunicator = roomCommunicator;
         this.attendanceRepository = attendanceRepository;
         this.lectureRepository = lectureRepository;
-        this.restrictionCommunicator = restrictionCommunicator;
         this.courseAdapter = courseAdapter;
-        this.roomCommunicator = roomCommunicator;
         this.validate = validate;
-    }
-
-    /**
-     * This method will form the main API endpoint for the Scheduling functionality, once the
-     * connection face with the other services is determined, it will be implemented to match up.
-     *
-     * @return a response entity indicating success or failure.
-     */
-    @PostMapping(path = "/scheduleLectures")
-    @ResponseBody
-    public ResponseEntity<?> scheduleLectures(HttpServletRequest request)
-            throws JSONException, InterruptedException, IOException {
-
-        String validation = validate.validateRole(request, teacherRole);
-        if (validation.equals(noAccessMessage.getMessage())) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(noAccessMessage);
-        }
-
-        try {
-            // Make API call to retrieve the start time
-            LocalTime startTime = LocalTime
-                    .ofSecondOfDay(restrictionCommunicator.getStartTime());
-
-            // Make API call to retrieve the end time
-            LocalTime endTime = LocalTime
-                    .ofSecondOfDay(restrictionCommunicator.getEndTime());
-            // Make API call to retrieve time gap length
-            int timeGapLength = restrictionCommunicator.getTimeGapLength();
-            // Make API call to retrieve rooms with restricted capacity
-            List<Room> rooms =
-                    restrictionCommunicator.getAllRoomsWithAdjustedCapacity();
-            // Get all the lectures to be scheduled
-            List<Lecture> lecturesToSchedule = courseAdapter
-                    .getToBeScheduledLectures(LocalDate.now());
-            // Create the scheduler that does the scheduling
-            lectureScheduler.setFields(rooms, lecturesToSchedule, startTime,
-                    endTime, timeGapLength);
-            // Schedule the lecture
-            lectureScheduler.scheduleAllLectures();
-
-            return ResponseEntity.ok(new StringMessage("Successfully scheduled lectures."));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new StringMessage("Internal server error."));
-        }
     }
 
     /**
@@ -157,9 +80,9 @@ public class CalendarController {
     public ResponseEntity<?> getMyPersonalScheduleStudent(HttpServletRequest request)
             throws IOException, InterruptedException, ServerErrorException {
 
-        String validation = validate.validateRole(request, studentRole);
-        if (validation.equals(noAccessMessage.getMessage())) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(noAccessMessage);
+        String validation = validate.validateRole(request, Constants.studentRole);
+        if (validation.equals(Constants.noAccessMessage.getMessage())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Constants.noAccessMessage);
         }
 
         List<Lecture> lectures = new ArrayList<>();
@@ -190,9 +113,9 @@ public class CalendarController {
     public ResponseEntity<?> getMyPersonalScheduleTeacher(HttpServletRequest request)
             throws IOException, InterruptedException, ServerErrorException {
 
-        String validation = validate.validateRole(request, teacherRole);
-        if (validation.equals(noAccessMessage.getMessage())) {
-            return ResponseEntity.ok(noAccessMessage);
+        String validation = validate.validateRole(request, Constants.teacherRole);
+        if (validation.equals(Constants.noAccessMessage.getMessage())) {
+            return ResponseEntity.ok(Constants.noAccessMessage);
         }
 
         List<BareCourse> courseList =
@@ -228,9 +151,9 @@ public class CalendarController {
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date)
             throws IOException, InterruptedException, ServerErrorException {
 
-        String validation = validate.validateRole(request, studentRole);
-        if (validation.equals(noAccessMessage.getMessage())) {
-            return ResponseEntity.ok(noAccessMessage);
+        String validation = validate.validateRole(request, Constants.studentRole);
+        if (validation.equals(Constants.noAccessMessage.getMessage())) {
+            return ResponseEntity.ok(Constants.noAccessMessage);
         }
 
         ArrayList<Lecture> lectures = new ArrayList<>();
@@ -264,13 +187,13 @@ public class CalendarController {
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date)
             throws IOException, InterruptedException, ServerErrorException {
 
-        String validation = validate.validateRole(request, teacherRole);
-        if (validation.equals(noAccessMessage.getMessage())) {
-            return ResponseEntity.ok(noAccessMessage);
+        String validation = validate.validateRole(request, Constants.teacherRole);
+        if (validation.equals(Constants.noAccessMessage.getMessage())) {
+            return ResponseEntity.ok(Constants.noAccessMessage);
         }
 
         List<BareCourse> courseList =
-               courseAdapter.coursesFromTeacher(validation);
+                courseAdapter.coursesFromTeacher(validation);
         List<Lecture> lectureList = new ArrayList<>();
 
         for (BareCourse bareCourse : courseList) {
@@ -303,9 +226,9 @@ public class CalendarController {
             HttpServletRequest request, String courseId)
             throws IOException, InterruptedException, ServerErrorException {
 
-        String validation = validate.validateRole(request, studentRole);
-        if (validation.equals(noAccessMessage.getMessage())) {
-            return ResponseEntity.ok(noAccessMessage);
+        String validation = validate.validateRole(request, Constants.studentRole);
+        if (validation.equals(Constants.noAccessMessage.getMessage())) {
+            return ResponseEntity.ok(Constants.noAccessMessage);
         }
 
         ArrayList<Lecture> lectures = new ArrayList<>();
@@ -335,112 +258,18 @@ public class CalendarController {
     // we need to add specific values to lectureIds
     // we need to suppress this warning for every method
     public ResponseEntity<?> getMyPersonalScheduleForCourseTeacher(
-            HttpServletRequest request, String courseId)
-            throws IOException, InterruptedException {
+            HttpServletRequest request, String courseId) {
 
-        String validation = validate.validateRole(request, teacherRole);
+        String validation = validate.validateRole(request, Constants.teacherRole);
 
-        if (validation.equals(noAccessMessage.getMessage())) {
-            return ResponseEntity.ok(noAccessMessage);
+        if (validation.equals(Constants.noAccessMessage.getMessage())) {
+            return ResponseEntity.ok(Constants.noAccessMessage);
         }
 
         // Should we check if the teacher actually teaches the course?
 
         List<Lecture> result = lectureRepository.findByCourseId(courseId);
         return ResponseEntity.ok(result);
-    }
-
-    /**
-     * This method is used by a user to indicate that
-     * the user will be absent during a fysical lecture.
-     *
-     * @param context the {@link CalendarController.AbsenceContext} of the request
-     *
-     * @return a string with 'success' if done.
-     */
-    @PostMapping(path = "/indicateAbsence")
-    @ResponseBody
-    @SuppressWarnings({"PMD.DataflowAnomalyAnalysis", "PMD.AvoidDuplicateLiterals"})
-    // we need to add specific values to lectureIds
-    // we need to suppress this warning for every method
-    public ResponseEntity<?> indicateAbsence(HttpServletRequest request,
-                                             @RequestBody AbsenceContext context)
-            throws IOException, InterruptedException {
-        String userId = context.getUserId();
-        String courseId = context.getCourseId();
-        LocalDate date = context.getDate();
-
-        if (!validate.validateRole(request, studentRole).equals(userId)) {
-            return ResponseEntity.ok(noAccessMessage);
-        }
-        try {
-            List<Lecture> list = lectureRepository
-                    .findByDateAndCourseId(date.plusDays(1), courseId);
-
-            for (Lecture l : list) {
-                int lectureId = l.getRoomId();
-                for (Attendance a :
-                        attendanceRepository.findByLectureIdAndStudentId(lectureId, userId)) {
-                    attendanceRepository.delete(a);
-                    a.setPhysical(false);
-                    attendanceRepository.save(a);
-                }
-            }
-            return ResponseEntity.ok(new StringMessage("Indicated absence."));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new StringMessage("Could not indicated absence."));
-        }
-    }
-
-    @Data
-    @AllArgsConstructor
-    public static class AbsenceContext {
-        String userId;
-        String courseId;
-        LocalDate date;
-    }
-
-    /**
-     * This method is used by a lecture to retrieve a list of netIds belonging to students that
-     * were selected to attend the lecture on-campus.
-     *
-     * @param request an object containing authorization properties.
-     * @param courseId the course for which the user will be absent.
-     * @param date the date on which the lecture would have took place
-     *
-     * @return a list of netIds of selected students
-     */
-    @GetMapping(path = "/getPhysicalAttendantsForLecture")
-    @ResponseBody
-    public ResponseEntity<?> getPhysicalAttendantsForLecture(
-            HttpServletRequest request, String courseId,
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date)
-            throws InterruptedException, IOException {
-
-        String validation = validate.validateRole(request, teacherRole);
-
-        if (validation.equals(noAccessMessage.getMessage())) {
-            return ResponseEntity.ok(noAccessMessage);
-        }
-
-        List<Lecture> list = lectureRepository.findByDateAndCourseId(date.plusDays(1),
-                courseId);
-        List<String> netIds = new ArrayList<>();
-
-        for (Lecture l : list) {
-            int lectureId = l.getRoomId();
-            List<String> temp = attendanceRepository
-                    .findByLectureId(lectureId).stream()
-                    .filter(Attendance::getPhysical)
-                    .map(Attendance::getStudentId)
-                    .collect(Collectors.toList());
-            netIds.addAll(temp);
-        }
-
-
-
-        return ResponseEntity.ok(netIds);
     }
 
     /**
@@ -457,25 +286,5 @@ public class CalendarController {
             result.put(a.getLectureId(), a.getPhysical());
         }
         return result;
-    }
-
-    /**
-     * Helper method to validate the role of a user.
-     *
-     * @param request the request containing jwt token information
-     * @param role the desired role
-     *
-     * @return an error message if the user hasn't got the desired role, else its netId.
-     */
-    public String validateRole(HttpServletRequest request, String role) {
-        try {
-            JSONObject jwtInfo = JwtValidate.jwtValidate(request);
-            if (!jwtInfo.getString("role").equals(role)) {
-                return noAccessMessage.getMessage();
-            }
-            return jwtInfo.getString("netid");
-        } catch (Exception e) {
-            return noAccessMessage.getMessage();
-        }
     }
 }
