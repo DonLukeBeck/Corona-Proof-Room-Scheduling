@@ -7,11 +7,13 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "room")
@@ -27,58 +29,4 @@ public class Room {
 
     @Column(name = "capacity")
     private int capacity;
-
-    /**
-     * Returns the id of the room.
-     *
-     * @return room id of room nl.tudelft.sem.shared.entity
-     */
-    public int getRoomId() {
-        return roomId;
-    }
-
-    /**
-     * Sets the id of the room.
-     *
-     * @param roomId of room nl.tudelft.sem.shared.entity
-     */
-    public void setRoomId(int roomId) {
-        this.roomId = roomId;
-    }
-
-    /**
-     * Gets the name variable of the room.
-     *
-     * @return name of of room nl.tudelft.sem.shared.entity
-     */
-    public String getName() {
-        return name;
-    }
-
-    /**
-     * Sets the name variable of the room.
-     *
-     * @param name of room nl.tudelft.sem.shared.entity
-     */
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    /**
-     * Gets the capacity of the room.
-     *
-     * @return capacity of room nl.tudelft.sem.shared.entity
-     */
-    public int getCapacity() {
-        return capacity;
-    }
-
-    /**
-     * Sets the capacity of the room.
-     *
-     * @param capacity of room nl.tudelft.sem.shared.entity
-     */
-    public void setCapacity(int capacity) {
-        this.capacity = capacity;
-    }
 }
