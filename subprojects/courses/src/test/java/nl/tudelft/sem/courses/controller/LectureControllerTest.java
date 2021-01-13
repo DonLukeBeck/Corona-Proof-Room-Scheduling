@@ -134,42 +134,6 @@ public class LectureControllerTest {
     }
 
     @Test
-    void getAllLectures() {
-        assertEquals(lectureRepository.findAll(), lectureController.getAllLectures().getBody());
-    }
-
-    @Test
-    void getLecturesAfterDate() {
-        List<BareLecture> list =
-                (List<BareLecture>) lectureController.getLecturesAfterDate(dt).getBody();
-        for (BareLecture l : list) {
-            assert (bareLectures.contains(l));
-        }
-    }
-
-    @Test
-    void planNewLectureSuccess() throws JSONException, IOException, InterruptedException {
-        assertEquals(ResponseEntity.ok(new StringMessage("Lecture planned.")),
-                lectureController.planNewLecture(request, addlecture));
-    }
-
-    @Test
-    void planNewLectureAccessDenied() throws JSONException, IOException, InterruptedException {
-        assertEquals(ResponseEntity.status(HttpStatus.FORBIDDEN).body(noAccessMessage),
-                lectureController.planNewLecture(wrongRequest, addlecture));
-    }
-
-
-    @Test
-    void planNewLectureFail() throws JSONException, IOException, InterruptedException {
-        addlecture.setCourseId("randomCourseIdFail");
-        assertEquals(ResponseEntity.ok(new StringMessage(
-                "The course with id " + addlecture.getCourseId()
-                        + " does not exist.")), lectureController
-                .planNewLecture(request, addlecture));
-    }
-
-    @Test
     void cancelLectureSuccess() throws JSONException, IOException, InterruptedException {
         assertEquals(ResponseEntity.ok(new StringMessage("Lecture(s) cancelled.")),
                 lectureController.cancelLecture(request, lecture.getCourseId(), localDate));

@@ -1,14 +1,5 @@
 package nl.tudelft.sem.courses.controller;
 
-import java.io.IOException;
-import java.sql.Date;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import javax.servlet.http.HttpServletRequest;
 import nl.tudelft.sem.courses.entity.Lecture;
 import nl.tudelft.sem.courses.repository.CourseRepository;
 import nl.tudelft.sem.courses.repository.LectureRepository;
@@ -25,14 +16,20 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
 
-@RestController
-@RequestMapping(path = "/lecture")
-public class LectureController {
+import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
+import java.sql.Date;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+public class LecturePlannerController {
 
     @Autowired
     private transient CourseRepository courseRepository;
@@ -44,12 +41,12 @@ public class LectureController {
     private transient String teacherRole = "teacher";
 
     protected transient StringMessage noAccessMessage =
-        new StringMessage("You are not allowed to view this page. Please contact administrator.");
+            new StringMessage("You are not allowed to view this page. Please contact administrator.");
 
     /**
      * Instantiates repository needed.
      */
-    public LectureController(CourseRepository courseRepository,
+    public LecturePlannerController(CourseRepository courseRepository,
                              LectureRepository lectureRepository, Validate validate) {
         this.courseRepository = courseRepository;
         this.lectureRepository = lectureRepository;
@@ -84,34 +81,34 @@ public class LectureController {
     }
 
     /**
-     * Cancels a lecture with provided properties.
+     * Plans a lecture with provided properties.
      *
-     * @param courseId the Id of the associated course
-     * @param date the date on which to cancel the lecture
+     * @param addLecture the object containing the lecture details
      * @return an indication of whether the operation succeeded or not
      */
-    @DeleteMapping(path = "/cancelLecture") // Map ONLY POST Requests
-    public ResponseEntity<?> cancelLecture(HttpServletRequest request,
-                                           @RequestParam String courseId,
-                                           @RequestParam @DateTimeFormat(
-            iso = DateTimeFormat.ISO.DATE) LocalDate date) throws JSONException, IOException,
-            InterruptedException {
+    @PostMapping(path = "/planNewLecture") // Map ONLY POST Requests
+    @SuppressWarnings("PMD.DataflowAnomalyAnalysis")
+    // Found 'DD'-anomaly for variable 'lectureId' (lines '96'-'98').
+    // -> correct since we need to count
+    public ResponseEntity<?> planNewLecture(HttpServletRequest request,
+                                            @RequestBody AddLecture addLecture)
+            throws JSONException, IOException, InterruptedException {
 
         String validation = validate.validateRole(request, teacherRole);
         if (validation.equals(noAccessMessage.getMessage())) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(noAccessMessage);
         }
 
-        // We need to add one day since Spring of MariaDB or something matches against one day off
-        Date sqlDate = Date.valueOf(date.plusDays(1));
-        List<Lecture> lectures =
-                lectureRepository.findByCourseIdAndScheduledDate(courseId, sqlDate);
-        if (lectures.size() == 0) {
-            return ResponseEntity.notFound().build();
+        if (courseRepository.findByCourseId(addLecture.getCourseId()) != null) {
+            Lecture lecture = new Lecture();
+            lecture.setCourseId(addLecture.getCourseId());
+            lecture.setDuration(addLecture.getDurationInMinutes());
+            lecture.setScheduledDate(addLecture.getDate());
+            lectureRepository.save(lecture);
+            return ResponseEntity.ok(new StringMessage("Lecture planned."));
+        } else {
+            return ResponseEntity.ok(new StringMessage("The course with id "
+                    + addLecture.getCourseId() + " does not exist."));
         }
-        for (Lecture l : lectures) {
-            lectureRepository.delete(l);
-        }
-        return ResponseEntity.ok(new StringMessage("Lecture(s) cancelled."));
     }
 }
