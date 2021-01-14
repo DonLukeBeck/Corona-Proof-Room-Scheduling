@@ -36,7 +36,7 @@ public abstract class BaseValidator implements Validator {
      * @return next validation
      * @throws Exception if the chain is complete
      */
-    protected boolean checkNext(TokenRole tokenRole) throws Exception {
+    protected boolean checkNext(TokenRole tokenRole) {
         if (next == null) {
             return true;
         }

@@ -40,34 +40,27 @@ public class UserController {
      * @param token String containing jwt token
      * @return Extracted role from token
      */
+    // the `isTeacher` variable isn't actually being overwritten, it just appears after itself
+    // because it can take different values
+    @SuppressWarnings("PMD.DataflowAnomalyAnalysis")
     @PostMapping(path = "/validate")
     public ResponseEntity<?> validate(@RequestBody String token) {
-
-        TokenRole tokenRole = new TokenRole("ROLE_TEACHER", token);
 
         //creating the chain
         Validator handler = new DateValidator();
         handler.setNext(new RoleValidator());
+        boolean isTeacher, isValid;
 
-        try {
-            //one method call to rule the chain of validation for teacher
-            boolean isValid = handler.handle(tokenRole);
-            if (isValid) {
-                return ResponseEntity.ok(new TokenInfo("teacher",
-                        jwtUtil.extractNetid(tokenRole.getToken())));
-            }
-            tokenRole = new TokenRole("ROLE_STUDENT", token);
-            //one method call to rule the chain of validation for student
-            isValid = handler.handle(tokenRole);
-            if (isValid) {
-                return ResponseEntity.ok(new TokenInfo("student",
-                        jwtUtil.extractNetid(tokenRole.getToken())));
-            }
-        } catch (Exception e) {
+        if (handler.handle(new TokenRole("ROLE_TEACHER", token)))
+            isTeacher = isValid = true;
+        else
+            isTeacher = !(isValid = handler.handle(new TokenRole("ROLE_STUDENT", token)));
+
+        if (isValid)
+            return ResponseEntity.ok(new TokenInfo( isTeacher ? "teacher" : "student",
+                jwtUtil.extractNetid(token)));
+        else
             return ResponseEntity.ok(new TokenInfo(null, jwtUtil.extractNetid(token)));
-        }
-
-        return ResponseEntity.ok(new TokenInfo(null, jwtUtil.extractNetid(token)));
     }
 
     /**
