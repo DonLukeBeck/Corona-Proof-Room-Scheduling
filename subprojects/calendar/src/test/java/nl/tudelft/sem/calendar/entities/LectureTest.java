@@ -29,7 +29,7 @@ class LectureTest {
     private transient Attendance attendance;
     private transient String courseName;
     private transient String teacherId;
-    private transient List<Enrollment> participants;
+    private transient List<String> participants;
 
     /**
      * Creates a lecture and attributes that are used for verification.
@@ -56,12 +56,10 @@ class LectureTest {
         courseName = "ADS";
         teacherId = "rkrebbers";
 
-        participants = Arrays.asList(
-                Enrollment.builder().studentId("abobe").courseId("CSE2100").build(), 
-                Enrollment.builder().studentId("mbjdegoede").courseId("CSE2100").build());
+        participants = Arrays.asList("abobe", "mbjdegoede");
 
         course = Course.builder()
-                .participantsList(participants)
+                .netIds(participants)
                 .courseId(courseId)
                 .courseName(courseName)
                 .teacherId(teacherId).build();
@@ -210,7 +208,7 @@ class LectureTest {
     @Test
     void testSetCourse() {
         Course course1 = Course.builder()
-                .participantsList(participants)
+                .netIds(participants)
                 .courseId(courseId)
                 .courseName("CSE1400")
                 .teacherId(teacherId).build();
