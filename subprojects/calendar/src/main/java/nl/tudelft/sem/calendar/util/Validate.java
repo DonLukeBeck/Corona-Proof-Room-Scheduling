@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class Validate {
+
     private static String noAccessMessage =
             "You are not allowed to view this page. Please contact administrator.";
 

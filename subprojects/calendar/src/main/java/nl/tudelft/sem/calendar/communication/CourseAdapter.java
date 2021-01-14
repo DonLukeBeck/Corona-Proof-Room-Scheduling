@@ -65,9 +65,9 @@ public class CourseAdapter {
         var resp = courseCommunicator.getCourseFromId(courseId);
         var enrollments = courseCommunicator.getEnrollmentsForCourse(courseId);
 
-        return new Course(resp.getCourseId(), resp.getCourseName(), resp.getTeacherId(),
-            enrollments.stream().map(e -> new Enrollment(e.getStudentId(), e.getCourseId()))
-                .collect(Collectors.toList()));
+        return new Course(enrollments.stream().map(BareEnrollment::getStudentId)
+                .collect(Collectors.toList()), resp.getCourseId(), resp.getCourseName(),
+                resp.getTeacherId());
     }
 
     /**
