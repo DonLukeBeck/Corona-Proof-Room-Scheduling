@@ -7,6 +7,9 @@ import org.springframework.stereotype.Service;
 @Service
 public class Validate {
 
+    private static String noAccessMessage =
+            "You are not allowed to view this page. Please contact administrator.";
+
     /**
      * Helper method to validate the role of a user.
      *
@@ -16,7 +19,6 @@ public class Validate {
      * @return an error message if the user hasn't got the desired role, else its netId.
      */
     public String validateRole(HttpServletRequest request, String role) {
-        String noAccessMessage = "You are not allowed to view this page. Please contact administrator.";
         try {
             JSONObject jwtInfo = JwtValidate.jwtValidate(request);
             if (!jwtInfo.getString("role").equals(role)) {
