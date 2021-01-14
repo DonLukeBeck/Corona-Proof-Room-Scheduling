@@ -56,16 +56,12 @@ public class UserController {
                 return ResponseEntity.ok(new TokenInfo("teacher",
                         jwtUtil.extractNetid(tokenRole.getToken())));
             }
-            try {
-                tokenRole = new TokenRole("ROLE_STUDENT", token);
-                //one method call to rule the chain of validation for student
-                isValid = handler.handle(tokenRole);
-                if (isValid) {
-                    return ResponseEntity.ok(new TokenInfo("student",
-                            jwtUtil.extractNetid(tokenRole.getToken())));
-                }
-            } catch (Exception e) {
-                return ResponseEntity.ok(new TokenInfo(null, jwtUtil.extractNetid(token)));
+            tokenRole = new TokenRole("ROLE_STUDENT", token);
+            //one method call to rule the chain of validation for student
+            isValid = handler.handle(tokenRole);
+            if (isValid) {
+                return ResponseEntity.ok(new TokenInfo("student",
+                        jwtUtil.extractNetid(tokenRole.getToken())));
             }
         } catch (Exception e) {
             return ResponseEntity.ok(new TokenInfo(null, jwtUtil.extractNetid(token)));
@@ -82,8 +78,7 @@ public class UserController {
      * @throws AuthenticationException if authentication fails
      */
     @PostMapping("/login")
-    public ResponseEntity<?> generateToken(@RequestBody AuthenticationRequest authRequest)
-            throws AuthenticationException {
+    public ResponseEntity<?> generateToken(@RequestBody AuthenticationRequest authRequest) {
         try {
             //validate username and password
             authenticationManager.authenticate(
