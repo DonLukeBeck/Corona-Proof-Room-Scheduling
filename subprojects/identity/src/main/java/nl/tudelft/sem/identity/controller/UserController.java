@@ -42,7 +42,6 @@ public class UserController {
      */
     @PostMapping(path = "/validate")
     public ResponseEntity<?> validate(@RequestBody String token) {
-        JwtUtil jwtUtil = new JwtUtil();
 
         TokenRole tokenRole = new TokenRole("ROLE_TEACHER", token);
 
