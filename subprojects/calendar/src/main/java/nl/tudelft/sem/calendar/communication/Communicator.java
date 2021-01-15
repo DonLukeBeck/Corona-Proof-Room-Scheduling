@@ -32,6 +32,7 @@ public abstract class Communicator {
         }
         return response;
     }
+
     protected String encode(String s) {
         return URLEncoder.encode(s, StandardCharsets.UTF_8);
     }

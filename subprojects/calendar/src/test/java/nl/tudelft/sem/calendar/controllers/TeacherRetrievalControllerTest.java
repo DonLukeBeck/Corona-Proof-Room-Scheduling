@@ -90,7 +90,7 @@ class TeacherRetrievalControllerTest {
     private void createCourses() {
         courses = new Course[] { new Course(List.of(netIds).subList(0, 2),
                 "CSE1200", "Calculus", "teacher1"),
-                new Course(List.of(netIds).subList(2, 3),
+                    new Course(List.of(netIds).subList(2, 3),
                         "CSE2200", "someCourse", "teacher2") };
 
         courses[0].setTeacherId(netIds[3]);
