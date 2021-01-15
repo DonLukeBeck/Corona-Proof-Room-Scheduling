@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 import nl.tudelft.sem.restrictions.communication.RoomsCommunicator;
 import nl.tudelft.sem.restrictions.communication.ServerErrorException;
 import nl.tudelft.sem.restrictions.communication.Validate;
+import nl.tudelft.sem.restrictions.controllers.RestrictionGettersController;
 import nl.tudelft.sem.shared.entity.IntValue;
 import nl.tudelft.sem.shared.entity.StringMessage;
 import org.junit.jupiter.api.BeforeEach;

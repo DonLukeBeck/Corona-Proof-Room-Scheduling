@@ -1,9 +1,12 @@
-package nl.tudelft.sem.restrictions;
+package nl.tudelft.sem.restrictions.controllers;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import nl.tudelft.sem.restrictions.Restriction;
+import nl.tudelft.sem.restrictions.RestrictionRepository;
+import nl.tudelft.sem.restrictions.Room;
 import nl.tudelft.sem.restrictions.communication.RoomsCommunicator;
 import nl.tudelft.sem.restrictions.communication.ServerErrorException;
 import nl.tudelft.sem.shared.entity.IntValue;
@@ -92,18 +95,22 @@ public class RestrictionGettersController {
     public ResponseEntity<?> getAllRoomsWithAdjustedCapacity()
             throws InterruptedException, ServerErrorException, IOException {
         List<Room> it = roomsCommunicator.getAllRooms();
+        return ResponseEntity.ok(adjustCapacitiesOfRooms(it));
+    }
+
+    private List<Room> adjustCapacitiesOfRooms(List<Room> it) {
+        int cap;
         for (Room r : it) {
-            int cap = r.getCapacity();
-            IntValue capRestriction;
-            int minSeatsBig = (int) getRestrictionVal("minSeatsBig");
-            if (cap >= minSeatsBig) {
-                capRestriction = new IntValue((int) getRestrictionVal("bigRoomMaxPercentage"));
+            cap = r.getCapacity();
+            if (cap >= ((int) getRestrictionVal("minSeatsBig"))) {
+                r.setCapacity((cap / 100)
+                        * ((int) getRestrictionVal("bigRoomMaxPercentage")));
             } else {
-                capRestriction = new IntValue((int) getRestrictionVal("smallRoomMaxPercentage"));
+                r.setCapacity((cap / 100)
+                        * ((int) getRestrictionVal("smallRoomMaxPercentage")));
             }
-            r.setCapacity(cap * capRestriction.getValue() / 100);
         }
-        return ResponseEntity.ok(it);
+        return it;
     }
 }
 

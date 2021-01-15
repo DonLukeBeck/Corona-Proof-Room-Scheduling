@@ -2,13 +2,12 @@ package nl.tudelft.sem.restrictions;
 
 import static nl.tudelft.sem.shared.Constants.noAccessMessage;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.when;
 
 import javax.servlet.http.HttpServletRequest;
 import nl.tudelft.sem.restrictions.communication.Validate;
-import nl.tudelft.sem.restrictions.controllers.RestrictionSettersController;
+import nl.tudelft.sem.restrictions.controllers.RestrictionCapacityController;
 import nl.tudelft.sem.shared.entity.StringMessage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,10 +22,10 @@ import org.springframework.test.context.ContextConfiguration;
 
 @ContextConfiguration(classes = Restriction.class)
 @AutoConfigureMockMvc
-@WebMvcTest(RestrictionSettersController.class)
+@WebMvcTest(RestrictionCapacityControllerTest.class)
 // This class doesn't ever need to be serialized, so neither do it's members
 @SuppressWarnings("PMD.BeanMembersShouldSerialize")
-class RestrictionSettersControllerTest {
+public class RestrictionCapacityControllerTest {
 
     private Restriction rest1;
     private Restriction rest2;
@@ -42,7 +41,7 @@ class RestrictionSettersControllerTest {
     Validate validate;
 
     @InjectMocks
-    private RestrictionSettersController restrictionController;
+    private RestrictionCapacityController restrictionController;
 
     /**
      * The initial setup before each test.
@@ -60,8 +59,7 @@ class RestrictionSettersControllerTest {
         request = Mockito.mock(HttpServletRequest.class);
         wrongRequest = Mockito.mock(HttpServletRequest.class);
 
-        restrictionController = new RestrictionSettersController(restrictionRepository,
-                validate);
+        restrictionController = new RestrictionCapacityController(restrictionRepository, validate);
         when(restrictionRepository.findByName(rest1.getName()))
                 .thenReturn(java.util.Optional.ofNullable(rest1));
         when(restrictionRepository.findByName(rest2.getName()))
@@ -92,50 +90,37 @@ class RestrictionSettersControllerTest {
     }
 
     @Test
-    public void equalsTest() {
-        assertEquals(rest2, rest2);
+    void setCapacityRestriction() {
+        RestrictionCapacityController.SetCapacityRestrictionContext context =
+                new RestrictionCapacityController.SetCapacityRestrictionContext(true, 1.0f);
+        assertEquals(ae, restrictionController.setCapacityRestriction(request, context));
+        assertEquals(fb, restrictionController.setCapacityRestriction(wrongRequest, context));
     }
 
     @Test
-    public void notEqualsTest() {
-        assertNotEquals(restrictionController, rest1);
+    void setCapacityRestriction2() {
+        RestrictionCapacityController.SetCapacityRestrictionContext context =
+                new RestrictionCapacityController.SetCapacityRestrictionContext(false, 2.0f);
+        assertEquals(ae, restrictionController.setCapacityRestriction(request, context));
+        assertEquals(fb, restrictionController.setCapacityRestriction(wrongRequest, context));
     }
 
     @Test
-    public void notEquals2() {
-        assertNotEquals(rest2, rest1);
+    public void addNewRestrictionSuccess() {
+        assertEquals(new StringMessage("Saved"), RestrictionCapacityController
+                .addRestriction("name", 3.0f, restrictionRepository));
     }
 
     @Test
-    public void toStringTest() {
-        assertEquals(rest1.toString(), "Restriction(name=test, value=1.0)");
+    public void addNewRestrictionSuccess1() {
+        assertEquals(new StringMessage("Saved"), RestrictionCapacityController
+                .addRestriction("test", 4.0f, restrictionRepository));
     }
 
     @Test
-    void setMinSeatsBig() {
-        assertEquals(ae, restrictionController.setMinSeatsBig(request, 2.0f));
-        assertEquals(fb, restrictionController.setMinSeatsBig(wrongRequest, 2.0f));
+    public void addNewRestrictionSuccess2() {
+        assertEquals(new StringMessage("Already Exists"), RestrictionCapacityController
+                .addRestriction("test2", 2.0f, restrictionRepository));
     }
 
-    @Test
-    void setTimeGapLength() {
-        assertEquals(ae, restrictionController.setTimeGapLength(request, 1.0f));
-        assertEquals(fb, restrictionController.setTimeGapLength(wrongRequest, 1.0f));
-    }
-
-    @Test
-    void setStartTime() {
-        assertEquals(ResponseEntity.ok(new StringMessage("Saved")),
-                restrictionController.setStartTime(request, 1000));
-        assertEquals(fb,
-                restrictionController.setStartTime(wrongRequest, 1000));
-    }
-
-    @Test
-    void setEndTime() {
-        assertEquals(ResponseEntity.ok(new StringMessage("Saved")),
-                restrictionController.setEndTime(request, 3000));
-        assertEquals(fb,
-                restrictionController.setEndTime(wrongRequest, 3000));
-    }
 }

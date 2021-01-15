@@ -1,9 +1,7 @@
-package nl.tudelft.sem.restrictions;
+package nl.tudelft.sem.restrictions.controllers;
 
-import java.util.Optional;
 import javax.servlet.http.HttpServletRequest;
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import nl.tudelft.sem.restrictions.RestrictionRepository;
 import nl.tudelft.sem.restrictions.communication.Validate;
 import nl.tudelft.sem.shared.Constants;
 import nl.tudelft.sem.shared.entity.StringMessage;
@@ -16,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-
 @RestController // This means that this class is a RestController
 @RequestMapping(path = "/restrictions") // URL's start with /restrictions (after Application path)
 public class RestrictionSettersController {
@@ -26,6 +23,9 @@ public class RestrictionSettersController {
 
     @Autowired
     private transient Validate validate;
+
+    private static ResponseEntity<?> forbidden = ResponseEntity.status(HttpStatus.FORBIDDEN)
+            .body(Constants.noAccessMessage);
 
     /**
      * Initializes the repository that is being used.
@@ -39,25 +39,14 @@ public class RestrictionSettersController {
     }
 
     /**
-     * Creates a new restriction or updates it.
+     * Add the restriction to database.
      *
-     * @param name of the restriction
-     * @param value of the restriction (float)
-     * @return message containing the action that has been done
+     * @param name of restriction
+     * @param value of restriction
+     * @return string message
      */
-    public StringMessage addNewRestriction(String name, float value) {
-        Optional<Restriction> r = restrictionRepository.findByName(name);
-        if (r.isPresent()) {
-            if (r.get().getValue() == value) {
-                return new StringMessage("Already Exists");
-            } else {
-                restrictionRepository.delete(r.get());
-                restrictionRepository.save(new Restriction(name, value));
-                return new StringMessage("Updated");
-            }
-        }
-        restrictionRepository.save(new Restriction(name, value));
-        return new StringMessage("Saved");
+    private StringMessage addRestriction(String name, float value) {
+        return RestrictionCapacityController.addRestriction(name, value, restrictionRepository);
     }
 
     /**
@@ -66,39 +55,9 @@ public class RestrictionSettersController {
      * @param request of the user
      * @return boolean indication of teacher
      */
-    public boolean teacherValidate(HttpServletRequest request) {
+    private boolean teacherValidate(HttpServletRequest request) {
         String validation = validate.validateRole(request, Constants.teacherRole);
         return validation.equals(Constants.noAccessMessage.getMessage());
-    }
-
-    /**
-     * This function sets the capacity restrictions for big and small rooms.
-     *
-     * @param context the {@link SetCapacityRestrictionContext} to create the restriction
-     * @return a string containing the success or error message
-     */
-    @PostMapping(path = "/setCapacityRestriction") // Map ONLY POST Requests
-    @ResponseBody
-    public ResponseEntity<?> setCapacityRestriction(HttpServletRequest request,
-                                            @RequestBody SetCapacityRestrictionContext context) {
-        if (teacherValidate(request)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body(Constants.noAccessMessage);
-        }
-        if (context.isBigRoom()) {
-            return ResponseEntity.ok(
-                    addNewRestriction("bigRoomMaxPercentage", context.getMaxPercentageAllowed()));
-        } else {
-            return ResponseEntity.ok(
-                    addNewRestriction("smallRoomMaxPercentage", context.getMaxPercentageAllowed()));
-        }
-    }
-
-    @Data
-    @AllArgsConstructor
-    public static class SetCapacityRestrictionContext {
-        boolean isBigRoom;
-        float maxPercentageAllowed;
     }
 
     /**
@@ -112,9 +71,9 @@ public class RestrictionSettersController {
     public ResponseEntity<?> setMinSeatsBig(HttpServletRequest request,
                                             @RequestBody float numberOfSeats) {
         if (teacherValidate(request)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Constants.noAccessMessage);
+            return forbidden;
         }
-        return ResponseEntity.ok(addNewRestriction("minSeatsBig", numberOfSeats));
+        return ResponseEntity.ok(addRestriction("minSeatsBig", numberOfSeats));
     }
 
     /**
@@ -128,10 +87,10 @@ public class RestrictionSettersController {
     public ResponseEntity<?> setTimeGapLength(HttpServletRequest request,
                                               @RequestBody float gapTimeInMinutes) {
         if (teacherValidate(request)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Constants.noAccessMessage);
+            return forbidden;
         }
 
-        return ResponseEntity.ok(addNewRestriction("gapTimeInMinutes", gapTimeInMinutes));
+        return ResponseEntity.ok(addRestriction("gapTimeInMinutes", gapTimeInMinutes));
     }
 
     /**
@@ -145,9 +104,9 @@ public class RestrictionSettersController {
     public ResponseEntity<?> setStartTime(HttpServletRequest request,
                                           @RequestBody int startTime) {
         if (teacherValidate(request)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Constants.noAccessMessage);
+            return forbidden;
         }
-        return ResponseEntity.ok(addNewRestriction("startTime", (float) startTime));
+        return ResponseEntity.ok(addRestriction("startTime", (float) startTime));
     }
 
     /**
@@ -161,10 +120,10 @@ public class RestrictionSettersController {
     public ResponseEntity<?> setEndTime(HttpServletRequest request,
                                         @RequestBody int endTime) {
         if (teacherValidate(request)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Constants.noAccessMessage);
+            return forbidden;
         }
 
-        return ResponseEntity.ok(addNewRestriction("endTime", (float) endTime));
+        return ResponseEntity.ok(addRestriction("endTime", (float) endTime));
     }
 }
 
