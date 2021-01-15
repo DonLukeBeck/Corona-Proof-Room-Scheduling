@@ -6,7 +6,14 @@ import static java.util.stream.Collectors.groupingBy;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.PriorityQueue;
 import lombok.Getter;
 import lombok.Setter;
 import nl.tudelft.sem.calendar.entities.Attendance;
@@ -93,14 +100,11 @@ public class LectureScheduler {
                 //checkstyle complains about the distance between the variable and its first usage
                 //however, we cannot use it after the calls below because the method will fail
                 int capacity = assignRoom(toBeScheduled, toBeScheduled.getDurationInMinutes());
-
                 // solve a time conversion issue by adding an hour to the time before export
                 toBeScheduled.setStartTime(toBeScheduled.getStartTime().plusHours(1));
                 toBeScheduled.setEndTime(toBeScheduled.getEndTime().plusHours(1));
-
                 // save lecture in database and update it with a version including an id
                 toBeScheduled = lectureRepository.saveAndFlush(toBeScheduled);
-
                 // then assign students to this lecture with id
                 assignStudents(capacity, toBeScheduled, allParticipants);
             }
@@ -120,7 +124,7 @@ public class LectureScheduler {
     // This isn't a DU-anomaly since `selectedStudents` is being read when the participants are
     // being stored in the database
     @SuppressWarnings("PMD.DataflowAnomalyAnalysis")
-    public void assignStudents(int capacity, Lecture scheduledLecture, Map<String,
+    void assignStudents(int capacity, Lecture scheduledLecture, Map<String,
             LocalDate> allParticipants) {
 
         // Use a priority queue to select students based on the closest deadline.
@@ -158,7 +162,7 @@ public class LectureScheduler {
      * Sorts the list of rooms by decreasing capacity, so that the biggest lectures will be
      * scheduled in the biggest rooms.
      */
-    public void sortRoomsByCapacity() {
+    void sortRoomsByCapacity() {
         roomList.sort(Comparator.comparing(Room::getCapacity, reverseOrder()));
     }
 
@@ -168,7 +172,7 @@ public class LectureScheduler {
      *
      * @return a map grouping lecture requests by date
      */
-    public Map<LocalDate, List<Lecture>> groupLecturesByDay() {
+    Map<LocalDate, List<Lecture>> groupLecturesByDay() {
         return lecturesToSchedule.stream().collect(groupingBy(Lecture::getDate));
     }
 
@@ -180,7 +184,7 @@ public class LectureScheduler {
      * @param lecturesByDay the map storing all lectures grouped by day
      * @return a list of requested lectures, sorted by the corresponding course size
      */
-    public List<Lecture> getSortedLecturesForDay(LocalDate date, Map<LocalDate,
+    List<Lecture> getSortedLecturesForDay(LocalDate date, Map<LocalDate,
             List<Lecture>> lecturesByDay) {
         lecturesByDay.get(date).sort(Comparator.comparing(
                 l -> l.getCourse().getNetIds().size(), reverseOrder()));
@@ -201,7 +205,7 @@ public class LectureScheduler {
      *      are placed with increasing deadline, so that the students which haven't been
      *      to campus for the longest time are selected the first.
      */
-    public PriorityQueue<OnCampusCandidate> createCandidateSelector(LocalDate lectureDate,
+    PriorityQueue<OnCampusCandidate> createCandidateSelector(LocalDate lectureDate,
                         List<String> courseParticipants, Map<String, LocalDate> allParticipants) {
 
         PriorityQueue<OnCampusCandidate> candidates = new PriorityQueue<>(courseParticipants.size(),
@@ -233,7 +237,7 @@ public class LectureScheduler {
      * @return the capacity of the room in which the lecture is now scheduled,
      *      used to assign students to it.
      */
-    public int assignRoom(Lecture scheduledLecture, int durationInMinutes) {
+    int assignRoom(Lecture scheduledLecture, int durationInMinutes) {
         while (roomSearchIndex < roomList.size()) {
             // Check if it fits in the current room at the current day
             if (durationInMinutes <= (int) Duration.between(

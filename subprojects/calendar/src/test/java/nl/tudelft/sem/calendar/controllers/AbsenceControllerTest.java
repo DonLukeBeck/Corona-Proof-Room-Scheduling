@@ -2,23 +2,17 @@ package nl.tudelft.sem.calendar.controllers;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import nl.tudelft.sem.calendar.entities.Attendance;
 import nl.tudelft.sem.calendar.entities.Course;
 import nl.tudelft.sem.calendar.entities.Lecture;
@@ -85,7 +79,8 @@ class AbsenceControllerTest {
         createLecturesAndAttendances();
         configureMocks();
 
-        absenceController = new AbsenceController(attendanceRepository, lectureRepository, validate);
+        absenceController = new AbsenceController(attendanceRepository,
+                lectureRepository, validate);
     }
 
     private void createCourses() {

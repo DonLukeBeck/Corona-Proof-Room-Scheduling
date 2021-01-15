@@ -9,6 +9,6 @@ public interface Validator {
 
     void setNext(Validator handler);
 
-    boolean handle(TokenRole tokenRole) throws Exception;
+    boolean handle(TokenRole tokenRole);
 
 }
