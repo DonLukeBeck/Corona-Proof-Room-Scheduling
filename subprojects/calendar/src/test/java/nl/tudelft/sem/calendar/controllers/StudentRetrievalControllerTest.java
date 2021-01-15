@@ -94,8 +94,8 @@ class StudentRetrievalControllerTest {
     private void createCourses() {
         courses = new Course[] { new Course(List.of(netIds).subList(0, 2),
                 "CSE1200", "Calculus", "teacher1"),
-                new Course(List.of(netIds).subList(2, 3),
-                        "CSE2200", "someCourse", "teacher2") };
+                    new Course(List.of(netIds).subList(2, 3), "CSE2200",
+                            "someCourse", "teacher2")};
 
         courses[0].setTeacherId(netIds[3]);
         courses[1].setTeacherId(netIds[4]);
@@ -234,8 +234,8 @@ class StudentRetrievalControllerTest {
             throws InterruptedException, ServerErrorException, IOException {
 
         List<Lecture> response =
-            (List<Lecture>) retrievalController.getMyPersonalScheduleForCourseStudent(studentRequest,
-            lecturesToSchedule.get(1).getCourseId()).getBody();
+            (List<Lecture>) retrievalController.getMyPersonalScheduleForCourseStudent(
+                    studentRequest, lecturesToSchedule.get(1).getCourseId()).getBody();
 
         assertEquals(1, Objects.requireNonNull(response).size());
         assertTrue(response.get(0).isSelectedForOnCampus());

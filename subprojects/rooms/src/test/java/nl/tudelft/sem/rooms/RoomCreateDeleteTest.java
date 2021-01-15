@@ -20,12 +20,12 @@ import org.springframework.test.context.ContextConfiguration;
 @WebMvcTest
 // This class doesn't ever need to be serialized, so neither do it's members
 @SuppressWarnings("PMD.BeanMembersShouldSerialize")
-class RoomControllerTest {
+class RoomCreateDeleteTest {
 
     private Room room1;
     private Room room2;
 
-    private RoomController roomController;
+    private RoomCreateDelete roomController;
     private List<Room> allRooms;
 
     @MockBean
@@ -40,7 +40,7 @@ class RoomControllerTest {
         this.room2 = new Room(2, "DW-2", 20);
         allRooms = Arrays.asList(room1, room2);
 
-        roomController = new RoomController(roomRepository);
+        roomController = new RoomCreateDelete(roomRepository);
         when(roomRepository.findAll())
                 .thenReturn(allRooms);
         when(roomRepository.findByName(room1.getName()))
@@ -56,20 +56,38 @@ class RoomControllerTest {
     }
 
     @Test
-    void getAllRooms() {
-        assertEquals(ResponseEntity.ok(allRooms),
-                roomController.getAllRooms());
+    void addNewRoom() {
+        RoomCreateDelete.NewRoomContext context =
+            new RoomCreateDelete.NewRoomContext(room1.getName(), room1.getCapacity());
+        assertEquals(ResponseEntity.ok(new StringMessage("Already Exists")),
+                roomController.addNewRoom(context));
     }
 
     @Test
-    void getRoomName() {
-        assertEquals(ResponseEntity.ok(new StringMessage("DW-2")),
-                roomController.getRoomName(room2.getRoomId()));
+    void addNewRoom1() {
+        RoomCreateDelete.NewRoomContext context =
+            new RoomCreateDelete.NewRoomContext("hey", -4);
+        assertEquals(ResponseEntity.ok(new StringMessage("Invalid capacity.")),
+                roomController.addNewRoom(context));
     }
 
     @Test
-    void getRoomName1() {
-        assertEquals(ResponseEntity.notFound().build(),
-                roomController.getRoomName(7));
+    void addNewRoom2() {
+        RoomCreateDelete.NewRoomContext context =
+            new RoomCreateDelete.NewRoomContext("hey", 4);
+        assertEquals(ResponseEntity.ok(new StringMessage("Room added.")),
+                roomController.addNewRoom(context));
+    }
+
+    @Test
+    void deleteRoom() {
+        assertEquals(ResponseEntity.ok(new StringMessage("Room could not be found.")),
+                roomController.deleteRoom("Test"));
+    }
+
+    @Test
+    void deleteRoom1() {
+        assertEquals(ResponseEntity.ok(new StringMessage("Deleted")),
+                roomController.deleteRoom("DW-1"));
     }
 }

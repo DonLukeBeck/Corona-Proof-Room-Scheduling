@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import java.io.IOException;
 import java.util.List;
 import nl.tudelft.sem.restrictions.Room;
+import nl.tudelft.sem.shared.Constants;
 import org.springframework.stereotype.Service;
 
 @Service

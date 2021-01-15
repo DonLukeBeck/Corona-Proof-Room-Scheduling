@@ -11,5 +11,6 @@ public class Constants {
     public static final String teacherRole = "teacher";
     public static final String studentRole = "student";
     public static final StringMessage noAccessMessage =
-            new StringMessage("You are not allowed to view this page. Please contact administrator.");
+            new StringMessage("You are not allowed to view this page."
+                    + " Please contact administrator.");
 }
