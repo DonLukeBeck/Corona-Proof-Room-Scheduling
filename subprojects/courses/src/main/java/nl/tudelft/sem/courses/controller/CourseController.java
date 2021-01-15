@@ -1,31 +1,30 @@
 package nl.tudelft.sem.courses.controller;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import javax.servlet.http.HttpServletRequest;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import nl.tudelft.sem.courses.entity.Course;
 import nl.tudelft.sem.courses.entity.Enrollment;
 import nl.tudelft.sem.courses.repository.CourseRepository;
 import nl.tudelft.sem.courses.repository.EnrollmentRepository;
 import nl.tudelft.sem.courses.util.Validate;
+import nl.tudelft.sem.shared.Constants;
 import nl.tudelft.sem.shared.entity.AddCourse;
-import nl.tudelft.sem.shared.entity.BareCourse;
 import nl.tudelft.sem.shared.entity.StringMessage;
 import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-
+@Getter
+@AllArgsConstructor
 @RestController // This means that this class is a RestController
 @RequestMapping(path = "/course") // URL's start with /course (after Application path)
 public class CourseController {
@@ -36,34 +35,6 @@ public class CourseController {
     private transient EnrollmentRepository enrollmentRepository;
     @Autowired
     private transient Validate validate;
-
-    private transient String teacherRole = "teacher";
-
-    protected transient StringMessage noAccessMessage =
-        new StringMessage("You are not allowed to view this page. Please contact administrator.");
-
-    /**
-     * Instantiates repository needed.
-     */
-    public CourseController(CourseRepository courseRepository,
-                            EnrollmentRepository enrollmentRepository, Validate validate) {
-        this.courseRepository = courseRepository;
-        this.enrollmentRepository = enrollmentRepository;
-        this.validate = validate;
-    }
-
-    public Validate getValidate() {
-        return validate;
-    }
-
-    public CourseRepository getCourseRepository() {
-        return courseRepository;
-    }
-
-    public EnrollmentRepository getEnrollmentRepository() {
-        return enrollmentRepository;
-    }
-
 
     /**
      * Adds a new course with provided parameters.
@@ -77,9 +48,9 @@ public class CourseController {
             HttpServletRequest request, @RequestBody AddCourse addCourse)
             throws IOException, InterruptedException, JSONException {
 
-        String validation = validate.validateRole(request, teacherRole);
-        if (validation.equals(noAccessMessage.getMessage())) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(noAccessMessage);
+        String validation = validate.validateRole(request, Constants.teacherRole);
+        if (validation.equals(Constants.noAccessMessage.getMessage())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Constants.noAccessMessage);
         }
 
         Course r = courseRepository.findByCourseId(addCourse.getCourseId());
@@ -117,9 +88,9 @@ public class CourseController {
                                           @RequestParam String courseId)
             throws JSONException, IOException, InterruptedException {
 
-        String validation = validate.validateRole(request, teacherRole);
-        if (validation.equals(noAccessMessage.getMessage())) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(noAccessMessage);
+        String validation = validate.validateRole(request, Constants.teacherRole);
+        if (validation.equals(Constants.noAccessMessage.getMessage())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Constants.noAccessMessage);
         }
 
         Course r = courseRepository.findByCourseId(courseId);
