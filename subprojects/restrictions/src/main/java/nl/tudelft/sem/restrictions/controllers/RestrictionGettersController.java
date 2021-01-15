@@ -27,6 +27,11 @@ public class RestrictionGettersController {
     @Autowired
     private transient RoomsCommunicator roomsCommunicator;
 
+    private transient int cap;
+    private transient int minSeatsBig;
+    private transient int bigPercentage;
+    private transient int smallPercentage;
+
     /**
      * Initializes the repository that is being used.
      *
@@ -99,15 +104,17 @@ public class RestrictionGettersController {
     }
 
     private List<Room> adjustCapacitiesOfRooms(List<Room> it) {
-        int cap;
+        minSeatsBig = ((int) getRestrictionVal("minSeatsBig"));
+        smallPercentage = ((int) getRestrictionVal("smallRoomMaxPercentage"));
+        bigPercentage = ((int) getRestrictionVal("bigRoomMaxPercentage"));
         for (Room r : it) {
             cap = r.getCapacity();
-            if (cap >= ((int) getRestrictionVal("minSeatsBig"))) {
+            if (cap >= minSeatsBig) {
                 r.setCapacity((cap / 100)
-                        * ((int) getRestrictionVal("bigRoomMaxPercentage")));
+                        * bigPercentage);
             } else {
                 r.setCapacity((cap / 100)
-                        * ((int) getRestrictionVal("smallRoomMaxPercentage")));
+                        * smallPercentage);
             }
         }
         return it;
