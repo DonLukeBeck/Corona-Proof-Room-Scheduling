@@ -12,8 +12,7 @@ class CourseTest {
     private static String courseId;
     private static String courseName;
     private static String teacherId;
-    private static List<Enrollment> participants;
-    private static String exampleCourseName = "CSE2100";
+    private static List<String> participants;
 
     /**
      * Creates a course and its attributes used in all test cases.
@@ -25,12 +24,10 @@ class CourseTest {
         courseName = "ADS";
         teacherId = "rkrebbers";
 
-        participants = Arrays.asList(
-                Enrollment.builder().studentId("abobe").courseId(exampleCourseName).build(),
-                Enrollment.builder().studentId("mbjdegoede").courseId(exampleCourseName).build());
+        participants = Arrays.asList("abobe", "mbjdegoede");
 
         course = Course.builder()
-                .participantsList(participants)
+                .netIds(participants)
                 .courseId(courseId)
                 .courseName(courseName)
                 .teacherId(teacherId).build();
@@ -41,7 +38,7 @@ class CourseTest {
      */
     @Test
     void testGetParticipantsList() {
-        assertEquals(participants, course.getParticipantsList());
+        assertEquals(participants, course.getNetIds());
     }
 
     /**
@@ -49,12 +46,10 @@ class CourseTest {
      */
     @Test
     void testSetParticipantsList() {
-        List<Enrollment> participants2 = Arrays.asList(
-                Enrollment.builder().studentId("someNetId").courseId(exampleCourseName).build(),
-                Enrollment.builder().studentId("someNetId2").courseId(exampleCourseName).build());
+        List<String> participants2 = Arrays.asList("someNetId", "someNetId2");
 
-        course.setParticipantsList(participants2);
-        assertEquals(participants2, course.getParticipantsList());
+        course.setNetIds(participants2);
+        assertEquals(participants2, course.getNetIds());
     }
 
     /**
@@ -63,8 +58,7 @@ class CourseTest {
      */
     @Test
     void getNetIds() {
-        assertEquals(Arrays.asList(participants.get(0).getStudentId(),
-                participants.get(1).getStudentId()), course.getNetIds());
+        assertEquals(participants, course.getNetIds());
     }
 
     /**

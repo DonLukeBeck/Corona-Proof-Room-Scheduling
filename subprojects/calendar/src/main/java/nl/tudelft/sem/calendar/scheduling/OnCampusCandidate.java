@@ -2,7 +2,11 @@ package nl.tudelft.sem.calendar.scheduling;
 
 import java.time.LocalDate;
 import java.util.Objects;
+import lombok.Getter;
+import lombok.Setter;
 
+@Getter
+@Setter
 public class OnCampusCandidate {
 
     private String netId;
@@ -50,41 +54,4 @@ public class OnCampusCandidate {
         return Objects.hash(netId, deadline);
     }
 
-    /**
-     * Returns the associated netId of this student.
-     *
-     * @return a string indicating the netid
-     */
-    public String getNetId() {
-        return netId;
-    }
-
-    /**
-     * Sets the associated netId of this student.
-     *
-     * @param netId a string indicating the netid to be set
-     */
-    public void setNetId(String netId) {
-        this.netId = netId;
-    }
-
-    /**
-     * Returns the deadline of this student.
-     *
-     * @return a localdate indicating indicating the latest date at which
-     *                  a student should come to campus
-     */
-    public LocalDate getDeadline() {
-        return this.deadline;
-    }
-
-    /**
-     * Sets the deadline of this student.
-     *
-     * @param deadline a localdate indicating the latest date at which a student should come to
-     *                 campus
-     */
-    public void setDeadline(LocalDate deadline) {
-        this.deadline = deadline;
-    }
 }

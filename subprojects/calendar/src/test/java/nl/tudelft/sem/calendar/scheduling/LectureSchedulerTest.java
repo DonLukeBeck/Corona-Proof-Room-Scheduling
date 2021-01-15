@@ -205,7 +205,7 @@ class LectureSchedulerTest {
     @Test
     void testSetFields() {
         assertEquals(roomList, scheduler.getRoomList());
-        assertEquals(lecturesToSchedule, scheduler.getLecturesList());
+        assertEquals(lecturesToSchedule, scheduler.getLecturesToSchedule());
         assertEquals(startTime, scheduler.getStartTime());
         assertEquals(endTime, scheduler.getEndTime());
         assertEquals(timeGapLengthInMinutes, scheduler.getTimeGapLengthInMinutes());

@@ -6,14 +6,9 @@ import static java.util.stream.Collectors.groupingBy;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.PriorityQueue;
+import java.util.*;
+import lombok.Getter;
+import lombok.Setter;
 import nl.tudelft.sem.calendar.entities.Attendance;
 import nl.tudelft.sem.calendar.entities.Lecture;
 import nl.tudelft.sem.calendar.entities.Room;
@@ -25,6 +20,8 @@ import org.springframework.stereotype.Service;
 
 
 @Service
+@Getter
+@Setter
 @ComponentScan(basePackages = {"nl.tudelft.sem.identity.*"})
 public class LectureScheduler {
 
@@ -262,85 +259,5 @@ public class LectureScheduler {
         return 0;
     }
 
-    /**
-     * Returns the list of rooms used for scheduling.
-     *
-     * @return the list of rooms used for scheduling
-     */
-    public List<Room> getRoomList() {
-        return roomList;
-    }
 
-
-    /**
-     * Sets the room search index for scheduling, used for testing purposes.
-     *
-     * @param roomSearchIndex the index of where the scheduling algorithm should begin scheduling
-     */
-    public void setRoomSearchIndex(int roomSearchIndex) {
-        this.roomSearchIndex = roomSearchIndex;
-    }
-
-    /**
-     * Returns the room search index for scheduling, used for testing purposes.
-     *
-     * @return the most recent index of where the scheduling algorithm tries to schedule
-     */
-    public int getRoomSearchIndex() {
-        return this.roomSearchIndex;
-    }
-
-    /**
-     * Returns the list of lectures to be scheduled, used for testing purposes.
-     *
-     * @return the list of lectures to be schedule
-     */
-    public List<Lecture> getLecturesList() {
-        return this.lecturesToSchedule;
-    }
-
-    /**
-     * Returns the time to start the scheduling at, used for testing purposes.
-     *
-     * @return the time to start the scheduling at
-     */
-    public LocalTime getStartTime() {
-        return this.startTime;
-    }
-
-    /**
-     * Returns the time to end the scheduling at, used for testing purposes.
-     *
-     * @return the time to end the scheduling at
-     */
-    public LocalTime getEndTime() {
-        return this.endTime;
-    }
-
-    /**
-     * Returns the time gap in minutes between any two lectures, used for testing purposes.
-     *
-     * @return time gap in minutes between any two lectures
-     */
-    public int getTimeGapLengthInMinutes() {
-        return this.timeGapLengthInMinutes;
-    }
-
-    /**
-     * Returns the array with availability times for each room, used for testing purposes.
-     *
-     * @return the array with availability times for each room
-     */
-    public LocalTime[] getRoomAvailability() {
-        return this.roomAvailability;
-    }
-
-    /**
-     * Returns the map with course participants and their deadlines, used for testing purposes.
-     *
-     * @return the map with course participants and their deadlines
-     */
-    public Map<String, LocalDate> getAllParticipants() {
-        return allParticipants;
-    }
 }

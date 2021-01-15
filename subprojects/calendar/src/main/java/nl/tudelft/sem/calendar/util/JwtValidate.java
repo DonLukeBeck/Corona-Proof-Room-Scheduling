@@ -13,7 +13,6 @@ import org.json.JSONObject;
 public class JwtValidate {
 
     private static HttpClient client = HttpClient.newBuilder().build();
-    private static String uri = "/validate";
 
     /**
      * Primary method to verify the role inside a jwt token from a request authorization Header.
@@ -39,6 +38,7 @@ public class JwtValidate {
         }
 
         HttpRequest.Builder builder = HttpRequest.newBuilder();
+        String uri = "/validate";
         builder.uri(URI.create(Constants.IDENTITY_SERVER_URL + uri))
                 .header("Content-Type", "text/plain; charset=UTF-8")
                 .POST(HttpRequest.BodyPublishers.ofString(token));
