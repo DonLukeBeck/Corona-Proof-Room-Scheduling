@@ -18,6 +18,7 @@ import nl.tudelft.sem.courses.repository.CourseRepository;
 import nl.tudelft.sem.courses.repository.EnrollmentRepository;
 import nl.tudelft.sem.courses.repository.LectureRepository;
 import nl.tudelft.sem.courses.util.Validate;
+import nl.tudelft.sem.shared.Constants;
 import nl.tudelft.sem.shared.entity.AddCourse;
 import nl.tudelft.sem.shared.entity.StringMessage;
 import org.json.JSONException;
@@ -37,9 +38,6 @@ import org.springframework.test.context.ContextConfiguration;
 // This class doesn't ever need to be serialized, so neither do it's members
 @SuppressWarnings("PMD.BeanMembersShouldSerialize")
 public class CourseRetrievalControllerTest {
-    private transient StringMessage noAccessMessage =
-            new StringMessage("You are not allowed to view this page."
-                    + " Please contact administrator.");
 
     private AddCourse addcourse;
     private Course course;
@@ -114,10 +112,10 @@ public class CourseRetrievalControllerTest {
         when(validate.validateRole(request, "teacher"))
                 .thenReturn("netid");
         when(validate.validateRole(wrongRequest, "teacher"))
-                .thenReturn(noAccessMessage.getMessage());
+                .thenReturn(Constants.noAccessMessage.getMessage());
 
         courseController =
-                new CourseRetrievalController(courseRepository, enrollmentRepository, validate);
+                new CourseRetrievalController(courseRepository, enrollmentRepository);
     }
 
     @Test

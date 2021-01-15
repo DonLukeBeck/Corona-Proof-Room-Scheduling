@@ -18,6 +18,7 @@ import nl.tudelft.sem.courses.repository.CourseRepository;
 import nl.tudelft.sem.courses.repository.EnrollmentRepository;
 import nl.tudelft.sem.courses.repository.LectureRepository;
 import nl.tudelft.sem.courses.util.Validate;
+import nl.tudelft.sem.shared.Constants;
 import nl.tudelft.sem.shared.entity.AddLecture;
 import nl.tudelft.sem.shared.entity.BareLecture;
 import nl.tudelft.sem.shared.entity.StringMessage;
@@ -38,9 +39,6 @@ import org.springframework.test.context.ContextConfiguration;
 // This class doesn't ever need to be serialized, so neither do it's members
 @SuppressWarnings("PMD.BeanMembersShouldSerialize")
 public class LectureRetrievalControllerTest {
-    private transient StringMessage noAccessMessage =
-            new StringMessage("You are not allowed to view this page."
-                    + " Please contact administrator.");
 
     private AddLecture addlecture;
     private Lecture lecture;
@@ -106,7 +104,7 @@ public class LectureRetrievalControllerTest {
         lectureRepository.save(lecture);
 
         lectureController =
-                new LectureRetrievalController(courseRepository, lectureRepository, validate);
+                new LectureRetrievalController(lectureRepository);
 
         when(courseRepository.findByCourseId(course.getCourseId())).thenReturn(course);
         when(courseRepository.findByCourseName(course.getCourseName())).thenReturn(course);
@@ -122,15 +120,13 @@ public class LectureRetrievalControllerTest {
         when(validate.validateRole(request, "teacher"))
                 .thenReturn("netid");
         when(validate.validateRole(wrongRequest, "teacher"))
-                .thenReturn(noAccessMessage.getMessage());
+                .thenReturn(Constants.noAccessMessage.getMessage());
     }
 
     @Test
     public void constructor() {
         assertNotNull(lectureController);
-        assertEquals(courseRepository, lectureController.getCourseRepository());
         assertEquals(lectureRepository, lectureController.getLectureRepository());
-        assertEquals(validate, lectureController.getValidate());
     }
 
     @Test
