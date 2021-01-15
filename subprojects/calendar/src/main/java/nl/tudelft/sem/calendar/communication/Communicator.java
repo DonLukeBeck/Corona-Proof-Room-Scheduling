@@ -36,8 +36,4 @@ public abstract class Communicator {
     protected String encode(String s) {
         return URLEncoder.encode(s, StandardCharsets.UTF_8);
     }
-
-    protected void setHttpClient(HttpClient httpClient) {
-        client = httpClient;
-    }
 }

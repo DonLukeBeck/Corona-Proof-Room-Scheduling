@@ -2,6 +2,8 @@ package nl.tudelft.sem.courses.controller;
 
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import nl.tudelft.sem.courses.entity.Enrollment;
 import nl.tudelft.sem.courses.repository.EnrollmentRepository;
 import nl.tudelft.sem.shared.entity.BareEnrollment;
@@ -13,19 +15,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+@Getter
+@AllArgsConstructor
 @RestController
 @RequestMapping(path = "/enrollment")
 public class EnrollmentController {
 
     @Autowired
     private transient EnrollmentRepository enrollmentRepository;
-
-    /**
-     * Instantiates repository needed.
-     */
-    public EnrollmentController(EnrollmentRepository enrollmentRepository) {
-        this.enrollmentRepository = enrollmentRepository;
-    }
 
     /**
      * Get endpoint to retrieve all enrollments.

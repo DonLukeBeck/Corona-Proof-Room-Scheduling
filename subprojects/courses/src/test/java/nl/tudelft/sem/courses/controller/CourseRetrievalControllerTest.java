@@ -37,7 +37,7 @@ import org.springframework.test.context.ContextConfiguration;
 @WebMvcTest
 // This class doesn't ever need to be serialized, so neither do it's members
 @SuppressWarnings("PMD.BeanMembersShouldSerialize")
-public class CourseControllerTest {
+public class CourseRetrievalControllerTest {
 
     private AddCourse addcourse;
     private Course course;
@@ -45,7 +45,7 @@ public class CourseControllerTest {
     private List<String> participants;
     private List<Enrollment> enrollments;
 
-    private CourseController courseController;
+    private CourseRetrievalController courseController;
     private HttpServletRequest request;
     private HttpServletRequest wrongRequest;
 
@@ -115,7 +115,7 @@ public class CourseControllerTest {
                 .thenReturn(Constants.noAccessMessage.getMessage());
 
         courseController =
-                new CourseController(courseRepository, enrollmentRepository, validate);
+                new CourseRetrievalController(courseRepository, enrollmentRepository);
     }
 
     @Test
@@ -124,27 +124,20 @@ public class CourseControllerTest {
     }
 
     @Test
-    void createNewCourseSuccess() throws IOException, InterruptedException {
-        AddCourse newOne = new AddCourse(
-                "CSE1299", "OOPP", "Andy", participants);
-
-        assertEquals(ResponseEntity.ok(new StringMessage("Course created.")),
-                courseController.createNewCourse(request, newOne));
+    void getAllCoursesSuccess() {
+        assertEquals(courseRepository.findAll(), courseController.getAllCourses().getBody());
     }
 
     @Test
-    void createNewCourseAccessDenied() throws IOException, InterruptedException {
-        AddCourse newOne = new AddCourse(
-                "CSE1299", "OOPP", "Andy", participants);
-
-        assertEquals(ResponseEntity.status(HttpStatus.FORBIDDEN).body(Constants.noAccessMessage),
-                courseController.createNewCourse(wrongRequest, newOne));
+    void getCoursesForTeacherSuccess() {
+        assertEquals(courseRepository.findAllByTeacherId(course.getTeacherId()),
+                courseController.getCoursesForTeacher(course.getTeacherId()).getBody());
     }
 
     @Test
-    void createNewCourseAlreadyExists() throws IOException, InterruptedException {
-        assertEquals(ResponseEntity.ok(new StringMessage("Course already exists.")),
-                courseController.createNewCourse(request, addcourse));
+    void getCoursesForTeacherFail() {
+        assertNotEquals(courseRepository.findAllByTeacherId(course.getTeacherId()),
+                courseController.getCoursesForTeacher("RandomTeacherId").getBody());
     }
 
     @Test
@@ -157,20 +150,23 @@ public class CourseControllerTest {
     }
 
     @Test
-    void deleteCourseSuccess() throws JSONException, IOException, InterruptedException {
-        assertEquals(ResponseEntity.ok(new StringMessage("Course deleted.")),
-                courseController.deleteCourse(request, course.getCourseId()));
+    void getCourseParticipants() {
+        ResponseEntity<ArrayList<String>> response = (ResponseEntity<ArrayList<String>>)
+                courseController.getCourseParticipants(enrollment.getCourseId());
+
+        for (String i : response.getBody()) {
+            Enrollment e = new Enrollment();
+            e.setCourseId(enrollment.getCourseId());
+            e.setStudentId(i);
+            assert (enrollments.contains(e));
+        }
     }
 
     @Test
-    void deleteCourseAccessDenied() throws JSONException, IOException, InterruptedException {
-        assertEquals(ResponseEntity.status(HttpStatus.FORBIDDEN).body(Constants.noAccessMessage),
-                courseController.deleteCourse(wrongRequest, course.getCourseId()));
-    }
-
-    @Test
-    void deleteCourseNotExistent() throws JSONException, IOException, InterruptedException {
-        assertEquals(ResponseEntity.notFound().build(),
-                courseController.deleteCourse(request, "RandomNumber"));
+    void getCourseParticipantsFail() {
+        enrollment.setCourseId("randomCourseIdFail");
+        ResponseEntity<ArrayList<String>> response = (ResponseEntity<ArrayList<String>>)
+                courseController.getCourseParticipants(enrollment.getCourseId());
+        assertEquals(0, response.getBody().size());
     }
 }

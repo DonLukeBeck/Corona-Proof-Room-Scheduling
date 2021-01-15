@@ -75,10 +75,13 @@ class LectureSchedulerTest {
     private void createCourses() {
         testCourses = new Course[3];
         testCourses[0] = new Course(
-                Arrays.asList("someNetId", "someNetId2"));
+                Arrays.asList("someNetId", "someNetId2"), "CSE1200",
+                "Calculus", "teacher1");
         testCourses[1] = new Course(
-                Arrays.asList("abobe", "mbjdegoede", "cparlar"));
-        testCourses[2] = new Course(Collections.singletonList("mdavid"));
+                Arrays.asList("abobe", "mbjdegoede", "cparlar"), "CSE2200",
+                "SomeCourse", "teacher2");
+        testCourses[2] = new Course(Collections.singletonList("mdavid"), "CSE2250",
+                "SomeCourse2", "teacher1");
     }
 
     /**
@@ -202,7 +205,7 @@ class LectureSchedulerTest {
     @Test
     void testSetFields() {
         assertEquals(roomList, scheduler.getRoomList());
-        assertEquals(lecturesToSchedule, scheduler.getLecturesList());
+        assertEquals(lecturesToSchedule, scheduler.getLecturesToSchedule());
         assertEquals(startTime, scheduler.getStartTime());
         assertEquals(endTime, scheduler.getEndTime());
         assertEquals(timeGapLengthInMinutes, scheduler.getTimeGapLengthInMinutes());

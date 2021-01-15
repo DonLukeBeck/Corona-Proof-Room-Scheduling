@@ -7,6 +7,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import javax.servlet.http.HttpServletRequest;
+import nl.tudelft.sem.shared.Constants;
 import org.json.JSONException;
 import org.json.JSONObject;
 

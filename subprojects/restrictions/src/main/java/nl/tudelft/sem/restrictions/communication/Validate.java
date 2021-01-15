@@ -1,6 +1,5 @@
 package nl.tudelft.sem.restrictions.communication;
 
-import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -21,7 +20,7 @@ public class Validate {
      * @return an error message if the user hasn't got the desired role, else its netId.
      */
     public String validateRole(HttpServletRequest request, String role)
-            throws JSONException, IOException, InterruptedException {
+            throws JSONException {
 
         try {
             JSONObject jwtInfo = JwtValidate.jwtValidate(request);
