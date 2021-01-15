@@ -1,6 +1,7 @@
 package nl.tudelft.sem.identity;
 
 import java.util.List;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.annotation.PostConstruct;
@@ -27,32 +28,36 @@ public class Application {
     @Autowired
     private UserRepository repository;
 
+    Collector<? super User, ? extends Object, List<User>> collector = Collectors.toList();
+
     /**
      * Initialise a list of users to be added to the database.
      */
     @PostConstruct
-    public void initUsers() {
+    void initUsers() {
 
        	//password encoder to encode raw password in database
        	BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
+       	String password = encoder.encode("12345");
+
        	//list of user objects to be 'registered' in the database
        	List<User> users = Stream.of(
-       	    new User("luca", encoder.encode("1234"), "student", false),
-            new User("luka", encoder.encode("12345"), "teacher", true),
-            new User("testTeacher", encoder.encode("12345"), "teacher", true)
-       	).collect(Collectors.toList());
+       	    new User("luca", password, "student", false),
+            new User("luka", password, "teacher", true),
+            new User("testTeacher", password, "teacher", true)
+       	).collect(collector);
        	repository.saveAll(users);
     }
 
     @Bean
     @LoadBalanced
-    public RestTemplate getRestTemplate() {
+    RestTemplate getRestTemplate() {
         return new RestTemplate();
     }
 
     @Bean
-    public WebClient.Builder getWebClientBuilder() {
+    WebClient.Builder getWebClientBuilder() {
         return WebClient.builder();
     }
 

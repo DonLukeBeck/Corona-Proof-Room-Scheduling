@@ -49,18 +49,20 @@ public class UserController {
         //creating the chain
         Validator handler = new DateValidator();
         handler.setNext(new RoleValidator());
-        boolean isTeacher, isValid;
+        boolean isTeacher;
+        boolean isValid;
 
-        if (handler.handle(new TokenRole("ROLE_TEACHER", token)))
+        if (handler.handle(new TokenRole("ROLE_TEACHER", token))) {
             isTeacher = isValid = true;
-        else
+        } else {
             isTeacher = !(isValid = handler.handle(new TokenRole("ROLE_STUDENT", token)));
-
-        if (isValid)
-            return ResponseEntity.ok(new TokenInfo( isTeacher ? "teacher" : "student",
-                jwtUtil.extractNetid(token)));
-        else
+        }
+        if (isValid) {
+            return ResponseEntity.ok(new TokenInfo(isTeacher ? "teacher" : "student",
+                    jwtUtil.extractNetid(token)));
+        } else {
             return ResponseEntity.ok(new TokenInfo(null, jwtUtil.extractNetid(token)));
+        }
     }
 
     /**
