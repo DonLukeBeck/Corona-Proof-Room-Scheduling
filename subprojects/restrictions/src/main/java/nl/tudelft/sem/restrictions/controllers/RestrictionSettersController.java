@@ -45,7 +45,7 @@ public class RestrictionSettersController {
      * @param value of restriction
      * @return string message
      */
-    private StringMessage addRestriction(String name, float value) {
+    StringMessage addRestriction(String name, float value) {
         return RestrictionCapacityController.addRestriction(name, value, restrictionRepository);
     }
 
@@ -55,7 +55,7 @@ public class RestrictionSettersController {
      * @param request of the user
      * @return boolean indication of teacher
      */
-    private boolean teacherValidate(HttpServletRequest request) {
+    boolean teacherValidate(HttpServletRequest request) {
         String validation = validate.validateRole(request, Constants.teacherRole);
         return validation.equals(Constants.noAccessMessage.getMessage());
     }

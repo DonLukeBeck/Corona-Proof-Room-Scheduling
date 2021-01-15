@@ -103,21 +103,26 @@ public class RestrictionGettersController {
         return ResponseEntity.ok(adjustCapacitiesOfRooms(it));
     }
 
-    private List<Room> adjustCapacitiesOfRooms(List<Room> it) {
-        minSeatsBig = ((int) getRestrictionVal("minSeatsBig"));
-        smallPercentage = ((int) getRestrictionVal("smallRoomMaxPercentage"));
-        bigPercentage = ((int) getRestrictionVal("bigRoomMaxPercentage"));
+    List<Room> adjustCapacitiesOfRooms(List<Room> it) {
+        updateConstants();
         for (Room r : it) {
             cap = r.getCapacity();
             if (cap >= minSeatsBig) {
-                r.setCapacity((cap / 100)
+                cap = ((cap / 100)
                         * bigPercentage);
             } else {
-                r.setCapacity((cap / 100)
+                cap = ((cap / 100)
                         * smallPercentage);
             }
+            r.setCapacity(cap);
         }
         return it;
+    }
+
+    void updateConstants() {
+        minSeatsBig = ((int) getRestrictionVal("minSeatsBig"));
+        smallPercentage = ((int) getRestrictionVal("smallRoomMaxPercentage"));
+        bigPercentage = ((int) getRestrictionVal("bigRoomMaxPercentage"));
     }
 }
 
