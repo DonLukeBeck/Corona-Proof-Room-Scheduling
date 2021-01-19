@@ -1,9 +1,11 @@
 package nl.tudelft.sem.calendar.controllers;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -159,20 +161,22 @@ class TeacherRetrievalControllerTest {
 
         when(lectureRepository.findByDateAndCourseId(any(), any()))
             .thenReturn(lecturesToSchedule.subList(0, 2));
-        when(lectureRepository.findByCourseIdAndDate(any(),any()))
+        when(lectureRepository.findByCourseIdAndDate(any(), any()))
                 .thenReturn(lecturesToSchedule.subList(0, 2));
         when(attendanceRepository.findByLectureIdAndStudentId(
                 lecturesToSchedule.get(0).getLectureId(), netIds[1]))
                 .thenReturn(attendances.subList(1, 2));
 
-        when(courseAdapter.coursesFromTeacher(any())).thenReturn(Arrays.asList(new BareCourse(),new BareCourse()));
+        when(courseAdapter.coursesFromTeacher(any()))
+                .thenReturn(Arrays.asList(new BareCourse(), new BareCourse()));
     }
 
     @Test
     void testGetMyPersonalScheduleTeacherSuccess()
             throws InterruptedException, ServerErrorException, IOException {
-        List<Lecture> lectures = (List<Lecture>)(retrievalController.getMyPersonalScheduleTeacher(teacherRequest).getBody());
-        for(Lecture l :lectures) {
+        List<Lecture> lectures = (List<Lecture>) (retrievalController
+                .getMyPersonalScheduleTeacher(teacherRequest).getBody());
+        for (Lecture l : lectures) {
             assertTrue(l.isSelectedForOnCampus());
             assertNotNull(l.getRoomName());
         }
@@ -191,8 +195,9 @@ class TeacherRetrievalControllerTest {
     @Test
     void testGetMyPersonalScheduleForDayTeacherSuccess()
             throws InterruptedException, ServerErrorException, IOException {
-        List<Lecture> lectures = (List<Lecture>)retrievalController.getMyPersonalScheduleForDayTeacher(teacherRequest,dates[0]).getBody();
-        for(Lecture l: lectures) {
+        List<Lecture> lectures = (List<Lecture>) retrievalController
+                .getMyPersonalScheduleForDayTeacher(teacherRequest, dates[0]).getBody();
+        for (Lecture l : lectures) {
             assertTrue(l.isSelectedForOnCampus());
             assertNotNull(l.getRoomName());
         }

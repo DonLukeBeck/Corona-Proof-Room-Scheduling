@@ -1,5 +1,6 @@
 package nl.tudelft.sem.courses.controller;
 
+import java.util.Collection;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.AllArgsConstructor;
@@ -45,8 +46,16 @@ public class EnrollmentController {
     @GetMapping("/getEnrollmentsByCourse")
     @ResponseBody
     public ResponseEntity<?> getEnrollmentsByCourse(@RequestParam("courseId") String courseId) {
-        return ResponseEntity.ok(bareFromEnrollment(enrollmentRepository.findAll().stream()
-                .filter(e -> e.getCourseId().equals(courseId))).collect(Collectors.toList()));
+        if (courseId == null) {
+            return ResponseEntity.notFound().build();
+        }
+        Collection<Enrollment> temp = enrollmentRepository.findAll();
+        return ResponseEntity.ok(bareFromEnrollment(
+                temp.stream()
+                .filter(e -> courseId
+                        .equals(e.getCourseId())))
+                .collect(Collectors
+                        .toList()));
     }
 
     /**
