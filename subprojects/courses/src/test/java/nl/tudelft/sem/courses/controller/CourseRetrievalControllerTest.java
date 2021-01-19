@@ -98,9 +98,11 @@ public class CourseRetrievalControllerTest {
         wrongRequest = Mockito.mock(HttpServletRequest.class);
 
         when(courseRepository.findByCourseId(course.getCourseId())).thenReturn(course);
+        when(courseRepository.findByCourseId("randomCourseIdFail")).thenReturn(null);
         when(courseRepository.findByCourseName(course.getCourseName())).thenReturn(course);
         when(courseRepository.findAllByTeacherId(
                 course.getTeacherId())).thenReturn(List.of(course));
+        when(courseRepository.findAllByTeacherId("RandomTeacherId")).thenReturn(null);
 
         when(enrollmentRepository.findByCourseId(course.getCourseId())).thenReturn(enrollments);
 
@@ -126,6 +128,16 @@ public class CourseRetrievalControllerTest {
     @Test
     void getAllCoursesSuccess() {
         assertEquals(courseRepository.findAll(), courseController.getAllCourses().getBody());
+    }
+
+    @Test
+    void getCourseSucces() {
+        assertEquals(courseRepository.findByCourseId(course.getCourseId()), courseController.getCourse(course.getCourseId()).getBody());
+    }
+
+    @Test
+    void getCourseFail() {
+        assertNotEquals(courseRepository.findByCourseId(course.getCourseId()), courseController.getCourse("randomCourseIdFail").getBody());
     }
 
     @Test
