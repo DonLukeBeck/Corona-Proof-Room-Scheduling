@@ -1,8 +1,10 @@
 package nl.tudelft.sem.calendar.controllers;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -21,6 +23,7 @@ import nl.tudelft.sem.calendar.repositories.AttendanceRepository;
 import nl.tudelft.sem.calendar.repositories.LectureRepository;
 import nl.tudelft.sem.calendar.util.Validate;
 import nl.tudelft.sem.shared.Constants;
+import nl.tudelft.sem.shared.entity.BareCourse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -108,7 +111,7 @@ class TeacherRetrievalControllerTest {
                 .date(dates[0]).lectureId(1).build();
 
         Lecture lec2 = Lecture.builder().course(courses[1])
-                .roomId(rooms.get(1).getRoomId()).roomName(rooms.get(1).getName())
+                .roomId(rooms.get(1).getRoomId()).roomName(null)
                 .courseId(courses[1].getCourseId()).durationInMinutes(100)
                 .date(dates[0]).lectureId(2).build();
 
@@ -146,50 +149,62 @@ class TeacherRetrievalControllerTest {
             .thenReturn(lecturesToSchedule.get(1));
         when(lectureRepository.findByCourseId(lecturesToSchedule.get(1).getCourseId()))
             .thenReturn(Arrays.asList(lecturesToSchedule.get(1)));
+        when(lectureRepository.findByCourseId(null)).thenReturn(lecturesToSchedule.subList(0, 2));
         when(lectureRepository.findByDate(dates[0].plusDays(1)))
             .thenReturn(Arrays.asList(lecturesToSchedule.get(0), lecturesToSchedule.get(1)));
 
         when(roomCommunicator.getRoomName(lecturesToSchedule.get(0).getLectureId()))
             .thenReturn(lecturesToSchedule.get(0).getRoomName());
         when(roomCommunicator.getRoomName(lecturesToSchedule.get(1).getLectureId()))
-            .thenReturn(lecturesToSchedule.get(1).getRoomName());
+            .thenReturn("IZ - 2");
 
         when(lectureRepository.findByDateAndCourseId(any(), any()))
             .thenReturn(lecturesToSchedule.subList(0, 2));
-
+        when(lectureRepository.findByCourseIdAndDate(any(),any()))
+                .thenReturn(lecturesToSchedule.subList(0, 2));
         when(attendanceRepository.findByLectureIdAndStudentId(
                 lecturesToSchedule.get(0).getLectureId(), netIds[1]))
                 .thenReturn(attendances.subList(1, 2));
+
+        when(courseAdapter.coursesFromTeacher(any())).thenReturn(Arrays.asList(new BareCourse(),new BareCourse()));
     }
 
     @Test
     void testGetMyPersonalScheduleTeacherSuccess()
             throws InterruptedException, ServerErrorException, IOException {
-        List<Lecture> lectureList = new ArrayList<>();
-        assertEquals(ResponseEntity.ok(lectureList),
-                        retrievalController.getMyPersonalScheduleTeacher(teacherRequest));
+        assertEquals("<200 OK OK,[Lecture(lectureId=1, courseId=CSE1200, roomId=1, startTime=null, endTime=null, date=2020-12-17, durationInMinutes=90, course=Course(netIds=[mbjdegoede, cparlar], courseId=CSE1200, courseName=Web and Database, teacherId=teacher1), roomName=Class, selectedForOnCampus=true), Lecture(lectureId=2, courseId=CSE1500, roomId=2, startTime=null, endTime=null, date=2020-12-17, durationInMinutes=100, course=Course(netIds=[abobe], courseId=CSE1500, courseName=someCourse, teacherId=teacher2), roomName=IZ - 2, selectedForOnCampus=true), Lecture(lectureId=1, courseId=CSE1200, roomId=1, startTime=null, endTime=null, date=2020-12-17, durationInMinutes=90, course=Course(netIds=[mbjdegoede, cparlar], courseId=CSE1200, courseName=Web and Database, teacherId=teacher1), roomName=Class, selectedForOnCampus=true), Lecture(lectureId=2, courseId=CSE1500, roomId=2, startTime=null, endTime=null, date=2020-12-17, durationInMinutes=100, course=Course(netIds=[abobe], courseId=CSE1500, courseName=someCourse, teacherId=teacher2), roomName=IZ - 2, selectedForOnCampus=true)],[]>",retrievalController.getMyPersonalScheduleTeacher(teacherRequest).toString());
+
     }
 
     @Test
     void testGetMyPersonalScheduleTeacherAccessDenied()
             throws InterruptedException, ServerErrorException, IOException {
+        Lecture lec = mock(Lecture.class);
         assertEquals(ResponseEntity.ok(Constants.noAccessMessage),
                 retrievalController.getMyPersonalScheduleTeacher(wrongRequest));
+        Mockito.verify(lec, Mockito.never()).setSelectedForOnCampus(true);
+        Mockito.verify(lec, Mockito.never()).setRoomName("name");
     }
 
     @Test
     void testGetMyPersonalScheduleForDayTeacherSuccess()
             throws InterruptedException, ServerErrorException, IOException {
-        List<Lecture> lectureList = new ArrayList<>();
-        assertEquals(ResponseEntity.ok(lectureList),
-                retrievalController.getMyPersonalScheduleForDayTeacher(teacherRequest, dates[0]));
+        String sol = retrievalController.getMyPersonalScheduleForDayTeacher(teacherRequest,dates[0]).toString();
+        assertEquals("<200 OK OK,[Lecture(lectureId=1, courseId=CSE1200, roomId=1, startTime=null, endTime=null, date=2020-12-17, durationInMinutes=90, course=Course(netIds=[mbjdegoede, cparlar], courseId=CSE1200, courseName=Web and Database, teacherId=teacher1), roomName=Class, selectedForOnCampus=true), Lecture(lectureId=2, courseId=CSE1500, roomId=2, startTime=null, endTime=null, date=2020-12-17, durationInMinutes=100, course=Course(netIds=[abobe], courseId=CSE1500, courseName=someCourse, teacherId=teacher2), roomName=IZ - 2, selectedForOnCampus=true), Lecture(lectureId=1, courseId=CSE1200, roomId=1, startTime=null, endTime=null, date=2020-12-17, durationInMinutes=90, course=Course(netIds=[mbjdegoede, cparlar], courseId=CSE1200, courseName=Web and Database, teacherId=teacher1), roomName=Class, selectedForOnCampus=true), Lecture(lectureId=2, courseId=CSE1500, roomId=2, startTime=null, endTime=null, date=2020-12-17, durationInMinutes=100, course=Course(netIds=[abobe], courseId=CSE1500, courseName=someCourse, teacherId=teacher2), roomName=IZ - 2, selectedForOnCampus=true)],[]>"
+        ,sol);
     }
+
+
 
     @Test
     void testGetMyPersonalScheduleForDayTeacherAccessDenied()
             throws InterruptedException, ServerErrorException, IOException {
         assertEquals(ResponseEntity.ok(Constants.noAccessMessage),
                 retrievalController.getMyPersonalScheduleForDayTeacher(wrongRequest, dates[0]));
+        Lecture lec = mock(Lecture.class);
+        Mockito.verify(lec, Mockito.never()).setSelectedForOnCampus(true);
+        Mockito.verify(lec, Mockito.never()).setRoomName("name");
+
     }
 
     @Test
