@@ -1,8 +1,7 @@
 package nl.tudelft.sem.calendar.controllers;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -172,8 +171,11 @@ class TeacherRetrievalControllerTest {
     @Test
     void testGetMyPersonalScheduleTeacherSuccess()
             throws InterruptedException, ServerErrorException, IOException {
-        assertEquals("<200 OK OK,[Lecture(lectureId=1, courseId=CSE1200, roomId=1, startTime=null, endTime=null, date=2020-12-17, durationInMinutes=90, course=Course(netIds=[mbjdegoede, cparlar], courseId=CSE1200, courseName=Web and Database, teacherId=teacher1), roomName=Class, selectedForOnCampus=true), Lecture(lectureId=2, courseId=CSE1500, roomId=2, startTime=null, endTime=null, date=2020-12-17, durationInMinutes=100, course=Course(netIds=[abobe], courseId=CSE1500, courseName=someCourse, teacherId=teacher2), roomName=IZ - 2, selectedForOnCampus=true), Lecture(lectureId=1, courseId=CSE1200, roomId=1, startTime=null, endTime=null, date=2020-12-17, durationInMinutes=90, course=Course(netIds=[mbjdegoede, cparlar], courseId=CSE1200, courseName=Web and Database, teacherId=teacher1), roomName=Class, selectedForOnCampus=true), Lecture(lectureId=2, courseId=CSE1500, roomId=2, startTime=null, endTime=null, date=2020-12-17, durationInMinutes=100, course=Course(netIds=[abobe], courseId=CSE1500, courseName=someCourse, teacherId=teacher2), roomName=IZ - 2, selectedForOnCampus=true)],[]>",retrievalController.getMyPersonalScheduleTeacher(teacherRequest).toString());
-
+        List<Lecture> lectures = (List<Lecture>)(retrievalController.getMyPersonalScheduleTeacher(teacherRequest).getBody());
+        for(Lecture l :lectures) {
+            assertTrue(l.isSelectedForOnCampus());
+            assertNotNull(l.getRoomName());
+        }
     }
 
     @Test
@@ -189,9 +191,11 @@ class TeacherRetrievalControllerTest {
     @Test
     void testGetMyPersonalScheduleForDayTeacherSuccess()
             throws InterruptedException, ServerErrorException, IOException {
-        String sol = retrievalController.getMyPersonalScheduleForDayTeacher(teacherRequest,dates[0]).toString();
-        assertEquals("<200 OK OK,[Lecture(lectureId=1, courseId=CSE1200, roomId=1, startTime=null, endTime=null, date=2020-12-17, durationInMinutes=90, course=Course(netIds=[mbjdegoede, cparlar], courseId=CSE1200, courseName=Web and Database, teacherId=teacher1), roomName=Class, selectedForOnCampus=true), Lecture(lectureId=2, courseId=CSE1500, roomId=2, startTime=null, endTime=null, date=2020-12-17, durationInMinutes=100, course=Course(netIds=[abobe], courseId=CSE1500, courseName=someCourse, teacherId=teacher2), roomName=IZ - 2, selectedForOnCampus=true), Lecture(lectureId=1, courseId=CSE1200, roomId=1, startTime=null, endTime=null, date=2020-12-17, durationInMinutes=90, course=Course(netIds=[mbjdegoede, cparlar], courseId=CSE1200, courseName=Web and Database, teacherId=teacher1), roomName=Class, selectedForOnCampus=true), Lecture(lectureId=2, courseId=CSE1500, roomId=2, startTime=null, endTime=null, date=2020-12-17, durationInMinutes=100, course=Course(netIds=[abobe], courseId=CSE1500, courseName=someCourse, teacherId=teacher2), roomName=IZ - 2, selectedForOnCampus=true)],[]>"
-        ,sol);
+        List<Lecture> lectures = (List<Lecture>)retrievalController.getMyPersonalScheduleForDayTeacher(teacherRequest,dates[0]).getBody();
+        for(Lecture l: lectures) {
+            assertTrue(l.isSelectedForOnCampus());
+            assertNotNull(l.getRoomName());
+        }
     }
 
 
