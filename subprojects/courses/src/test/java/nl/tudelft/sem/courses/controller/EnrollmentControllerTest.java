@@ -1,20 +1,15 @@
 package nl.tudelft.sem.courses.controller;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
-import java.sql.Date;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import nl.tudelft.sem.courses.entity.Course;
 import nl.tudelft.sem.courses.entity.Enrollment;
-import nl.tudelft.sem.courses.entity.Lecture;
 import nl.tudelft.sem.courses.repository.CourseRepository;
 import nl.tudelft.sem.courses.repository.EnrollmentRepository;
-import nl.tudelft.sem.courses.repository.LectureRepository;
-import nl.tudelft.sem.shared.entity.BareLecture;
+import nl.tudelft.sem.shared.entity.BareEnrollment;
 import org.json.JSONException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -31,15 +26,14 @@ import org.springframework.test.context.ContextConfiguration;
 public class EnrollmentControllerTest {
 
     private Course course;
+    private Course course2;
     private EnrollmentController enrollmentController;
+    private List<BareEnrollment> bareEnrollments;
 
     @MockBean
     CourseRepository courseRepository;
     @MockBean
     EnrollmentRepository enrollmentRepository;
-    @MockBean
-    LectureRepository lectureRepository;
-
 
     /**
      * The initial setup before each test.
@@ -48,54 +42,39 @@ public class EnrollmentControllerTest {
     void setUp() throws JSONException {
 
         String courseId = "CSE1200";
+        String courseId2 = "anothercourse";
 
         Enrollment enrollment = new Enrollment();
         enrollment.setCourseId(courseId);
         enrollment.setStudentId("Henry");
+        Enrollment enrollment2 = new Enrollment();
+        enrollment.setCourseId(courseId2);
+        enrollment.setStudentId("OtherStudent");
         List<Enrollment> enrollments = new ArrayList<>();
         enrollments.add(enrollment);
-        List<String> participants = new ArrayList<>();
-        participants.add(enrollment.getStudentId());
+        enrollments.add(enrollment2);
         enrollmentRepository.save(enrollment);
+        enrollmentRepository.save(enrollment2);
+        bareEnrollments = new ArrayList<>();
+        bareEnrollments.add(new BareEnrollment(enrollment.getCourseId(), enrollment.getStudentId()));
+        bareEnrollments.add(new BareEnrollment(enrollment2.getCourseId(), enrollment2.getStudentId()));
+
 
         String courseName = "OOPP";
         String teacherId = "Andy";
 
-        this.course = new Course();
-        course.setCourseName(courseName);
-        course.setTeacherId(teacherId);
-        course.setCourseId(courseId);
+        String courseName2 = "NOTOOPP";
+        String teacherId2 = "NotAndy";
+
+        this.course = new Course(courseId, courseName, teacherId);
         courseRepository.save(course);
 
-        LocalDate localDate = LocalDate.of(2020, 1, 8);
-        Date sqlDate = Date.valueOf(localDate);
-        Lecture lecture = new Lecture();
-        lecture.setDuration(30);
-        lecture.setScheduledDate(sqlDate);
-        lecture.setCourseId(courseId);
-        BareLecture bareLecture = new BareLecture();
-        bareLecture.setDurationInMinutes(30);
-        bareLecture.setDate(localDate);
-        bareLecture.setCourseId(courseId);
-        List<Lecture> lectures = new ArrayList<>();
-        List<BareLecture> bareLectures = new ArrayList<>();
-        lectures.add(lecture);
-        bareLectures.add(bareLecture);
-        lectureRepository.save(lecture);
+        this.course2 = new Course(courseId2, courseName2, teacherId2);
+        courseRepository.save(course2);
 
         enrollmentController =
                 new EnrollmentController(enrollmentRepository);
-
-        when(courseRepository.findByCourseId(course.getCourseId())).thenReturn(course);
-        when(courseRepository.findByCourseName(course.getCourseName())).thenReturn(course);
-        when(courseRepository.findAllByTeacherId(course.getTeacherId()))
-                .thenReturn(List.of(course));
-        when(lectureRepository.findByCourseId(course.getCourseId())).thenReturn(lectures);
-        when(lectureRepository.findByCourseIdAndScheduledDate(course.getCourseId(),
-                Date.valueOf(localDate.plusDays(1)))).thenReturn(List.of(lecture));
-        LocalDate dt = localDate.minusDays(5);
-        Date sqldt = Date.valueOf(dt);
-        when(lectureRepository.findByScheduledDateAfter(sqldt)).thenReturn(lectures);
+        when(enrollmentRepository.findAll()).thenReturn(enrollments);
     }
 
     @Test
@@ -105,7 +84,7 @@ public class EnrollmentControllerTest {
 
     @Test
     void getAllEnrollmentsTest() {
-        assertEquals(enrollmentRepository.findAll(),
+        assertEquals(bareEnrollments,
                 enrollmentController.getAllEnrollments().getBody());
     }
 
@@ -114,4 +93,21 @@ public class EnrollmentControllerTest {
         assertEquals(enrollmentRepository.findByCourseId(course.getCourseId()),
                 enrollmentController.getEnrollmentsByCourse(course.getCourseId()).getBody());
     }
+
+    @Test
+    void GetEnrollmentsByCourseTest2() {
+        assertEquals(null, enrollmentController.getEnrollmentsByCourse(null).getBody());
+    }
+
+    @Test
+    void GetEnrollmentsByCourseTest3() {
+        assertEquals(enrollmentRepository.findByCourseId("randomCourseId"), enrollmentController.getEnrollmentsByCourse("randomCourseId").getBody());
+    }
+
+    @Test
+    void getEnrollmentsByCourseTest4() {
+        assertNotEquals(enrollmentRepository.findByCourseId(course.getCourseId()),
+                enrollmentController.getEnrollmentsByCourse(course2.getCourseId()).getBody());
+    }
+
 }

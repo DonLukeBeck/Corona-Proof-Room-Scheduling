@@ -1,7 +1,10 @@
 package nl.tudelft.sem.calendar.controllers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
@@ -21,6 +24,7 @@ import nl.tudelft.sem.calendar.repositories.AttendanceRepository;
 import nl.tudelft.sem.calendar.repositories.LectureRepository;
 import nl.tudelft.sem.calendar.util.Validate;
 import nl.tudelft.sem.shared.Constants;
+import nl.tudelft.sem.shared.entity.BareCourse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -108,7 +112,7 @@ class TeacherRetrievalControllerTest {
                 .date(dates[0]).lectureId(1).build();
 
         Lecture lec2 = Lecture.builder().course(courses[1])
-                .roomId(rooms.get(1).getRoomId()).roomName(rooms.get(1).getName())
+                .roomId(rooms.get(1).getRoomId()).roomName(null)
                 .courseId(courses[1].getCourseId()).durationInMinutes(100)
                 .date(dates[0]).lectureId(2).build();
 
@@ -146,50 +150,70 @@ class TeacherRetrievalControllerTest {
             .thenReturn(lecturesToSchedule.get(1));
         when(lectureRepository.findByCourseId(lecturesToSchedule.get(1).getCourseId()))
             .thenReturn(Arrays.asList(lecturesToSchedule.get(1)));
+        when(lectureRepository.findByCourseId(null)).thenReturn(lecturesToSchedule.subList(0, 2));
         when(lectureRepository.findByDate(dates[0].plusDays(1)))
             .thenReturn(Arrays.asList(lecturesToSchedule.get(0), lecturesToSchedule.get(1)));
 
         when(roomCommunicator.getRoomName(lecturesToSchedule.get(0).getLectureId()))
             .thenReturn(lecturesToSchedule.get(0).getRoomName());
         when(roomCommunicator.getRoomName(lecturesToSchedule.get(1).getLectureId()))
-            .thenReturn(lecturesToSchedule.get(1).getRoomName());
+            .thenReturn("IZ - 2");
 
         when(lectureRepository.findByDateAndCourseId(any(), any()))
             .thenReturn(lecturesToSchedule.subList(0, 2));
-
+        when(lectureRepository.findByCourseIdAndDate(any(), any()))
+                .thenReturn(lecturesToSchedule.subList(0, 2));
         when(attendanceRepository.findByLectureIdAndStudentId(
                 lecturesToSchedule.get(0).getLectureId(), netIds[1]))
                 .thenReturn(attendances.subList(1, 2));
+
+        when(courseAdapter.coursesFromTeacher(any()))
+                .thenReturn(Arrays.asList(new BareCourse(), new BareCourse()));
     }
 
     @Test
     void testGetMyPersonalScheduleTeacherSuccess()
             throws InterruptedException, ServerErrorException, IOException {
-        List<Lecture> lectureList = new ArrayList<>();
-        assertEquals(ResponseEntity.ok(lectureList),
-                        retrievalController.getMyPersonalScheduleTeacher(teacherRequest));
+        List<Lecture> lectures = (List<Lecture>) (retrievalController
+                .getMyPersonalScheduleTeacher(teacherRequest).getBody());
+        for (Lecture l : lectures) {
+            assertTrue(l.isSelectedForOnCampus());
+            assertNotNull(l.getRoomName());
+        }
     }
 
     @Test
     void testGetMyPersonalScheduleTeacherAccessDenied()
             throws InterruptedException, ServerErrorException, IOException {
+        Lecture lec = mock(Lecture.class);
         assertEquals(ResponseEntity.ok(Constants.noAccessMessage),
                 retrievalController.getMyPersonalScheduleTeacher(wrongRequest));
+        Mockito.verify(lec, Mockito.never()).setSelectedForOnCampus(true);
+        Mockito.verify(lec, Mockito.never()).setRoomName("name");
     }
 
     @Test
     void testGetMyPersonalScheduleForDayTeacherSuccess()
             throws InterruptedException, ServerErrorException, IOException {
-        List<Lecture> lectureList = new ArrayList<>();
-        assertEquals(ResponseEntity.ok(lectureList),
-                retrievalController.getMyPersonalScheduleForDayTeacher(teacherRequest, dates[0]));
+        List<Lecture> lectures = (List<Lecture>) retrievalController
+                .getMyPersonalScheduleForDayTeacher(teacherRequest, dates[0]).getBody();
+        for (Lecture l : lectures) {
+            assertTrue(l.isSelectedForOnCampus());
+            assertNotNull(l.getRoomName());
+        }
     }
+
+
 
     @Test
     void testGetMyPersonalScheduleForDayTeacherAccessDenied()
             throws InterruptedException, ServerErrorException, IOException {
         assertEquals(ResponseEntity.ok(Constants.noAccessMessage),
                 retrievalController.getMyPersonalScheduleForDayTeacher(wrongRequest, dates[0]));
+        Lecture lec = mock(Lecture.class);
+        Mockito.verify(lec, Mockito.never()).setSelectedForOnCampus(true);
+        Mockito.verify(lec, Mockito.never()).setRoomName("name");
+
     }
 
     @Test

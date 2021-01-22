@@ -2,12 +2,15 @@
 package nl.tudelft.sem.courses.controller;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.sql.Date;
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
@@ -45,9 +48,6 @@ public class LectureRetrievalControllerTest {
     private LocalDate localDate;
     private List<BareLecture> bareLectures;
     private LocalDate dt;
-    private HttpServletRequest request;
-    private HttpServletRequest wrongRequest;
-
     private LectureRetrievalController lectureController;
 
     @MockBean
@@ -56,6 +56,7 @@ public class LectureRetrievalControllerTest {
     EnrollmentRepository enrollmentRepository;
     @MockBean
     LectureRepository lectureRepository;
+
     @MockBean
     Validate validate;
 
@@ -65,26 +66,6 @@ public class LectureRetrievalControllerTest {
     @BeforeEach
     void setUp() throws JSONException, IOException, InterruptedException {
         String courseId = "CSE1200";
-        Enrollment enrollment = new Enrollment();
-        enrollment.setCourseId(courseId);
-        enrollment.setStudentId("Henry");
-        List<Enrollment> enrollments = new ArrayList<>();
-        enrollments.add(enrollment);
-        List<String> participants = new ArrayList<>();
-        participants.add(enrollment.getStudentId());
-        enrollmentRepository.save(enrollment);
-
-        String courseName = "OOPP";
-        String teacherId = "Andy";
-
-        Course course = new Course();
-        course.setCourseName(courseName);
-        course.setTeacherId(teacherId);
-        course.setCourseId(courseId);
-        courseRepository.save(course);
-
-        request = Mockito.mock(HttpServletRequest.class);
-        wrongRequest = Mockito.mock(HttpServletRequest.class);
 
         localDate = LocalDate.of(2020, 1, 8);
         Date sqlDate = Date.valueOf(localDate);
@@ -106,21 +87,12 @@ public class LectureRetrievalControllerTest {
         lectureController =
                 new LectureRetrievalController(lectureRepository);
 
-        when(courseRepository.findByCourseId(course.getCourseId())).thenReturn(course);
-        when(courseRepository.findByCourseName(course.getCourseName())).thenReturn(course);
-        when(courseRepository.findAllByTeacherId(course.getTeacherId()))
-                .thenReturn(List.of(course));
-        when(lectureRepository.findByCourseId(course.getCourseId())).thenReturn(lectures);
-        when(lectureRepository.findByCourseIdAndScheduledDate(course.getCourseId(),
-                Date.valueOf(localDate.plusDays(1)))).thenReturn(List.of(lecture));
+
         dt = localDate.minusDays(5);
         Date sqldt = Date.valueOf(dt);
         when(lectureRepository.findByScheduledDateAfter(sqldt)).thenReturn(lectures);
-
-        when(validate.validateRole(request, "teacher"))
-                .thenReturn("netid");
-        when(validate.validateRole(wrongRequest, "teacher"))
-                .thenReturn(Constants.noAccessMessage.getMessage());
+        when(lectureRepository.findByScheduledDateAfter(null)).thenReturn(null);
+        when(lectureRepository.findAll()).thenReturn(lectures);
     }
 
     @Test
@@ -131,7 +103,8 @@ public class LectureRetrievalControllerTest {
 
     @Test
     void getAllLectures() {
-        assertEquals(lectureRepository.findAll(), lectureController.getAllLectures().getBody());
+        assertEquals(bareLectures
+                , lectureController.getAllLectures().getBody());
     }
 
     @Test
@@ -141,5 +114,18 @@ public class LectureRetrievalControllerTest {
         for (BareLecture l : list) {
             assert (bareLectures.contains(l));
         }
+    }
+
+    @Test
+    void getLecturesAfterDateNoDate() {
+        assertEquals(null, lectureController.getLecturesAfterDate(null).getBody());
+    }
+
+    @Test
+    void getLecturesAfterDateWrongDate() {
+        dt = localDate.plusYears(5);
+        List<BareLecture> list =
+                (List<BareLecture>) lectureController.getLecturesAfterDate(dt).getBody();
+        assertEquals(0, list.size());
     }
 }
